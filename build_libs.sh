@@ -106,7 +106,7 @@ fi
 git clone git://projects.vdr-developer.org/$PKG.git
 cd $PKG
 git checkout df-osd-handling+alter-vdpau-h264-decoder
-patch -p1 < ../patches/xinelib_20111210.patch
+patch -p1 < ../patches/xinelib_20111212.patch
 ./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
 make
 sudo make install
