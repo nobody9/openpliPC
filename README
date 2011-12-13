@@ -1,25 +1,51 @@
+******************************
+openpliPC project by nobody9
+******************************
+December, 2011
 
-To start
+Main thread discussion:
+http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2-on-ubuntu-104-32-bit/
 
+
+
+------------------------------
+BUILDING openpliPC
+------------------------------
+
+1) ONCE download openpliPC git repo as local user (not root):
+git clone https://github.com/nobody9/openpliPC.git
+
+2) cd openpliPC/
+
+2a optional) To keep in sync git repo:
+git pull https://github.com/nobody9/openpliPC.git
+
+3) Building needed libraries, execute ONCE:
 ./build_libs.sh
+it download, build and install all needed libraries
 
-it donwload, build and install all needed libraries and programs.
-
-To build enigma2
-
+4) Build Enigma2:
 ./build_enigma2.sh 
 
-it get the openpli enigma2 source code,patchit, compile and Install.
+it fetch the openpli Enigma2 source code, patch it, compile and install.
+some tasks require root access (sudo). you will be asked for your password.
+
+------------------------------
+Where is Enigma2 ?
+------------------------------
+
 Enigma2 will be installed in /usr/local,
 also the script copy´s example configs to /usr/local/etc/enigma2.
 the hole /proc/stb directory are located at /usr/local/etc/tuxbox/stb.
 
-Start enigma2:
+------------------------------
+Howto start enigma2:
+------------------------------
 
 sudo /usr/local/bin/enigma2
 
 
-
+------------------------------
 Informations:
 
 with xine_vdpau i get osd, video (SD and HD) and sound,
