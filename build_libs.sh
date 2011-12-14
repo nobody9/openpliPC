@@ -2,6 +2,9 @@
 #To build enigma2 on Ubuntu 10.10 32/64bit
 #Install these packages:
 #
+XINELIB_REF="04255996be730b37f80aa95a32c60636b827a8ba"
+XINELIB_PATCH="xinelib_20111214a.patch"
+#
 echo "-----------------------------------------"
 echo "*** INSTALL REQUIRED PACKAGES ***"
 echo "-----------------------------------------"
@@ -13,6 +16,7 @@ REQPKG="autoconf automake build-essential gettext subversion mercurial git autop
 	libvdpau-dev vdpau-va-driver \
 	libcdio-dev libvcdinfo-dev \
 	libavcodec-dev libpostproc-dev libnl2-dev \
+	python-setuptools \
 	"
 
 for p in $REQPKG; do
@@ -88,10 +92,20 @@ make
 sudo make install
 cd ..
 
-#git clone git://git.berlios.de/pythonwifi
-#cd pythonwifi
-#sudo python setup.py install
-#cd ..
+#Build and install pythonwifi:
+PKG="pythonwifi"
+echo "-----------------------------------------"
+echo "Build and install $PKG"
+echo "-----------------------------------------"
+if [ -d $PKG ]; then
+	echo "Erasing older build dir"
+	rm -Rf $PKG
+	rm -f $PKG*
+fi
+git clone git://git.berlios.de/$PKG
+cd $PKG
+sudo python setup.py install
+cd ..
 
 #Build and install xine-lib:
 PKG="xine-lib"
@@ -105,8 +119,9 @@ if [ -d $PKG ]; then
 fi
 git clone git://projects.vdr-developer.org/$PKG.git
 cd $PKG
-git checkout df-osd-handling+alter-vdpau-h264-decoder
-patch -p1 < ../patches/xinelib_20111212.patch
+#git checkout df-osd-handling+alter-vdpau-h264-decoder
+git checkout $XINELIB_REF
+patch -p1 < ../patches/$XINELIB_PATCH
 ./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
 make
 sudo make install
