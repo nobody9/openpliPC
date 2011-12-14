@@ -11,6 +11,7 @@ Tested on
 ------------------------------
 Ubuntu 10.04 32 bit
 Ubuntu 10.10 32 and 64 bit
+Ubuntu 10.10 32 and 64 bit as VMware virtual machine guest (OSX Lion 64 bit host)
 Ubuntu 11.10 32 and 64 bit
 Ubuntu 11.10 32 bit as VMware virtual machine guest (Win7 64 bit host)
 
@@ -48,9 +49,9 @@ Some tasks require root access (sudo). You will be asked for your password.
 Where is Enigma2 ?
 ------------------------------
 
-Enigma2 will be installed in /usr/local
-Example configs in /usr/local/etc/enigma2
-The hole /proc/stb directory are located at /usr/local/etc/tuxbox/stb
+Enigma2 will be installed in /usr/local/e2
+Example configs in /usr/local/e2/etc/enigma2
+The hole /proc/stb directory are located at /usr/local/e2/etc/tuxbox/stb
 
 
 ------------------------------
@@ -58,7 +59,7 @@ Run enigma2
 ------------------------------
 
 Enigma2 requires to be launched as root user:
-sudo /usr/local/bin/enigma2
+sudo /usr/local/e2/bin/enigma2
 
 If you are concerned about security, build and run Enigma2 in a Virtual Machine
 
@@ -85,7 +86,7 @@ EPG     ->  F6
 POWER   ->  F10
 
 3)
-Default NIM is configured in /usr/local/etc/tuxbox/nim_sockets
+Default NIM is configured in /usr/local/e2/etc/tuxbox/nim_sockets
 NIM Socket 0:
             Type: DVB-S2
             Name: VTUNER
@@ -101,10 +102,10 @@ NIM Socket 0:
             Frontend_Device: 0
 
 4)
-Adding plugin , extensione or skins 
-put plugins in /usr/local/lib/enigma2/python/Plugins/SystemPlugins
-put extensions in /usr/local/lib/enigma2/python/Plugins/Extensions
-put skin in /usr/local/share/enigma2
+Adding systemplugins , extensions or skins 
+put systemplugins in /usr/local/e2/lib/enigma2/python/Plugins/SystemPlugins
+put extensions in /usr/local/e2/lib/enigma2/python/Plugins/Extensions
+put skin in /usr/local/e2/share/enigma2
 
 
 ------------------------------

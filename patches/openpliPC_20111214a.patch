@@ -2666,11 +2666,11 @@ diff -Naur enigma2.ori/lib/driver/misc_options.cpp enigma2/lib/driver/misc_optio
  	if (state == m_12V_output_state)
  		return 0;
 -	int fd = open("/proc/stb/misc/12V_output", O_WRONLY);
-+	int fd = open("/usr/local/etc/stb/misc/12V_output", O_WRONLY);
++	int fd = open("/usr/local/e2/etc/stb/misc/12V_output", O_WRONLY);
  	if (fd < 0)
  	{
 -		eDebug("couldn't open /proc/stb/misc/12V_output");
-+		eDebug("couldn't open /usr/local/etc/stb/misc/12V_output");
++		eDebug("couldn't open /usr/local/e2/etc/stb/misc/12V_output");
  		return -1;
  	}
  	const char *str=0;
@@ -2679,11 +2679,11 @@ diff -Naur enigma2.ori/lib/driver/misc_options.cpp enigma2/lib/driver/misc_optio
  bool Misc_Options::detected_12V_output()
  {
 -	int fd = open("/proc/stb/misc/12V_output", O_WRONLY);
-+	int fd = open("/usr/local/etc/stb/misc/12V_output", O_WRONLY);
++	int fd = open("/usr/local/e2/etc/stb/misc/12V_output", O_WRONLY);
  	if (fd < 0)
  	{
 -		eDebug("couldn't open /proc/stb/misc/12V_output");
-+		eDebug("couldn't open /usr/local/etc/stb/misc/12V_output");
++		eDebug("couldn't open /usr/local/e2/etc/stb/misc/12V_output");
  		return false;
  	}
  	close(fd);
@@ -4368,7 +4368,7 @@ diff -Naur enigma2.ori/lib/dvb/decoder.cpp enigma2/lib/dvb/decoder.cpp
  	if (delay != m_pcm_delay )
  	{
 -		FILE *fp = fopen("/proc/stb/audio/audio_delay_pcm", "w");
-+		FILE *fp = fopen("/usr/local/etc/stb/audio/audio_delay_pcm", "w");
++		FILE *fp = fopen("/usr/local/e2/etc/stb/audio/audio_delay_pcm", "w");
  		if (fp)
  		{
  			fprintf(fp, "%x", delay*90);
@@ -4377,7 +4377,7 @@ diff -Naur enigma2.ori/lib/dvb/decoder.cpp enigma2/lib/dvb/decoder.cpp
  	if ( delay != m_ac3_delay )
  	{
 -		FILE *fp = fopen("/proc/stb/audio/audio_delay_bitstream", "w");
-+		FILE *fp = fopen("/usr/local/etc/stb/audio/audio_delay_bitstream", "w");
++		FILE *fp = fopen("/usr/local/e2/etc/stb/audio/audio_delay_bitstream", "w");
  		if (fp)
  		{
  			fprintf(fp, "%x", delay*90);
@@ -4895,7 +4895,7 @@ diff -Naur enigma2.ori/lib/dvb/decsa.cpp enigma2/lib/dvb/decsa.cpp
 +
 diff -Naur enigma2.ori/lib/dvb/decsa.h enigma2/lib/dvb/decsa.h
 --- enigma2.ori/lib/dvb/decsa.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/dvb/decsa.h	2011-12-14 02:02:07.000000000 +0100
++++ enigma2/lib/dvb/decsa.h	2011-12-14 12:03:39.000000000 +0100
 @@ -0,0 +1,47 @@
 +#ifndef __dvb_decsa_h
 +#define __dvb_decsa_h
@@ -4911,7 +4911,7 @@ diff -Naur enigma2.ori/lib/dvb/decsa.h enigma2/lib/dvb/decsa.h
 +#define TS_SYNC_BYTE     0x47
 +
 +#define MAX_REL_WAIT 100 // time to wait if key in used on set
-+#define MAX_KEY_WAIT 500 // time to wait if key not ready on change
++#define MAX_KEY_WAIT 200 // time to wait if key not ready on change
 +
 +#define MAX_CSA_PIDS 8192
 +#define MAX_CSA_IDX  16
@@ -5498,7 +5498,7 @@ diff -Naur enigma2.ori/lib/dvb/dvb.cpp enigma2/lib/dvb/dvb.cpp
  	}
  
 -	int fd = open("/proc/stb/info/model", O_RDONLY);
-+	int fd = open("/usr/local/etc/stb/info/model", O_RDONLY);
++	int fd = open("/usr/local/e2/etc/stb/info/model", O_RDONLY);
  	char tmp[16];
  	int rd = fd >= 0 ? read(fd, tmp, sizeof(tmp)) : 0;
  	if (fd >= 0)
@@ -5507,7 +5507,7 @@ diff -Naur enigma2.ori/lib/dvb/dvb.cpp enigma2/lib/dvb/dvb.cpp
  		m_boxtype = DM7020HD;
  	else {
 -		eDebug("boxtype detection via /proc/stb/info not possible... use fallback via demux count!\n");
-+		eDebug("boxtype detection via /usr/local/etc/stb/info not possible... use fallback via demux count!\n");
++		eDebug("boxtype detection via /usr/local/e2/etc/stb/info not possible... use fallback via demux count!\n");
  		if (m_demux.size() == 3)
  			m_boxtype = DM800;
  		else if (m_demux.size() < 5)
@@ -5667,14 +5667,14 @@ diff -Naur enigma2.ori/lib/dvb/dvbtime.cpp enigma2/lib/dvb/dvbtime.cpp
  void setRTC(time_t time)
  {
 -	FILE *f = fopen("/proc/stb/fp/rtc", "w");
-+	FILE *f = fopen("/usr/local/etc/stb/fp/rtc", "w");
++	FILE *f = fopen("/usr/local/e2/etc/stb/fp/rtc", "w");
  	if (f)
  	{
  		if (fprintf(f, "%u", (unsigned int)time))
  			prev_time = time;
  		else
 -			eDebug("write /proc/stb/fp/rtc failed (%m)");
-+			eDebug("write /usr/local/etc/stb/fp/rtc failed (%m)");
++			eDebug("write /usr/local/e2/etc/stb/fp/rtc failed (%m)");
  		fclose(f);
  	}
  	else
@@ -5683,14 +5683,14 @@ diff -Naur enigma2.ori/lib/dvb/dvbtime.cpp enigma2/lib/dvb/dvbtime.cpp
  {
  	time_t rtc_time=0;
 -	FILE *f = fopen("/proc/stb/fp/rtc", "r");
-+	FILE *f = fopen("/usr/local/etc/stb/fp/rtc", "r");
++	FILE *f = fopen("/usr/local/e2/etc/stb/fp/rtc", "r");
  	if (f)
  	{
  		// sanity check to detect corrupt atmel firmware
  		unsigned int tmp;
  		if (fscanf(f, "%u", &tmp) != 1)
 -			eDebug("read /proc/stb/fp/rtc failed (%m)");
-+			eDebug("read /usr/local/etc/stb/fp/rtc failed (%m)");
++			eDebug("read /usr/local/e2/etc/stb/fp/rtc failed (%m)");
  		else
  			rtc_time=tmp;
  		fclose(f);
@@ -5703,8 +5703,8 @@ diff -Naur enigma2.ori/lib/dvb/frontend.cpp enigma2/lib/dvb/frontend.cpp
  	char proc_name2[64];
 -	sprintf(proc_name, "/proc/stb/frontend/%d/lnb_sense", m_slotid);
 -	sprintf(proc_name2, "/proc/stb/fp/lnb_sense%d", m_slotid);
-+	sprintf(proc_name, "/usr/local/etc/stb/frontend/%d/lnb_sense", m_slotid);
-+	sprintf(proc_name2, "/usr/local/etc/stb/fp/lnb_sense%d", m_slotid);
++	sprintf(proc_name, "/usr/local/e2/etc/stb/frontend/%d/lnb_sense", m_slotid);
++	sprintf(proc_name2, "/usr/local/e2/etc/stb/fp/lnb_sense%d", m_slotid);
  	FILE *f;
  	if ((f=fopen(proc_name, "r")) || (f=fopen(proc_name2, "r")))
  	{
@@ -5713,7 +5713,7 @@ diff -Naur enigma2.ori/lib/dvb/frontend.cpp enigma2/lib/dvb/frontend.cpp
  				{
  					char proc_name[64];
 -					sprintf(proc_name, "/proc/stb/frontend/%d/static_current_limiting", sec_fe->m_dvbid);
-+					sprintf(proc_name, "/usr/local/etc/stb/frontend/%d/static_current_limiting", sec_fe->m_dvbid);
++					sprintf(proc_name, "/usr/local/e2/etc/stb/frontend/%d/static_current_limiting", sec_fe->m_dvbid);
  					FILE *f=fopen(proc_name, "w");
  					if (f) // new interface exist?
  					{
@@ -6061,7 +6061,7 @@ diff -Naur enigma2.ori/lib/dvb_ci/dvbci.cpp enigma2/lib/dvb_ci/dvbci.cpp
  	{
  		char buf[64];
 -		snprintf(buf, 64, "/proc/stb/tsmux/input%d", tuner_no);
-+		snprintf(buf, 64, "/usr/local/etc/stb/tsmux/input%d", tuner_no);
++		snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/input%d", tuner_no);
  
  		FILE *input=0;
  		if((input = fopen(buf, "wb")) == NULL) {
@@ -6070,7 +6070,7 @@ diff -Naur enigma2.ori/lib/dvb_ci/dvbci.cpp enigma2/lib/dvb_ci/dvbci.cpp
  	{
  		char buf[64];
 -		snprintf(buf, 64, "/proc/stb/tsmux/input%d", tuner_no);
-+		snprintf(buf, 64, "/usr/local/etc/stb/tsmux/input%d", tuner_no);
++		snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/input%d", tuner_no);
  
  		if (tuner_no > 1)
  			eDebug("setInputSource(%d, %d) failed... dm7025 just have two inputs", tuner_no, (int)source);
@@ -6079,7 +6079,7 @@ diff -Naur enigma2.ori/lib/dvb_ci/dvbci.cpp enigma2/lib/dvb_ci/dvbci.cpp
  	{
  		char buf[64];
 -		snprintf(buf, 64, "/proc/stb/tsmux/ci%d_input", slotid);
-+		snprintf(buf, 64, "/usr/local/etc/stb/tsmux/ci%d_input", slotid);
++		snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/ci%d_input", slotid);
  		FILE *ci = fopen(buf, "wb");
  		switch(source)
  		{
@@ -6088,10 +6088,10 @@ diff -Naur enigma2.ori/lib/dvb_ci/dvbci.cpp enigma2/lib/dvb_ci/dvbci.cpp
  //		eDebug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
  //		eDebug("eDVBCISlot::enableTS(%d %d)", enable, (int)source);
 -		FILE *ci = fopen("/proc/stb/tsmux/input2", "wb");
-+		FILE *ci = fopen("/usr/local/etc/stb/tsmux/input2", "wb");
++		FILE *ci = fopen("/usr/local/e2/etc/stb/tsmux/input2", "wb");
  		if(ci == NULL) {
 -			eDebug("cannot open /proc/stb/tsmux/input2");
-+			eDebug("cannot open /usr/local/etc/stb/tsmux/input2");
++			eDebug("cannot open /usr/local/e2/etc/stb/tsmux/input2");
  			return 0;
  		}
  		if (source != TUNER_A && source != TUNER_B)
@@ -6100,7 +6100,7 @@ diff -Naur enigma2.ori/lib/dvb_ci/dvbci.cpp enigma2/lib/dvb_ci/dvbci.cpp
  {
  	char buf[64];
 -	snprintf(buf, 64, "/proc/stb/tsmux/ci%d_tsclk", slotid);
-+	snprintf(buf, 64, "/usr/local/etc/stb/tsmux/ci%d_tsclk", slotid);
++	snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/ci%d_tsclk", slotid);
  	FILE *ci = fopen(buf, "wb");
  	if (ci)
  	{
@@ -6583,8 +6583,8 @@ diff -Naur enigma2.ori/lib/gdi/lcd.cpp enigma2/lib/gdi/lcd.cpp
  	{
 -		if (!access("/proc/stb/lcd/oled_brightness", W_OK) ||
 -		    !access("/proc/stb/fp/oled_brightness", W_OK) )
-+		if (!access("/usr/local/etc/stb/lcd/oled_brightness", W_OK) ||
-+		    !access("/usr/local/etc/stb/fp/oled_brightness", W_OK) )
++		if (!access("/usr/local/e2/etc/stb/lcd/oled_brightness", W_OK) ||
++		    !access("/usr/local/e2/etc/stb/fp/oled_brightness", W_OK) )
  			is_oled = 2;
  		lcdfd = open("/dev/dbox/lcd0", O_RDWR);
  	} else
@@ -6593,7 +6593,7 @@ diff -Naur enigma2.ori/lib/gdi/lcd.cpp enigma2/lib/gdi/lcd.cpp
  		ioctl(lcdfd, LCD_IOCTL_ASC_MODE, &i);
  		inverted=0;
 -		FILE *f = fopen("/proc/stb/lcd/xres", "r");
-+		FILE *f = fopen("/usr/local/etc/stb/lcd/xres", "r");
++		FILE *f = fopen("/usr/local/e2/etc/stb/lcd/xres", "r");
  		if (f)
  		{
  			int tmp;
@@ -6601,14 +6601,14 @@ diff -Naur enigma2.ori/lib/gdi/lcd.cpp enigma2/lib/gdi/lcd.cpp
  				xres = tmp;
  			fclose(f);
 -			f = fopen("/proc/stb/lcd/yres", "r");
-+			f = fopen("/usr/local/etc/stb/lcd/yres", "r");
++			f = fopen("/usr/local/e2/etc/stb/lcd/yres", "r");
  			if (f)
  			{
  				if (fscanf(f, "%x", &tmp) == 1)
  					yres = tmp;
  				fclose(f);
 -				f = fopen("/proc/stb/lcd/bpp", "r");
-+				f = fopen("/usr/local/etc/stb/lcd/bpp", "r");
++				f = fopen("/usr/local/e2/etc/stb/lcd/bpp", "r");
  				if (f)
  				{
  					if (fscanf(f, "%x", &tmp) == 1)
@@ -6617,15 +6617,15 @@ diff -Naur enigma2.ori/lib/gdi/lcd.cpp enigma2/lib/gdi/lcd.cpp
  #ifndef NO_LCD
  	eDebug("setLCDBrightness %d", brightness);
 -	FILE *f=fopen("/proc/stb/lcd/oled_brightness", "w");
-+	FILE *f=fopen("/usr/local/etc/stb/lcd/oled_brightness", "w");
++	FILE *f=fopen("/usr/local/e2/etc/stb/lcd/oled_brightness", "w");
  	if (!f)
 -		f = fopen("/proc/stb/fp/oled_brightness", "w");
-+		f = fopen("/usr/local/etc/stb/fp/oled_brightness", "w");
++		f = fopen("/usr/local/e2/etc/stb/fp/oled_brightness", "w");
  	if (f)
  	{
  		if (fprintf(f, "%d", brightness) == 0)
 -			eDebug("write /proc/stb/lcd/oled_brightness failed!! (%m)");
-+			eDebug("write /usr/local/etc/stb/lcd/oled_brightness failed!! (%m)");
++			eDebug("write /usr/local/e2/etc/stb/lcd/oled_brightness failed!! (%m)");
  		fclose(f);
  	}
  	else
@@ -7451,7 +7451,7 @@ diff -Naur enigma2.ori/lib/python/Components/AVSwitch.py enigma2/lib/python/Comp
  		elif valstr == "16_9": # auto ... 4:3 or 16:9
  			try:
 -				aspect_str = open("/proc/stb/vmpeg/0/aspect", "r").read()
-+				aspect_str = open("/usr/local/etc/stb/vmpeg/0/aspect", "r").read()
++				aspect_str = open("/usr/local/e2/etc/stb/vmpeg/0/aspect", "r").read()
  				if aspect_str == "1": # 4:3
  					return (4,3)
  			except IOError:
@@ -7485,7 +7485,7 @@ diff -Naur enigma2.ori/lib/python/Components/AVSwitch.py enigma2/lib/python/Comp
  
  	try:
 -		can_downmix = open("/proc/stb/audio/ac3_choices", "r").read()[:-1].find("downmix") != -1
-+		can_downmix = open("/usr/local/etc/stb/audio/ac3_choices", "r").read()[:-1].find("downmix") != -1
++		can_downmix = open("/usr/local/e2/etc/stb/audio/ac3_choices", "r").read()[:-1].find("downmix") != -1
  	except:
  		can_downmix = False
  
@@ -7493,7 +7493,7 @@ diff -Naur enigma2.ori/lib/python/Components/AVSwitch.py enigma2/lib/python/Comp
  	if can_downmix:
  		def setAC3Downmix(configElement):
 -			open("/proc/stb/audio/ac3", "w").write(configElement.value and "downmix" or "passthrough")
-+			open("/usr/local/etc/stb/audio/ac3", "w").write(configElement.value and "downmix" or "passthrough")
++			open("/usr/local/e2/etc/stb/audio/ac3", "w").write(configElement.value and "downmix" or "passthrough")
  		config.av.downmix_ac3 = ConfigYesNo(default = True)
  		config.av.downmix_ac3.addNotifier(setAC3Downmix)
  
@@ -7502,7 +7502,7 @@ diff -Naur enigma2.ori/lib/python/Components/AVSwitch.py enigma2/lib/python/Comp
  
  	try:
 -		can_osd_alpha = open("/proc/stb/video/alpha", "r") and True or False
-+		can_osd_alpha = open("/usr/local/etc/stb/video/alpha", "r") and True or False
++		can_osd_alpha = open("/usr/local/e2/etc/stb/video/alpha", "r") and True or False
  	except:
  		can_osd_alpha = False
  
@@ -7510,22 +7510,22 @@ diff -Naur enigma2.ori/lib/python/Components/AVSwitch.py enigma2/lib/python/Comp
  
  	def setAlpha(config):
 -		open("/proc/stb/video/alpha", "w").write(str(config.value))
-+		open("/usr/local/etc/stb/video/alpha", "w").write(str(config.value))
++		open("/usr/local/e2/etc/stb/video/alpha", "w").write(str(config.value))
  
  	if can_osd_alpha:
  		config.av.osd_alpha = ConfigSlider(default=255, limits=(0,255))
  		config.av.osd_alpha.addNotifier(setAlpha)
  
 -	if os.path.exists("/proc/stb/vmpeg/0/pep_scaler_sharpness"):
-+	if os.path.exists("/usr/local/etc/stb/vmpeg/0/pep_scaler_sharpness"):
++	if os.path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness"):
  		def setScaler_sharpness(config):
  			myval = int(config.value)
  			try:
  				print "--> setting scaler_sharpness to: %0.8X" % myval
 -				open("/proc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
 -				open("/proc/stb/vmpeg/0/pep_apply", "w").write("1")
-+				open("/usr/local/etc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
-+				open("/usr/local/etc/stb/vmpeg/0/pep_apply", "w").write("1")
++				open("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
++				open("/usr/local/e2/etc/stb/vmpeg/0/pep_apply", "w").write("1")
  			except IOError:
  				print "couldn't write pep_scaler_sharpness"
  
@@ -7716,6 +7716,20 @@ diff -Naur enigma2.ori/lib/python/Components/Harddisk.py enigma2/lib/python/Comp
  		# Find stuff not detected by the enumeration
  		p = (
  			("/media/hdd", _("Harddisk")),
+diff -Naur enigma2.ori/lib/python/Components/InputDevice.py enigma2/lib/python/Components/InputDevice.py
+--- enigma2.ori/lib/python/Components/InputDevice.py	2011-12-14 02:00:09.000000000 +0100
++++ enigma2/lib/python/Components/InputDevice.py	2011-12-14 13:11:52.000000000 +0100
+@@ -8,8 +8,8 @@
+ # asm-generic/ioctl.h
+ IOC_NRBITS = 8L
+ IOC_TYPEBITS = 8L
+-IOC_SIZEBITS = 13L
+-IOC_DIRBITS = 3L
++IOC_SIZEBITS = 14L
++IOC_DIRBITS = 2L
+ 
+ IOC_NRSHIFT = 0L
+ IOC_TYPESHIFT = IOC_NRSHIFT+IOC_NRBITS
 diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Components/NimManager.py
 --- enigma2.ori/lib/python/Components/NimManager.py	2011-12-14 02:00:09.000000000 +0100
 +++ enigma2/lib/python/Components/NimManager.py	2011-12-14 02:02:07.000000000 +0100
@@ -7724,13 +7738,13 @@ diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Co
  		if self.internally_connectable is not None:
  			print "setting internal link on frontend id", self.frontend_id
 -			open("/proc/stb/frontend/%d/rf_switch" % self.frontend_id, "w").write("internal")
-+			open("/usr/local/etc/stb/frontend/%d/rf_switch" % self.frontend_id, "w").write("internal")
++			open("/usr/local/e2/etc/stb/frontend/%d/rf_switch" % self.frontend_id, "w").write("internal")
  		
  	def removeInternalLink(self):
  		if self.internally_connectable is not None:
  			print "removing internal link on frontend id", self.frontend_id
 -			open("/proc/stb/frontend/%d/rf_switch" % self.frontend_id, "w").write("external")
-+			open("/usr/local/etc/stb/frontend/%d/rf_switch" % self.frontend_id, "w").write("external")
++			open("/usr/local/e2/etc/stb/frontend/%d/rf_switch" % self.frontend_id, "w").write("external")
  	
  	def isMultiType(self):
  		return (len(self.multi_type) > 0)
@@ -7739,10 +7753,10 @@ diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Co
  
  	def enumerateNIMs(self):
 -		# enum available NIMs. This is currently very dreambox-centric and uses the /proc/bus/nim_sockets interface.
-+		# enum available NIMs. This is currently very dreambox-centric and uses the /usr/local/etc/tuxbox/nim_sockets interface.
++		# enum available NIMs. This is currently very dreambox-centric and uses the /usr/local/e2/etc/tuxbox/nim_sockets interface.
  		# the result will be stored into nim_slots.
 -		# the content of /proc/bus/nim_sockets looks like:
-+		# the content of /usr/local/etc/tuxbox/nim_sockets looks like:
++		# the content of /usr/local/e2/etc/tuxbox/nim_sockets looks like:
  		# NIM Socket 0:
  		#          Type: DVB-S
  		#          Name: BCM4501 DVB-S2 NIM (internal)
@@ -7751,7 +7765,7 @@ diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Co
  
  		try:
 -			nimfile = open("/proc/bus/nim_sockets")
-+			nimfile = open("/usr/local/etc/tuxbox/nim_sockets")
++			nimfile = open("/usr/local/e2/etc/tuxbox/nim_sockets")
  		except IOError:
  			return
  
@@ -7760,7 +7774,7 @@ diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Co
  				entry["has_outputs"] = True
  			if entry.has_key("frontend_device"): # check if internally connectable
 -				if path.exists("/proc/stb/frontend/%d/rf_switch" % entry["frontend_device"]):
-+				if path.exists("/usr/local/etc/stb/frontend/%d/rf_switch" % entry["frontend_device"]):
++				if path.exists("/usr/local/e2/etc/stb/frontend/%d/rf_switch" % entry["frontend_device"]):
  					entry["internally_connectable"] = entry["frontend_device"] - 1
  				else:
  					entry["internally_connectable"] = None
@@ -7769,13 +7783,13 @@ diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Co
  		slot_id = configElement.slot_id
  		if nimmgr.nim_slots[slot_id].description == 'Alps BSBE2':
 -			open("/proc/stb/frontend/%d/tone_amplitude" %(fe_id), "w").write(configElement.value)
-+			open("/usr/local/etc/stb/frontend/%d/tone_amplitude" %(fe_id), "w").write(configElement.value)
++			open("/usr/local/e2/etc/stb/frontend/%d/tone_amplitude" %(fe_id), "w").write(configElement.value)
  
  	def tunerTypeChanged(nimmgr, configElement):
  		fe_id = configElement.fe_id
  
 -		cur_type = int(open("/proc/stb/frontend/%d/mode" % (fe_id), "r").read())
-+		cur_type = int(open("/usr/local/etc/stb/frontend/%d/mode" % (fe_id), "r").read())
++		cur_type = int(open("/usr/local/e2/etc/stb/frontend/%d/mode" % (fe_id), "r").read())
  		if cur_type != int(configElement.value):
  			print "tunerTypeChanged feid %d from %d to mode %d" % (fe_id, cur_type, int(configElement.value))
  
@@ -7784,7 +7798,7 @@ diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Co
  			frontend = eDVBResourceManager.getInstance().allocateRawChannel(fe_id).getFrontend()
  			frontend.closeFrontend()
 -			open("/proc/stb/frontend/%d/mode" % (fe_id), "w").write(configElement.value)
-+			open("/usr/local/etc/stb/frontend/%d/mode" % (fe_id), "w").write(configElement.value)
++			open("/usr/local/e2/etc/stb/frontend/%d/mode" % (fe_id), "w").write(configElement.value)
  			frontend.reopenFrontend()
  			try:
  				open("/sys/module/dvb_core/parameters/dvb_shutdown_timeout", "w").write(oldvalue)
@@ -7807,7 +7821,7 @@ diff -Naur enigma2.ori/lib/python/Components/Timezones.py enigma2/lib/python/Com
  			timezonesHandler = self.parseTimezones(self.timezones)
  			parser.setContentHandler(timezonesHandler)
 -			parser.parse('/etc/timezone.xml')
-+			parser.parse('/usr/local/etc/tuxbox/timezone.xml')
++			parser.parse('/usr/local/e2/etc/tuxbox/timezone.xml')
  		except:
  			pass
  		
@@ -7849,7 +7863,7 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  from Tools.CList import CList
  from os import path as os_path
 -# The "VideoEnhancement" is the interface to /proc/stb/vmpeg/0.
-+# The "VideoEnhancement" is the interface to /usr/local/etc/stb/vmpeg/0.
++# The "VideoEnhancement" is the interface to /usr/local/e2/etc/stb/vmpeg/0.
  
  class VideoEnhancement:
  	firstRun = True
@@ -7858,13 +7872,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  		config.pep.configsteps = NoSave(ConfigSelection(choices=[1, 5, 10, 25], default = 1))
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_contrast"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_contrast"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_contrast"):
  			def setContrast(config):
  				myval = int(config.value*256)
  				try:
  					print "--> setting contrast to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_contrast", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_contrast", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_contrast", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_contrast."
  
@@ -7873,13 +7887,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.contrast = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_saturation"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_saturation"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_saturation"):
  			def setSaturation(config):
  				myval = int(config.value*256)
  				try:
  					print "--> setting saturation to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_saturation", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_saturation", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_saturation", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_saturaion."
  
@@ -7888,13 +7902,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.saturation = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_hue"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_hue"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_hue"):
  			def setHue(config):
  				myval = int(config.value*256)
  				try:
  					print "--> setting hue to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_hue", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_hue", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_hue", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_hue."
  
@@ -7903,13 +7917,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.hue = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_brightness"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_brightness"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_brightness"):
  			def setBrightness(config):
  				myval = int(config.value*256)
  				try:
  					print "--> setting brightness to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_brightness", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_brightness", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_brightness", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_brightness."
  
@@ -7918,13 +7932,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.brightness = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_block_noise_reduction"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_block_noise_reduction"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_block_noise_reduction"):
  			def setBlock_noise_reduction(config):
  				myval = int(config.value)
  				try:
  					print "--> setting block_noise_reduction to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_block_noise_reduction", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_block_noise_reduction", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_block_noise_reduction", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_block_noise_reduction."
  
@@ -7933,13 +7947,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.block_noise_reduction = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_mosquito_noise_reduction"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_mosquito_noise_reduction"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_mosquito_noise_reduction"):
  			def setMosquito_noise_reduction(config):
  				myval = int(config.value)
  				try:
  					print "--> setting mosquito_noise_reduction to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_mosquito_noise_reduction", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_mosquito_noise_reduction", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_mosquito_noise_reduction", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_mosquito_noise_reduction."
  
@@ -7948,13 +7962,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.mosquito_noise_reduction = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_digital_contour_removal"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_digital_contour_removal"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_digital_contour_removal"):
  			def setDigital_contour_removal(config):
  				myval = int(config.value)
  				try:
  					print "--> setting digital_contour_removal to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_digital_contour_removal", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_digital_contour_removal", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_digital_contour_removal", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_digital_contour_removal."
  
@@ -7963,12 +7977,12 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.digital_contour_removal = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_split"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_split"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_split"):
  			def setSplitMode(config):
  				try:
  					print "--> setting splitmode to:",str(config.value)
 -					open("/proc/stb/vmpeg/0/pep_split", "w").write(str(config.value))
-+					open("/usr/local/etc/stb/vmpeg/0/pep_split", "w").write(str(config.value))
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_split", "w").write(str(config.value))
  				except IOError:
  					print "couldn't write pep_split."
  
@@ -7977,13 +7991,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.split = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_sharpness"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_sharpness"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_sharpness"):
  			def setSharpness(config):
  				myval = int(config.value*256)
  				try:
  					print "--> setting sharpness to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_sharpness", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_sharpness", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_sharpness", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_sharpness."
  
@@ -7992,13 +8006,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.sharpness = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_auto_flesh"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_auto_flesh"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_auto_flesh"):
  			def setAutoflesh(config):
  				myval = int(config.value)
  				try:
  					print "--> setting auto_flesh to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_auto_flesh", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_auto_flesh", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_auto_flesh", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_auto_flesh."
  
@@ -8007,13 +8021,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.auto_flesh = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_green_boost"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_green_boost"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_green_boost"):
  			def setGreenboost(config):
  				myval = int(config.value)
  				try:
  					print "--> setting green_boost to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_green_boost", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_green_boost", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_green_boost", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_green_boost."
  
@@ -8022,13 +8036,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.green_boost = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_blue_boost"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_blue_boost"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_blue_boost"):
  			def setBlueboost(config):
  				myval = int(config.value)
  				try:
  					print "--> setting blue_boost to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_blue_boost", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_blue_boost", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_blue_boost", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_blue_boost."
  
@@ -8037,13 +8051,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			config.pep.blue_boost = NoSave(ConfigNothing())
  
 -		if os_path.exists("/proc/stb/vmpeg/0/pep_dynamic_contrast"):
-+		if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_dynamic_contrast"):
++		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_dynamic_contrast"):
  			def setDynamic_contrast(config):
  				myval = int(config.value)
  				try:
  					print "--> setting dynamic_contrast to: %0.8X" % myval
 -					open("/proc/stb/vmpeg/0/pep_dynamic_contrast", "w").write("%0.8X" % myval)
-+					open("/usr/local/etc/stb/vmpeg/0/pep_dynamic_contrast", "w").write("%0.8X" % myval)
++					open("/usr/local/e2/etc/stb/vmpeg/0/pep_dynamic_contrast", "w").write("%0.8X" % myval)
  				except IOError:
  					print "couldn't write pep_dynamic_contrast."
  
@@ -8052,13 +8066,13 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  			x = config.av.scaler_sharpness.value
  		except KeyError:
 -			if os_path.exists("/proc/stb/vmpeg/0/pep_scaler_sharpness"):
-+			if os_path.exists("/usr/local/etc/stb/vmpeg/0/pep_scaler_sharpness"):
++			if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness"):
  				def setScaler_sharpness(config):
  					myval = int(config.value)
  					try:
  						print "--> setting scaler_sharpness to: %0.8X" % myval
 -						open("/proc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
-+						open("/usr/local/etc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
++						open("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
  					except IOError:
  						print "couldn't write pep_scaler_sharpness."
  
@@ -8067,7 +8081,7 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  		try:
  			print "--> applying pep values"
 -			open("/proc/stb/vmpeg/0/pep_apply", "w").write("1")
-+			open("/usr/local/etc/stb/vmpeg/0/pep_apply", "w").write("1")
++			open("/usr/local/e2/etc/stb/vmpeg/0/pep_apply", "w").write("1")
  		except IOError:
  			print "couldn't apply pep values."
  
@@ -8184,7 +8198,7 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/Videomode/VideoHardware.
 +				ret = (16,10)
 +		elif is_auto:
 +			try:
-+				aspect_str = open("/usr/local/stb/vmpeg/0/aspect", "r").read()
++				aspect_str = open("/usr/local/e2/stb/vmpeg/0/aspect", "r").read()
 +				if aspect_str == "1": # 4:3
 +					ret = (4,3)
 +			except IOError:
@@ -8670,7 +8684,7 @@ diff -Naur enigma2.ori/lib/python/Screens/Ci.py enigma2/lib/python/Screens/Ci.py
  		SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots() > 0
  		try:
 -			file = open("/proc/stb/tsmux/ci0_tsclk", "r")
-+			file = open("/usr/local/etc/stb/tsmux/ci0_tsclk", "r")
++			file = open("/usr/local/e2/etc/stb/tsmux/ci0_tsclk", "r")
  			file.close()
  			SystemInfo["CommonInterfaceSupportsHighBitrates"] = True
  		except:
@@ -8682,7 +8696,7 @@ diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/T
  	ret = None
  	try:
 -		ret = long(open("/proc/stb/fp/version", "r").read())
-+		ret = long(open("/usr/local/etc/stb/fp/version", "r").read())
++		ret = long(open("/usr/local/e2/etc/stb/fp/version", "r").read())
  	except IOError:
  		try:
  			fp = open("/dev/dbox/fp0")
@@ -8691,7 +8705,7 @@ diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/T
  def setFPWakeuptime(wutime):
  	try:
 -		open("/proc/stb/fp/wakeup_time", "w").write(str(wutime))
-+		open("/usr/local/etc/stb/fp/wakeup_time", "w").write(str(wutime))
++		open("/usr/local/e2/etc/stb/fp/wakeup_time", "w").write(str(wutime))
  	except IOError:
  		try:
  			fp = open("/dev/dbox/fp0")
@@ -8700,7 +8714,7 @@ diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/T
  def setRTCtime(wutime):
  	try:
 -		open("/proc/stb/fp/rtc", "w").write(str(wutime))
-+		open("/usr/local/etc/stb/fp/rtc", "w").write(str(wutime))
++		open("/usr/local/e2/etc/stb/fp/rtc", "w").write(str(wutime))
  	except IOError:
  		try:
  			fp = open("/dev/dbox/fp0")
@@ -8709,7 +8723,7 @@ diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/T
  	ret = 0
  	try:
 -		ret = long(open("/proc/stb/fp/wakeup_time", "r").read())
-+		ret = long(open("/usr/local/etc/stb/fp/wakeup_time", "r").read())
++		ret = long(open("/usr/local/e2/etc/stb/fp/wakeup_time", "r").read())
  	except IOError:
  		try:
  			fp = open("/dev/dbox/fp0")
@@ -8718,7 +8732,7 @@ diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/T
  	wasTimerWakeup = False
  	try:
 -		wasTimerWakeup = int(open("/proc/stb/fp/was_timer_wakeup", "r").read()) and True or False
-+		wasTimerWakeup = int(open("/usr/local/etc/stb/fp/was_timer_wakeup", "r").read()) and True or False
++		wasTimerWakeup = int(open("/usr/local/e2/etc/stb/fp/was_timer_wakeup", "r").read()) and True or False
  	except:
  		try:
  			fp = open("/dev/dbox/fp0")
@@ -8727,7 +8741,7 @@ diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/T
  def clearFPWasTimerWakeup():
  	try:
 -		open("/proc/stb/fp/was_timer_wakeup", "w").write('0')
-+		open("/usr/local/etc/stb/fp/was_timer_wakeup", "w").write('0')
++		open("/usr/local/e2/etc/stb/fp/was_timer_wakeup", "w").write('0')
  	except:
  		try:
  			fp = open("/dev/dbox/fp0")
@@ -8739,7 +8753,7 @@ diff -Naur enigma2.ori/lib/python/Tools/HardwareInfo.py enigma2/lib/python/Tools
  		HardwareInfo.device_name = "unknown"
  		try:
 -			file = open("/proc/stb/info/model", "r")
-+			file = open("/usr/local/etc/stb/info/model", "r")
++			file = open("/usr/local/e2/etc/stb/info/model", "r")
  			HardwareInfo.device_name = file.readline().strip()
  			file.close()
  			try:
@@ -8748,7 +8762,7 @@ diff -Naur enigma2.ori/lib/python/Tools/HardwareInfo.py enigma2/lib/python/Tools
  			print "you should upgrade to new drivers for the hardware detection to work properly"
  			print "----------------"
 -			print "fallback to detect hardware via /proc/cpuinfo!!"
-+			print "fallback to detect hardware via /usr/local/etc/cpuinfo!!"
++			print "fallback to detect hardware via /usr/local/e2/etc/cpuinfo!!"
  			try:
  				rd = open("/proc/cpuinfo", "r").read()
  				if rd.find("Brcm4380 V4.2") != -1:

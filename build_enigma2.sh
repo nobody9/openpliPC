@@ -2,7 +2,7 @@
 
 #define enigma2 ref and enigma2 patch
 REF="ffebefa30b56fac2c114f4b10e3cb32ca33c8b92"
-PATCH="openpliPC_20111214.patch"
+PATCH="openpliPC_20111214a.patch"
 #Build and install enigma2:
 echo "--------------------------------------"
 echo "downloading OpenPli sources, please wait..."
@@ -22,7 +22,7 @@ echo "configuring OpenPli sources"
 echo "--------------------------------------"
 patch -p1 < ../patches/$PATCH
 autoreconf -i
-./configure --prefix=/usr/local --with-xlib --with-debug
+./configure --prefix=/usr/local/e2 --with-xlib --with-debug
  
 echo "--------------------------------------"
 echo "build OpenPli, please wait..."
@@ -30,7 +30,7 @@ echo "--------------------------------------"
 make
  
 echo "--------------------------------------"
-echo "installing OpenPli in /usr/local/"
+echo "installing OpenPli in /usr/local/e2"
 echo "--------------------------------------"
 sudo make install
 cd ..
@@ -38,14 +38,14 @@ cd ..
 echo "--------------------------------------"
 echo "final changes"
 echo "--------------------------------------"
-sudo strip /usr/local/bin/enigma2
+sudo strip /usr/local/e2/bin/enigma2
 #remove compiled py-files
-sudo find /usr/local/lib/enigma2/python/ -name '*.pyo' -exec rm {} \;
-sudo find /usr/local/lib/enigma2/python/ -name '*.pyc' -exec rm {} \;
+sudo find /usr/local/e2/lib/enigma2/python/ -name '*.pyo' -exec rm {} \;
+sudo find /usr/local/e2/lib/enigma2/python/ -name '*.pyc' -exec rm {} \;
 #copy needed files
-sudo mkdir -p /usr/local/etc/enigma2
-sudo mkdir -p /usr/local/etc/tuxbox
-sudo cp share/fonts/* /usr/local/share/fonts
-sudo cp -rf etc/* /usr/local/etc
+sudo mkdir -p /usr/local/e2/etc/enigma2
+sudo mkdir -p /usr/local/e2/etc/tuxbox
+sudo cp share/fonts/* /usr/local/e2/share/fonts
+sudo cp -rf etc/* /usr/local/e2/etc
  
 echo "**********************<END>**********************"
