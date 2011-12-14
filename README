@@ -7,53 +7,75 @@ Main thread discussion:
 http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2-on-ubuntu-104-32-bit/
 
 
-
 ------------------------------
 BUILDING openpliPC
 ------------------------------
 
-1) ONCE download openpliPC git repo as local user (not root):
+1a) download openpliPC git repo as local user (not root):
 git clone https://github.com/nobody9/openpliPC.git
+cd openpliPC/
 
-2) cd openpliPC/
+ - OR -
 
-2a optional) To keep in sync git repo:
+1b) Keep in sync previously cloned git repo:
+cd openpliPC/
 git pull https://github.com/nobody9/openpliPC.git
 
-3) Building needed libraries, execute ONCE:
-./build_libs.sh
-it download, build and install all needed libraries
 
-4) Build Enigma2:
+2) Building needed Enigma2 libraries:
+./build_libs.sh
+
+It download, build and install all needed libraries
+Some tasks require root access (sudo). You will be asked for your password.
+
+
+3) Build Enigma2:
 ./build_enigma2.sh 
 
-it fetch the openpli Enigma2 source code, patch it, compile and install.
-some tasks require root access (sudo). you will be asked for your password.
+It fetch the openpli Enigma2 source code, patch it, compile and install.
+Some tasks require root access (sudo). You will be asked for your password.
+
 
 ------------------------------
 Where is Enigma2 ?
 ------------------------------
 
-Enigma2 will be installed in /usr/local,
-also the script copy´s example configs to /usr/local/etc/enigma2.
-the hole /proc/stb directory are located at /usr/local/etc/tuxbox/stb.
+Enigma2 will be installed in /usr/local
+Example configs in /usr/local/etc/enigma2
+The hole /proc/stb directory are located at /usr/local/etc/tuxbox/stb
+
 
 ------------------------------
-Howto start enigma2:
+Run enigma2
 ------------------------------
 
+Enigma2 requires to be launched as root user:
 sudo /usr/local/bin/enigma2
 
+If you are concerned about security, build and run Enigma2 in a Virtual Machine
+
 
 ------------------------------
-Informations:
+Informations
+------------------------------
 
+1)
 with xine_vdpau i get osd, video (SD and HD) and sound,
 with xine_xshm i get video (SD and HD) and sound ,
 with xine_sdl i get only video (SD and HD) in size 720x576 they don´t scale and sound.
 
+2) Some remote control keys are remapped to local PC keyboard
+RED     ->  F1
+GREEN   ->  F2
+YELLOW  ->  F3
+BLUE    ->  F4
+MENU    ->  SPACE
 
+
+
+------------------------------
 Thanks to:
+------------------------------
 
 Cougar for porting Enigma2 to Enigma2PC.
 kanber_kav implement a Mediplayer in Enigma2PC over xinelib without gstreamer and implement subtitles.
