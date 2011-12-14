@@ -6,6 +6,12 @@ December, 2011
 Main thread discussion:
 http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2-on-ubuntu-104-32-bit/
 
+------------------------------
+Tested on
+------------------------------
+Ubuntu 11.10 32 and 64 bit
+Ubuntu 11.10 into a VMware virtual machine
+
 
 ------------------------------
 BUILDING openpliPC
@@ -64,20 +70,47 @@ with xine_vdpau i get osd, video (SD and HD) and sound,
 with xine_xshm i get video (SD and HD) and sound ,
 with xine_sdl i get only video (SD and HD) in size 720x576 they don´t scale and sound.
 
-2) Some remote control keys are remapped to local PC keyboard
+2)
+Some remote control keys are remapped to local PC keyboard
 RED     ->  F1
 GREEN   ->  F2
 YELLOW  ->  F3
 BLUE    ->  F4
-MENU    ->  SPACE
 
+MENU    ->  SPACE
+INFO    ->  F5
+EPG     ->  F6
+POWER   ->  F10
+
+3)
+Default NIM is configured in /usr/local/etc/tuxbox/nim_sockets
+NIM Socket 0:
+            Type: DVB-S2
+            Name: VTUNER
+            Has_Outputs: no
+            Frontend_Device: 0
+
+If you want to change or add NIM, you must edit nim_sockets file.
+Example: to change from DVB-S2 to DVB-T NIM, change as below
+NIM Socket 0:
+            Type: DVB-T
+            Name: VTUNER
+            Has_Outputs: no
+            Frontend_Device: 0
+
+4)
+Adding plugin , extensione or skins 
+put plugins in /usr/local/lib/enigma2/python/Plugins/SystemPlugins
+put extensions in /usr/local/lib/enigma2/python/Plugins/Extensions
+put skin in /usr/local/share/enigma2
 
 
 ------------------------------
-Thanks to:
+Thanks to
 ------------------------------
 
 Cougar for porting Enigma2 to Enigma2PC.
 kanber_kav implement a Mediplayer in Enigma2PC over xinelib without gstreamer and implement subtitles.
 buyukbang for testing.
-ambrosa for testing and cosmethic changes of the scripts.
+ambrosa for testing,cosmethic changes of the scripts, docs.
+
