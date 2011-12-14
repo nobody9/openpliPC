@@ -9,8 +9,10 @@ http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2-on-ubuntu
 ------------------------------
 Tested on
 ------------------------------
+Ubuntu 10.04 32 bit
+Ubuntu 10.10 32 and 64 bit
 Ubuntu 11.10 32 and 64 bit
-Ubuntu 11.10 into a VMware virtual machine
+Ubuntu 11.10 32 bit as VMware virtual machine guest (Win7 64 bit host)
 
 
 ------------------------------
