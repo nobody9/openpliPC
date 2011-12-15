@@ -33,6 +33,8 @@ git pull https://github.com/nobody9/openpliPC.git
 
 2) Building needed Enigma2 libraries:
 ./build_libs.sh
+If you are interested in a logfile , simply do:
+./build_libs.sh 2>&1 | tee build_libs.log
 
 It download, build and install all needed libraries
 Some tasks require root access (sudo). You will be asked for your password.
@@ -40,10 +42,11 @@ Some tasks require root access (sudo). You will be asked for your password.
 
 3) Build Enigma2:
 ./build_enigma2.sh 
+If you are interested in a logfile , simply do:
+./build_enigma.sh 2>&1 | tee build_log.log
 
 It fetch the openpli Enigma2 source code, patch it, compile and install.
 Some tasks require root access (sudo). You will be asked for your password.
-
 
 ------------------------------
 Where is Enigma2 ?
