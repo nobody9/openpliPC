@@ -1,8 +1,8 @@
 #!/bin/sh
 
 #define enigma2 ref and enigma2 patch
-REF="ff52cff162c5a48eb8278a32342a88758384cd2f"
-PATCH="openpliPC_20111214b.patch"
+REF="40eea73ce3269c031d231e8cf4ef307cfbc1466c"
+PATCH="openpliPC_20111215.patch"
 #Build and install enigma2:
 echo "--------------------------------------"
 echo "downloading OpenPli sources, please wait..."
