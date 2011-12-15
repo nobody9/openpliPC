@@ -52,9 +52,9 @@ Some tasks require root access (sudo). You will be asked for your password.
 Where is Enigma2 ?
 ------------------------------
 
-Enigma2 will be installed in /usr/local/e2
-Example configs in /usr/local/e2/etc/enigma2
-The hole /proc/stb directory are located at /usr/local/e2/etc/tuxbox/stb
+Enigma2 will be installed in /usr/local/e2/
+Example configs in /usr/local/e2/etc/enigma2/
+The hole /proc/stb directory are located at /usr/local/e2/etc/tuxbox/stb/
 
 
 ------------------------------
@@ -72,9 +72,9 @@ Informations
 ------------------------------
 
 1)
-with xine_vdpau i get osd, video (SD and HD) and sound,
-with xine_xshm i get video (SD and HD) and sound ,
-with xine_sdl i get only video (SD and HD) in size 720x576 they don´t scale and sound.
+with xine_vdpau I get osd, video (SD and HD) and sound,
+with xine_xshm I get video (SD and HD) and sound ,
+with xine_sdl I get only video (SD and HD) in size 720x576 they don´t scale and sound.
 
 
 2)
@@ -125,7 +125,7 @@ NIM Socket 0:
 
 
 4)
-Adding systemplugins , extensions or skins 
+Adding systemplugins, extensions or skins 
 put systemplugins in /usr/local/e2/lib/enigma2/python/Plugins/SystemPlugins
 put extensions in /usr/local/e2/lib/enigma2/python/Plugins/Extensions
 put skin in /usr/local/e2/share/enigma2
@@ -138,12 +138,17 @@ sudo ln -s /my/movie/archive /hdd
 sudo mkdir /hdd/movies
 
 
+6)
+/usr/local/e2/share/enigma2/xine.conf has many options about video and audio control
+take a look into it
+
+
 ------------------------------
 Thanks to
 ------------------------------
 
 Cougar for porting Enigma2 to Enigma2PC.
-kanber_kav implement a Mediplayer in Enigma2PC over xinelib without gstreamer and implement subtitles.
-buyukbang for testing.
-ambrosa for testing,cosmethic changes of the scripts, docs.
+kanber_kav  implement a Mediaplayer in Enigma2PC over xinelib without gstreamer and implement subtitles.
+buyukbang  for testing.
+ambrosa  for testing, cosmethic changes of the scripts, docs.
 
