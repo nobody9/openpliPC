@@ -101,8 +101,8 @@ EPG     ->  E or F6
 POWER   ->  F10
 RECORD  ->  R
 TV      ->  T
-VIDEO   ->  A
-AUDIO   ->  V
+VIDEO   ->  V
+AUDIO   ->  A
 MUTE    ->  M
 TIMESHIFT ->  P
 
@@ -116,7 +116,7 @@ NIM Socket 0:
             Frontend_Device: 0
 
 If you want to change or add NIM, you must edit nim_sockets file.
-Example: to change from DVB-S2 to DVB-T NIM, change as below
+Example: to change from DVB-S2 to DVB-T NIM, change "Type" as below
 NIM Socket 0:
             Type: DVB-T
             Name: VTUNER
