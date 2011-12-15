@@ -1,6 +1,6 @@
 diff -Naur enigma2.ori/configure.ac enigma2/configure.ac
 --- enigma2.ori/configure.ac	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/configure.ac	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/configure.ac	2011-12-15 19:04:08.000000000 +0100
 @@ -113,6 +113,16 @@
  fi
  AM_CONDITIONAL(HAVE_LIBXINE, test "$with_libxine" = "yes")
@@ -29,7 +29,7 @@ diff -Naur enigma2.ori/configure.ac enigma2/configure.ac
  lib/python/Plugins/SystemPlugins/DiseqcTester/Makefile
 diff -Naur enigma2.ori/data/Makefile.am enigma2/data/Makefile.am
 --- enigma2.ori/data/Makefile.am	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/data/Makefile.am	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/data/Makefile.am	2011-12-15 19:04:08.000000000 +0100
 @@ -19,7 +19,8 @@
  	tutorialwizard.xml \
  	freesat.t1 \
@@ -42,7 +42,7 @@ diff -Naur enigma2.ori/data/Makefile.am enigma2/data/Makefile.am
  dist_pkgdata_DATA += skin_text.xml
 diff -Naur enigma2.ori/data/keymap.xml enigma2/data/keymap.xml
 --- enigma2.ori/data/keymap.xml	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/data/keymap.xml	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/data/keymap.xml	2011-12-15 19:04:08.000000000 +0100
 @@ -88,6 +88,9 @@
  		<device name="dreambox remote control (native)">
  			<key id="KEY_RED" mapto="instantRecord" flags="b" />
@@ -158,7 +158,7 @@ diff -Naur enigma2.ori/data/keymap.xml enigma2/data/keymap.xml
  
 diff -Naur enigma2.ori/data/setup.xml enigma2/data/setup.xml
 --- enigma2.ori/data/setup.xml	2011-12-14 17:20:11.000000000 +0100
-+++ enigma2/data/setup.xml	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/data/setup.xml	2011-12-15 19:04:08.000000000 +0100
 @@ -158,4 +158,13 @@
  			<item text="Use power measurement" >config.sat.diseqcc</item>
  			<!--<item text="DiSEqC D">config.sat.diseqcd</item>-->
@@ -175,7 +175,7 @@ diff -Naur enigma2.ori/data/setup.xml enigma2/data/setup.xml
  </setupxml>
 diff -Naur enigma2.ori/data/xine.conf enigma2/data/xine.conf
 --- enigma2.ori/data/xine.conf	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/data/xine.conf	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/data/xine.conf	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,363 @@
 +#
 +# xine config file
@@ -542,7 +542,7 @@ diff -Naur enigma2.ori/data/xine.conf enigma2/data/xine.conf
 +subtitles.separate.use_unscaled_osd:1
 diff -Naur enigma2.ori/dvbsoftwareca/Makefile enigma2/dvbsoftwareca/Makefile
 --- enigma2.ori/dvbsoftwareca/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/dvbsoftwareca/Makefile	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/dvbsoftwareca/Makefile	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,16 @@
 +obj-m := dvbsoftwareca.o
 +dvbsoftwareca-objs := dvb_softwareca.o ca_netlink.o
@@ -562,7 +562,7 @@ diff -Naur enigma2.ori/dvbsoftwareca/Makefile enigma2/dvbsoftwareca/Makefile
 +	rm -Rf .tmp_versions
 diff -Naur enigma2.ori/dvbsoftwareca/ca_netlink.c enigma2/dvbsoftwareca/ca_netlink.c
 --- enigma2.ori/dvbsoftwareca/ca_netlink.c	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/dvbsoftwareca/ca_netlink.c	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/dvbsoftwareca/ca_netlink.c	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,166 @@
 +/*
 + * ca_netlink.c: Generic netlink communication
@@ -732,7 +732,7 @@ diff -Naur enigma2.ori/dvbsoftwareca/ca_netlink.c enigma2/dvbsoftwareca/ca_netli
 +
 diff -Naur enigma2.ori/dvbsoftwareca/ca_netlink.h enigma2/dvbsoftwareca/ca_netlink.h
 --- enigma2.ori/dvbsoftwareca/ca_netlink.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/dvbsoftwareca/ca_netlink.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/dvbsoftwareca/ca_netlink.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,39 @@
 +#ifndef __CA_NETLINK_H
 +#define __CA_NETLINK_H
@@ -775,7 +775,7 @@ diff -Naur enigma2.ori/dvbsoftwareca/ca_netlink.h enigma2/dvbsoftwareca/ca_netli
 +#endif
 diff -Naur enigma2.ori/dvbsoftwareca/dvb_softwareca.c enigma2/dvbsoftwareca/dvb_softwareca.c
 --- enigma2.ori/dvbsoftwareca/dvb_softwareca.c	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/dvbsoftwareca/dvb_softwareca.c	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/dvbsoftwareca/dvb_softwareca.c	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,318 @@
 +/*
 + * dvb_softwareca.c
@@ -1097,7 +1097,7 @@ diff -Naur enigma2.ori/dvbsoftwareca/dvb_softwareca.c enigma2/dvbsoftwareca/dvb_
 +
 diff -Naur enigma2.ori/dvbsoftwareca/dvb_softwareca.h enigma2/dvbsoftwareca/dvb_softwareca.h
 --- enigma2.ori/dvbsoftwareca/dvb_softwareca.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/dvbsoftwareca/dvb_softwareca.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/dvbsoftwareca/dvb_softwareca.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,17 @@
 +#include <linux/wait.h>
 +#include <linux/proc_fs.h>
@@ -1118,7 +1118,7 @@ diff -Naur enigma2.ori/dvbsoftwareca/dvb_softwareca.h enigma2/dvbsoftwareca/dvb_
 +
 diff -Naur enigma2.ori/lib/base/Makefile.am enigma2/lib/base/Makefile.am
 --- enigma2.ori/lib/base/Makefile.am	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/base/Makefile.am	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/Makefile.am	2011-12-15 19:04:08.000000000 +0100
 @@ -26,6 +26,8 @@
  	rawfile.cpp \
  	smartptr.cpp \
@@ -1137,7 +1137,7 @@ diff -Naur enigma2.ori/lib/base/Makefile.am enigma2/lib/base/Makefile.am
  	httpstream.h
 diff -Naur enigma2.ori/lib/base/condVar.cpp enigma2/lib/base/condVar.cpp
 --- enigma2.ori/lib/base/condVar.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/base/condVar.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/condVar.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,189 @@
 +/*
 + * condVar.cpp: Mutexes, conditional vars.
@@ -1330,7 +1330,7 @@ diff -Naur enigma2.ori/lib/base/condVar.cpp enigma2/lib/base/condVar.cpp
 +
 diff -Naur enigma2.ori/lib/base/condVar.h enigma2/lib/base/condVar.h
 --- enigma2.ori/lib/base/condVar.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/base/condVar.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/condVar.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,52 @@
 +#ifndef __base_condVar_h
 +#define __base_condVar_h
@@ -1386,7 +1386,7 @@ diff -Naur enigma2.ori/lib/base/condVar.h enigma2/lib/base/condVar.h
 +#endif
 diff -Naur enigma2.ori/lib/base/filepush.cpp enigma2/lib/base/filepush.cpp
 --- enigma2.ori/lib/base/filepush.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/base/filepush.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/filepush.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -1,6 +1,7 @@
  #include <lib/base/filepush.h>
  #include <lib/base/eerror.h>
@@ -1455,7 +1455,7 @@ diff -Naur enigma2.ori/lib/base/filepush.cpp enigma2/lib/base/filepush.cpp
  		/* if we aren't running, don't bother stopping. */
 diff -Naur enigma2.ori/lib/base/filepush.h enigma2/lib/base/filepush.h
 --- enigma2.ori/lib/base/filepush.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/base/filepush.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/filepush.h	2011-12-15 19:04:08.000000000 +0100
 @@ -7,6 +7,7 @@
  #include <lib/base/message.h>
  #include <sys/types.h>
@@ -1474,7 +1474,7 @@ diff -Naur enigma2.ori/lib/base/filepush.h enigma2/lib/base/filepush.h
  
 diff -Naur enigma2.ori/lib/base/rawfile.cpp enigma2/lib/base/rawfile.cpp
 --- enigma2.ori/lib/base/rawfile.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/base/rawfile.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/rawfile.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -255,3 +255,120 @@
  {
  	return m_totallength;
@@ -1598,7 +1598,7 @@ diff -Naur enigma2.ori/lib/base/rawfile.cpp enigma2/lib/base/rawfile.cpp
 +
 diff -Naur enigma2.ori/lib/base/rawfile.h enigma2/lib/base/rawfile.h
 --- enigma2.ori/lib/base/rawfile.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/base/rawfile.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/rawfile.h	2011-12-15 19:04:08.000000000 +0100
 @@ -3,14 +3,15 @@
  
  #include <string>
@@ -1654,7 +1654,7 @@ diff -Naur enigma2.ori/lib/base/rawfile.h enigma2/lib/base/rawfile.h
  #endif
 diff -Naur enigma2.ori/lib/base/tsRingbuffer.cpp enigma2/lib/base/tsRingbuffer.cpp
 --- enigma2.ori/lib/base/tsRingbuffer.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/base/tsRingbuffer.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/tsRingbuffer.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,335 @@
 +/*
 + * tsRingbuffer.cpp: A ring buffer
@@ -1993,7 +1993,7 @@ diff -Naur enigma2.ori/lib/base/tsRingbuffer.cpp enigma2/lib/base/tsRingbuffer.c
 +
 diff -Naur enigma2.ori/lib/base/tsRingbuffer.h enigma2/lib/base/tsRingbuffer.h
 --- enigma2.ori/lib/base/tsRingbuffer.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/base/tsRingbuffer.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/base/tsRingbuffer.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,90 @@
 +#ifndef __tsringbuffer_h
 +#define __tsringbuffer_h
@@ -2087,7 +2087,7 @@ diff -Naur enigma2.ori/lib/base/tsRingbuffer.h enigma2/lib/base/tsRingbuffer.h
 +#endif
 diff -Naur enigma2.ori/lib/components/Makefile.am enigma2/lib/components/Makefile.am
 --- enigma2.ori/lib/components/Makefile.am	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/components/Makefile.am	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/components/Makefile.am	2011-12-15 19:04:08.000000000 +0100
 @@ -8,8 +8,7 @@
  
  libenigma_components_a_SOURCES = \
@@ -2275,7 +2275,7 @@ diff -Naur enigma2.ori/lib/components/tuxtxtapp.h enigma2/lib/components/tuxtxta
 -#endif // __LIB_COMPONENTS_TUXTXTAPP_H__
 diff -Naur enigma2.ori/lib/driver/Makefile.am enigma2/lib/driver/Makefile.am
 --- enigma2.ori/lib/driver/Makefile.am	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/driver/Makefile.am	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/Makefile.am	2011-12-15 19:04:08.000000000 +0100
 @@ -37,3 +37,9 @@
  	rcsdl.cpp \
  	rcsdl.h
@@ -2288,7 +2288,7 @@ diff -Naur enigma2.ori/lib/driver/Makefile.am enigma2/lib/driver/Makefile.am
 +endif
 diff -Naur enigma2.ori/lib/driver/avswitch.cpp enigma2/lib/driver/avswitch.cpp
 --- enigma2.ori/lib/driver/avswitch.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/driver/avswitch.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/avswitch.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -2,278 +2,83 @@
  #include <fcntl.h>
  #include <sys/ioctl.h>
@@ -2622,7 +2622,7 @@ diff -Naur enigma2.ori/lib/driver/avswitch.cpp enigma2/lib/driver/avswitch.cpp
 \ No newline at end of file
 diff -Naur enigma2.ori/lib/driver/avswitch.h enigma2/lib/driver/avswitch.h
 --- enigma2.ori/lib/driver/avswitch.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/driver/avswitch.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/avswitch.h	2011-12-15 19:04:08.000000000 +0100
 @@ -2,18 +2,12 @@
  #define __avswitch_h
  
@@ -2660,7 +2660,7 @@ diff -Naur enigma2.ori/lib/driver/avswitch.h enigma2/lib/driver/avswitch.h
  };
 diff -Naur enigma2.ori/lib/driver/misc_options.cpp enigma2/lib/driver/misc_options.cpp
 --- enigma2.ori/lib/driver/misc_options.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/driver/misc_options.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/misc_options.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -22,10 +22,10 @@
  {
  	if (state == m_12V_output_state)
@@ -2689,7 +2689,7 @@ diff -Naur enigma2.ori/lib/driver/misc_options.cpp enigma2/lib/driver/misc_optio
  	close(fd);
 diff -Naur enigma2.ori/lib/driver/rcconsole.cpp enigma2/lib/driver/rcconsole.cpp
 --- enigma2.ori/lib/driver/rcconsole.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/driver/rcconsole.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/rcconsole.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -111,4 +111,7 @@
  	}
  };
@@ -2700,7 +2700,7 @@ diff -Naur enigma2.ori/lib/driver/rcconsole.cpp enigma2/lib/driver/rcconsole.cpp
 +
 diff -Naur enigma2.ori/lib/driver/rcinput.cpp enigma2/lib/driver/rcinput.cpp
 --- enigma2.ori/lib/driver/rcinput.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/driver/rcinput.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/rcinput.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -175,4 +175,7 @@
  	}
  };
@@ -2711,7 +2711,7 @@ diff -Naur enigma2.ori/lib/driver/rcinput.cpp enigma2/lib/driver/rcinput.cpp
 +
 diff -Naur enigma2.ori/lib/driver/rcsdl.cpp enigma2/lib/driver/rcsdl.cpp
 --- enigma2.ori/lib/driver/rcsdl.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/driver/rcsdl.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/rcsdl.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -1,4 +1,3 @@
 -#include <lib/base/etrace.h>
  #include <lib/driver/rcsdl.h>
@@ -2769,7 +2769,7 @@ diff -Naur enigma2.ori/lib/driver/rcsdl.cpp enigma2/lib/driver/rcsdl.cpp
  const char *eSDLInputDevice::getDescription() const
 diff -Naur enigma2.ori/lib/driver/rcxlib.cpp enigma2/lib/driver/rcxlib.cpp
 --- enigma2.ori/lib/driver/rcxlib.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/driver/rcxlib.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/rcxlib.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,224 @@
 +#include <lib/driver/rcxlib.h>
 +#include <lib/base/init.h>
@@ -2997,7 +2997,7 @@ diff -Naur enigma2.ori/lib/driver/rcxlib.cpp enigma2/lib/driver/rcxlib.cpp
 +eAutoInitP0<eRCXlibInit> init_rcXlib(eAutoInitNumbers::rc+1, "Xlib RC Driver");
 diff -Naur enigma2.ori/lib/driver/rcxlib.h enigma2/lib/driver/rcxlib.h
 --- enigma2.ori/lib/driver/rcxlib.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/driver/rcxlib.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/driver/rcxlib.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,35 @@
 +#ifndef __lib_driver_rcxlib_h
 +#define __lib_driver_rcxlib_h
@@ -3036,7 +3036,7 @@ diff -Naur enigma2.ori/lib/driver/rcxlib.h enigma2/lib/driver/rcxlib.h
 +#endif
 diff -Naur enigma2.ori/lib/dvb/Makefile.am enigma2/lib/dvb/Makefile.am
 --- enigma2.ori/lib/dvb/Makefile.am	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/Makefile.am	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/Makefile.am	2011-12-15 19:04:08.000000000 +0100
 @@ -33,7 +33,9 @@
  	subtitle.cpp \
  	teletext.cpp \
@@ -3058,7 +3058,7 @@ diff -Naur enigma2.ori/lib/dvb/Makefile.am enigma2/lib/dvb/Makefile.am
 +	decsa.h
 diff -Naur enigma2.ori/lib/dvb/ca_connector.cpp enigma2/lib/dvb/ca_connector.cpp
 --- enigma2.ori/lib/dvb/ca_connector.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/dvb/ca_connector.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/ca_connector.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,122 @@
 +#include <lib/dvb/ca_connector.h>
 +#include <lib/dvb/dvb.h>
@@ -3184,7 +3184,7 @@ diff -Naur enigma2.ori/lib/dvb/ca_connector.cpp enigma2/lib/dvb/ca_connector.cpp
 +eAutoInitPtr<caConnector> init_caConnector(eAutoInitNumbers::dvb-1, "caConnector");
 diff -Naur enigma2.ori/lib/dvb/ca_connector.h enigma2/lib/dvb/ca_connector.h
 --- enigma2.ori/lib/dvb/ca_connector.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/dvb/ca_connector.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/ca_connector.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,50 @@
 +#ifndef __lib_dvb_ca_connector_h
 +#define __lib_dvb_ca_connector_h
@@ -3238,7 +3238,7 @@ diff -Naur enigma2.ori/lib/dvb/ca_connector.h enigma2/lib/dvb/ca_connector.h
 +#endif
 diff -Naur enigma2.ori/lib/dvb/db.cpp enigma2/lib/dvb/db.cpp
 --- enigma2.ori/lib/dvb/db.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/db.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/db.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -803,18 +803,13 @@
  		return NULL;
  	}
@@ -3295,7 +3295,7 @@ diff -Naur enigma2.ori/lib/dvb/db.cpp enigma2/lib/dvb/db.cpp
  	}
 diff -Naur enigma2.ori/lib/dvb/decoder.cpp enigma2/lib/dvb/decoder.cpp
 --- enigma2.ori/lib/dvb/decoder.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/decoder.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/decoder.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -1,32 +1,7 @@
  #include <lib/base/ebase.h>
  #include <lib/base/eerror.h>
@@ -4516,7 +4516,7 @@ diff -Naur enigma2.ori/lib/dvb/decoder.cpp enigma2/lib/dvb/decoder.cpp
 -}
 diff -Naur enigma2.ori/lib/dvb/decoder.h enigma2/lib/dvb/decoder.h
 --- enigma2.ori/lib/dvb/decoder.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/decoder.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/decoder.h	2011-12-15 19:04:08.000000000 +0100
 @@ -3,6 +3,7 @@
  
  #include <lib/base/object.h>
@@ -4679,7 +4679,7 @@ diff -Naur enigma2.ori/lib/dvb/decoder.h enigma2/lib/dvb/decoder.h
  };
 diff -Naur enigma2.ori/lib/dvb/decsa.cpp enigma2/lib/dvb/decsa.cpp
 --- enigma2.ori/lib/dvb/decsa.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/dvb/decsa.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/decsa.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,212 @@
 +/*
 + * Based on "Softcam plugin to VDR (C++)"
@@ -4895,7 +4895,7 @@ diff -Naur enigma2.ori/lib/dvb/decsa.cpp enigma2/lib/dvb/decsa.cpp
 +
 diff -Naur enigma2.ori/lib/dvb/decsa.h enigma2/lib/dvb/decsa.h
 --- enigma2.ori/lib/dvb/decsa.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/dvb/decsa.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/decsa.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,47 @@
 +#ifndef __dvb_decsa_h
 +#define __dvb_decsa_h
@@ -4946,7 +4946,7 @@ diff -Naur enigma2.ori/lib/dvb/decsa.h enigma2/lib/dvb/decsa.h
 +#endif
 diff -Naur enigma2.ori/lib/dvb/demux.cpp enigma2/lib/dvb/demux.cpp
 --- enigma2.ori/lib/dvb/demux.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/demux.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/demux.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -84,21 +84,19 @@
  
  eDVBDemux::eDVBDemux(int adapter, int demux): adapter(adapter), demux(demux)
@@ -5405,7 +5405,7 @@ diff -Naur enigma2.ori/lib/dvb/demux.cpp enigma2/lib/dvb/demux.cpp
 +
 diff -Naur enigma2.ori/lib/dvb/demux.h enigma2/lib/dvb/demux.h
 --- enigma2.ori/lib/dvb/demux.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/demux.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/demux.h	2011-12-15 19:04:08.000000000 +0100
 @@ -3,6 +3,9 @@
  
  #include <lib/dvb/idvb.h>
@@ -5492,7 +5492,7 @@ diff -Naur enigma2.ori/lib/dvb/demux.h enigma2/lib/dvb/demux.h
  #endif
 diff -Naur enigma2.ori/lib/dvb/dvb.cpp enigma2/lib/dvb/dvb.cpp
 --- enigma2.ori/lib/dvb/dvb.cpp	2011-12-14 17:20:11.000000000 +0100
-+++ enigma2/lib/dvb/dvb.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/dvb.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -82,7 +82,7 @@
  		num_adapter++;
  	}
@@ -5641,7 +5641,7 @@ diff -Naur enigma2.ori/lib/dvb/dvb.cpp enigma2/lib/dvb/dvb.cpp
  	int r;
 diff -Naur enigma2.ori/lib/dvb/dvb.h enigma2/lib/dvb/dvb.h
 --- enigma2.ori/lib/dvb/dvb.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/dvb.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/dvb.h	2011-12-15 19:04:08.000000000 +0100
 @@ -135,7 +135,7 @@
  	DECLARE_REF(eDVBResourceManager);
  	int avail, busy;
@@ -5661,7 +5661,7 @@ diff -Naur enigma2.ori/lib/dvb/dvb.h enigma2/lib/dvb/dvb.h
  SWIG_EXTEND(ePtr<eDVBResourceManager>,
 diff -Naur enigma2.ori/lib/dvb/dvbtime.cpp enigma2/lib/dvb/dvbtime.cpp
 --- enigma2.ori/lib/dvb/dvbtime.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/dvbtime.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/dvbtime.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -17,13 +17,13 @@
  
  void setRTC(time_t time)
@@ -5696,7 +5696,7 @@ diff -Naur enigma2.ori/lib/dvb/dvbtime.cpp enigma2/lib/dvb/dvbtime.cpp
  		fclose(f);
 diff -Naur enigma2.ori/lib/dvb/frontend.cpp enigma2/lib/dvb/frontend.cpp
 --- enigma2.ori/lib/dvb/frontend.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/frontend.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/frontend.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -1485,8 +1485,8 @@
  	int power=m_slotid;  // this is needed for read inputpower from the correct tuner !
  	char proc_name[64];
@@ -5719,7 +5719,7 @@ diff -Naur enigma2.ori/lib/dvb/frontend.cpp enigma2/lib/dvb/frontend.cpp
  					{
 diff -Naur enigma2.ori/lib/dvb/idemux.h enigma2/lib/dvb/idemux.h
 --- enigma2.ori/lib/dvb/idemux.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/idemux.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/idemux.h	2011-12-15 19:04:08.000000000 +0100
 @@ -56,4 +56,29 @@
  	virtual RESULT connectEvent(const Slot1<void,int> &event, ePtr<eConnection> &conn)=0;
  };
@@ -5752,7 +5752,7 @@ diff -Naur enigma2.ori/lib/dvb/idemux.h enigma2/lib/dvb/idemux.h
  #endif
 diff -Naur enigma2.ori/lib/dvb/idvb.h enigma2/lib/dvb/idvb.h
 --- enigma2.ori/lib/dvb/idvb.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/idvb.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/idvb.h	2011-12-15 19:04:08.000000000 +0100
 @@ -618,6 +618,7 @@
  class iDVBSectionReader;
  class iDVBPESReader;
@@ -5771,7 +5771,7 @@ diff -Naur enigma2.ori/lib/dvb/idvb.h enigma2/lib/dvb/idvb.h
  	virtual RESULT getCADemuxID(uint8_t &id)=0;
 diff -Naur enigma2.ori/lib/dvb/pmt.cpp enigma2/lib/dvb/pmt.cpp
 --- enigma2.ori/lib/dvb/pmt.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/pmt.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/pmt.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -50,7 +50,7 @@
  	if ((m_last_channel_state != iDVBChannel::state_ok)
  		&& (state == iDVBChannel::state_ok) && (!m_demux))
@@ -5806,9 +5806,9 @@ diff -Naur enigma2.ori/lib/dvb/pmt.cpp enigma2/lib/dvb/pmt.cpp
  			else
  				m_pvr_channel->playFile(ref.path.c_str());
 diff -Naur enigma2.ori/lib/dvb/tstools.cpp enigma2/lib/dvb/tstools.cpp
---- enigma2.ori/lib/dvb/tstools.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/tstools.cpp	2011-12-14 17:20:56.000000000 +0100
-@@ -112,7 +112,8 @@
+--- enigma2.ori/lib/dvb/tstools.cpp	2011-12-15 19:03:29.000000000 +0100
++++ enigma2/lib/dvb/tstools.cpp	2011-12-15 19:04:08.000000000 +0100
+@@ -95,7 +95,8 @@
  
  		if (packet[0] != 0x47)
  		{
@@ -5820,7 +5820,7 @@ diff -Naur enigma2.ori/lib/dvb/tstools.cpp enigma2/lib/dvb/tstools.cpp
  				eDebug("resync %d", match - packet);
 diff -Naur enigma2.ori/lib/dvb/volume.cpp enigma2/lib/dvb/volume.cpp
 --- enigma2.ori/lib/dvb/volume.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/volume.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/volume.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -1,21 +1,5 @@
 -#include <lib/base/eerror.h>
  #include <lib/dvb/volume.h>
@@ -6042,7 +6042,7 @@ diff -Naur enigma2.ori/lib/dvb/volume.cpp enigma2/lib/dvb/volume.cpp
  void eDVBVolumecontrol::volumeToggleMute()
 diff -Naur enigma2.ori/lib/dvb/volume.h enigma2/lib/dvb/volume.h
 --- enigma2.ori/lib/dvb/volume.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/volume.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb/volume.h	2011-12-15 19:04:08.000000000 +0100
 @@ -19,9 +19,6 @@
  #ifdef SWIG
  	~eDVBVolumecontrol();
@@ -6055,7 +6055,7 @@ diff -Naur enigma2.ori/lib/dvb/volume.h enigma2/lib/dvb/volume.h
  	
 diff -Naur enigma2.ori/lib/dvb_ci/dvbci.cpp enigma2/lib/dvb_ci/dvbci.cpp
 --- enigma2.ori/lib/dvb_ci/dvbci.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb_ci/dvbci.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/dvb_ci/dvbci.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -653,7 +653,7 @@
  	if (getNumOfSlots() > 1) // FIXME .. we force DM8000 when more than one CI Slot is avail
  	{
@@ -6106,7 +6106,7 @@ diff -Naur enigma2.ori/lib/dvb_ci/dvbci.cpp enigma2/lib/dvb_ci/dvbci.cpp
  	{
 diff -Naur enigma2.ori/lib/gdi/Makefile.am enigma2/lib/gdi/Makefile.am
 --- enigma2.ori/lib/gdi/Makefile.am	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/gdi/Makefile.am	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gdi/Makefile.am	2011-12-15 19:04:08.000000000 +0100
 @@ -47,12 +47,19 @@
  	picload.h \
  	region.h
@@ -6134,7 +6134,7 @@ diff -Naur enigma2.ori/lib/gdi/Makefile.am enigma2/lib/gdi/Makefile.am
 +#endif
 diff -Naur enigma2.ori/lib/gdi/gxlibdc.cpp enigma2/lib/gdi/gxlibdc.cpp
 --- enigma2.ori/lib/gdi/gxlibdc.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/gdi/gxlibdc.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gdi/gxlibdc.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,356 @@
 +#include <fstream>
 +#include <lib/gdi/gxlibdc.h>
@@ -6494,7 +6494,7 @@ diff -Naur enigma2.ori/lib/gdi/gxlibdc.cpp enigma2/lib/gdi/gxlibdc.cpp
 +eAutoInitPtr<gXlibDC> init_gXlibDC(eAutoInitNumbers::graphic-1, "gXlibDC");
 diff -Naur enigma2.ori/lib/gdi/gxlibdc.h enigma2/lib/gdi/gxlibdc.h
 --- enigma2.ori/lib/gdi/gxlibdc.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/gdi/gxlibdc.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gdi/gxlibdc.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,78 @@
 +#ifndef __lib_gdi_gxlibdc_h
 +#define __lib_gdi_gxlibdc_h
@@ -6576,7 +6576,7 @@ diff -Naur enigma2.ori/lib/gdi/gxlibdc.h enigma2/lib/gdi/gxlibdc.h
 +#endif
 diff -Naur enigma2.ori/lib/gdi/lcd.cpp enigma2/lib/gdi/lcd.cpp
 --- enigma2.ori/lib/gdi/lcd.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/gdi/lcd.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gdi/lcd.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -75,8 +75,8 @@
  	lcdfd = open("/dev/dbox/oled0", O_RDWR);
  	if (lcdfd < 0)
@@ -6631,7 +6631,7 @@ diff -Naur enigma2.ori/lib/gdi/lcd.cpp enigma2/lib/gdi/lcd.cpp
  	else
 diff -Naur enigma2.ori/lib/gdi/xineLib.cpp enigma2/lib/gdi/xineLib.cpp
 --- enigma2.ori/lib/gdi/xineLib.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/gdi/xineLib.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gdi/xineLib.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,563 @@
 +#include <fstream>
 +#include <lib/gdi/xineLib.h>
@@ -7198,7 +7198,7 @@ diff -Naur enigma2.ori/lib/gdi/xineLib.cpp enigma2/lib/gdi/xineLib.cpp
 +
 diff -Naur enigma2.ori/lib/gdi/xineLib.h enigma2/lib/gdi/xineLib.h
 --- enigma2.ori/lib/gdi/xineLib.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/gdi/xineLib.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gdi/xineLib.h	2011-12-15 19:04:08.000000000 +0100
 @@ -0,0 +1,94 @@
 +#ifndef __lib_gdi_xineLib_h
 +#define __lib_gdi_xineLib_h
@@ -7296,7 +7296,7 @@ diff -Naur enigma2.ori/lib/gdi/xineLib.h enigma2/lib/gdi/xineLib.h
 +#endif
 diff -Naur enigma2.ori/lib/gui/evideo.cpp enigma2/lib/gui/evideo.cpp
 --- enigma2.ori/lib/gui/evideo.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/gui/evideo.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gui/evideo.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -1,8 +1,24 @@
  #include <lib/gui/evideo.h>
  #include <lib/gui/ewidgetdesktop.h>
@@ -7424,7 +7424,7 @@ diff -Naur enigma2.ori/lib/gui/evideo.cpp enigma2/lib/gui/evideo.cpp
  	m_decoder = decoder;
 diff -Naur enigma2.ori/lib/gui/evideo.h enigma2/lib/gui/evideo.h
 --- enigma2.ori/lib/gui/evideo.h	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/gui/evideo.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/gui/evideo.h	2011-12-15 19:04:08.000000000 +0100
 @@ -9,14 +9,14 @@
  	int m_state;
  	eRect m_user_rect;
@@ -7445,7 +7445,7 @@ diff -Naur enigma2.ori/lib/gui/evideo.h enigma2/lib/gui/evideo.h
  	void updatePosition(int disable = 0);
 diff -Naur enigma2.ori/lib/python/Components/AVSwitch.py enigma2/lib/python/Components/AVSwitch.py
 --- enigma2.ori/lib/python/Components/AVSwitch.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/AVSwitch.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/AVSwitch.py	2011-12-15 19:04:08.000000000 +0100
 @@ -24,7 +24,7 @@
  			return (4,3)
  		elif valstr == "16_9": # auto ... 4:3 or 16:9
@@ -7531,7 +7531,7 @@ diff -Naur enigma2.ori/lib/python/Components/AVSwitch.py enigma2/lib/python/Comp
  
 diff -Naur enigma2.ori/lib/python/Components/Converter/ServiceInfo.py enigma2/lib/python/Components/Converter/ServiceInfo.py
 --- enigma2.ori/lib/python/Components/Converter/ServiceInfo.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/Converter/ServiceInfo.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/Converter/ServiceInfo.py	2011-12-15 19:04:08.000000000 +0100
 @@ -42,7 +42,7 @@
  				"TsId": (self.TSID, (iPlayableService.evUpdatedInfo,)),
  				"OnId": (self.ONID, (iPlayableService.evUpdatedInfo,)),
@@ -7543,7 +7543,7 @@ diff -Naur enigma2.ori/lib/python/Components/Converter/ServiceInfo.py enigma2/li
  				"AudioTracksAvailable": (self.AUDIOTRACKS_AVAILABLE, (iPlayableService.evUpdatedInfo,)),
 diff -Naur enigma2.ori/lib/python/Components/Harddisk.py enigma2/lib/python/Components/Harddisk.py
 --- enigma2.ori/lib/python/Components/Harddisk.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/Harddisk.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/Harddisk.py	2011-12-15 19:04:08.000000000 +0100
 @@ -560,7 +560,7 @@
  		self.partitions = [ ]
  		self.devices_scanned_on_init = [ ]
@@ -7555,7 +7555,7 @@ diff -Naur enigma2.ori/lib/python/Components/Harddisk.py enigma2/lib/python/Comp
  			("/media/hdd", _("Harddisk")),
 diff -Naur enigma2.ori/lib/python/Components/InputDevice.py enigma2/lib/python/Components/InputDevice.py
 --- enigma2.ori/lib/python/Components/InputDevice.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/InputDevice.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/InputDevice.py	2011-12-15 19:04:08.000000000 +0100
 @@ -8,8 +8,8 @@
  # asm-generic/ioctl.h
  IOC_NRBITS = 8L
@@ -7569,7 +7569,7 @@ diff -Naur enigma2.ori/lib/python/Components/InputDevice.py enigma2/lib/python/C
  IOC_TYPESHIFT = IOC_NRSHIFT+IOC_NRBITS
 diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Components/NimManager.py
 --- enigma2.ori/lib/python/Components/NimManager.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/NimManager.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/NimManager.py	2011-12-15 19:04:08.000000000 +0100
 @@ -538,12 +538,12 @@
  	def setInternalLink(self):
  		if self.internally_connectable is not None:
@@ -7641,7 +7641,7 @@ diff -Naur enigma2.ori/lib/python/Components/NimManager.py enigma2/lib/python/Co
  				open("/sys/module/dvb_core/parameters/dvb_shutdown_timeout", "w").write(oldvalue)
 diff -Naur enigma2.ori/lib/python/Components/Sources/CurrentService.py enigma2/lib/python/Components/Sources/CurrentService.py
 --- enigma2.ori/lib/python/Components/Sources/CurrentService.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/Sources/CurrentService.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/Sources/CurrentService.py	2011-12-15 19:04:08.000000000 +0100
 @@ -16,6 +16,7 @@
  				iPlayableService.evUpdatedEventInfo: self.serviceEvent,
  				iPlayableService.evCuesheetChanged: self.serviceEvent,
@@ -7652,7 +7652,7 @@ diff -Naur enigma2.ori/lib/python/Components/Sources/CurrentService.py enigma2/l
  		self.navcore = navcore
 diff -Naur enigma2.ori/lib/python/Components/Timezones.py enigma2/lib/python/Components/Timezones.py
 --- enigma2.ori/lib/python/Components/Timezones.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/Timezones.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/Timezones.py	2011-12-15 19:04:08.000000000 +0100
 @@ -25,7 +25,7 @@
  		try:
  			timezonesHandler = self.parseTimezones(self.timezones)
@@ -7664,7 +7664,7 @@ diff -Naur enigma2.ori/lib/python/Components/Timezones.py enigma2/lib/python/Com
  		
 diff -Naur enigma2.ori/lib/python/Components/UsageConfig.py enigma2/lib/python/Components/UsageConfig.py
 --- enigma2.ori/lib/python/Components/UsageConfig.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Components/UsageConfig.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Components/UsageConfig.py	2011-12-15 19:04:08.000000000 +0100
 @@ -374,6 +374,14 @@
  		("8", "4"),("9", "1,4"),("10", "2,4"),("11", "1,2,4"),
  		("12", "3,4"),("13", "1,3,4"),("14", "2,3,4"),("15", "All")])
@@ -7682,7 +7682,7 @@ diff -Naur enigma2.ori/lib/python/Components/UsageConfig.py enigma2/lib/python/C
  		defval = None
 diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/SkinSelector/plugin.py enigma2/lib/python/Plugins/SystemPlugins/SkinSelector/plugin.py
 --- enigma2.ori/lib/python/Plugins/SystemPlugins/SkinSelector/plugin.py	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/Plugins/SystemPlugins/SkinSelector/plugin.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Plugins/SystemPlugins/SkinSelector/plugin.py	2011-12-15 19:04:08.000000000 +0100
 @@ -85,7 +85,7 @@
  		for x in names:
  			if x == "skin.xml":
@@ -7694,7 +7694,7 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/SkinSelector/plugin.py e
  					subdir = "Default Skin"
 diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEnhancement.py enigma2/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEnhancement.py
 --- enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEnhancement.py	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEnhancement.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEnhancement.py	2011-12-15 19:04:08.000000000 +0100
 @@ -1,7 +1,7 @@
  from Components.config import config, ConfigSubsection, ConfigSlider, ConfigSelection, ConfigNothing, NoSave
  from Tools.CList import CList
@@ -7924,7 +7924,7 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/VideoEnhancement/VideoEn
  
 diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/Videomode/VideoHardware.py enigma2/lib/python/Plugins/SystemPlugins/Videomode/VideoHardware.py
 --- enigma2.ori/lib/python/Plugins/SystemPlugins/Videomode/VideoHardware.py	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/python/Plugins/SystemPlugins/Videomode/VideoHardware.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Plugins/SystemPlugins/Videomode/VideoHardware.py	2011-12-15 19:04:08.000000000 +0100
 @@ -1,280 +1,131 @@
 -from enigma import eTimer
 +from enigma import eTimer, eAVSwitch
@@ -8366,7 +8366,7 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/Videomode/VideoHardware.
  video_hw = VideoHardware()
 diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/Videomode/plugin.py enigma2/lib/python/Plugins/SystemPlugins/Videomode/plugin.py
 --- enigma2.ori/lib/python/Plugins/SystemPlugins/Videomode/plugin.py	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/python/Plugins/SystemPlugins/Videomode/plugin.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Plugins/SystemPlugins/Videomode/plugin.py	2011-12-15 19:04:08.000000000 +0100
 @@ -19,6 +19,8 @@
  		self.hw = hw
  		self.onChangedEntry = [ ]
@@ -8515,7 +8515,7 @@ diff -Naur enigma2.ori/lib/python/Plugins/SystemPlugins/Videomode/plugin.py enig
  
 diff -Naur enigma2.ori/lib/python/Screens/Ci.py enigma2/lib/python/Screens/Ci.py
 --- enigma2.ori/lib/python/Screens/Ci.py	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/python/Screens/Ci.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Screens/Ci.py	2011-12-15 19:04:08.000000000 +0100
 @@ -242,7 +242,7 @@
  		eDVBCI_UI.getInstance().ciStateChanged.get().append(self.ciStateChanged)
  		SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots() > 0
@@ -8527,7 +8527,7 @@ diff -Naur enigma2.ori/lib/python/Screens/Ci.py enigma2/lib/python/Screens/Ci.py
  		except:
 diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/Tools/DreamboxHardware.py
 --- enigma2.ori/lib/python/Tools/DreamboxHardware.py	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/python/Tools/DreamboxHardware.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Tools/DreamboxHardware.py	2011-12-15 19:04:08.000000000 +0100
 @@ -4,7 +4,7 @@
  def getFPVersion():
  	ret = None
@@ -8584,7 +8584,7 @@ diff -Naur enigma2.ori/lib/python/Tools/DreamboxHardware.py enigma2/lib/python/T
  			fp = open("/dev/dbox/fp0")
 diff -Naur enigma2.ori/lib/python/Tools/HardwareInfo.py enigma2/lib/python/Tools/HardwareInfo.py
 --- enigma2.ori/lib/python/Tools/HardwareInfo.py	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/python/Tools/HardwareInfo.py	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/Tools/HardwareInfo.py	2011-12-15 19:04:08.000000000 +0100
 @@ -9,7 +9,7 @@
  
  		HardwareInfo.device_name = "unknown"
@@ -8605,7 +8605,7 @@ diff -Naur enigma2.ori/lib/python/Tools/HardwareInfo.py enigma2/lib/python/Tools
  				if rd.find("Brcm4380 V4.2") != -1:
 diff -Naur enigma2.ori/lib/python/enigma_python.i enigma2/lib/python/enigma_python.i
 --- enigma2.ori/lib/python/enigma_python.i	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/python/enigma_python.i	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/python/enigma_python.i	2011-12-15 19:04:08.000000000 +0100
 @@ -95,7 +95,6 @@
  #include <lib/dvb/cablescan.h>
  #include <lib/components/scan.h>
@@ -8643,7 +8643,7 @@ diff -Naur enigma2.ori/lib/python/enigma_python.i enigma2/lib/python/enigma_pyth
  
 diff -Naur enigma2.ori/lib/service/servicedvb.cpp enigma2/lib/service/servicedvb.cpp
 --- enigma2.ori/lib/service/servicedvb.cpp	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/service/servicedvb.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/service/servicedvb.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -976,6 +976,9 @@
  	CONNECT(m_service_handler_timeshift.serviceEvent, eDVBServicePlay::serviceEventTimeshift);
  	CONNECT(m_event_handler.m_eit_changed, eDVBServicePlay::gotNewEvent);
@@ -8984,7 +8984,7 @@ diff -Naur enigma2.ori/lib/service/servicedvb.cpp enigma2/lib/service/servicedvb
  		{
 diff -Naur enigma2.ori/lib/service/servicedvb.h enigma2/lib/service/servicedvb.h
 --- enigma2.ori/lib/service/servicedvb.h	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/service/servicedvb.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/service/servicedvb.h	2011-12-15 19:04:08.000000000 +0100
 @@ -4,12 +4,15 @@
  #include <lib/service/iservice.h>
  #include <lib/dvb/idvb.h>
@@ -9021,7 +9021,7 @@ diff -Naur enigma2.ori/lib/service/servicedvb.h enigma2/lib/service/servicedvb.h
  class eStaticServiceDVBBouquetInformation: public iStaticServiceInformation
 diff -Naur enigma2.ori/lib/service/servicemp3.cpp enigma2/lib/service/servicemp3.cpp
 --- enigma2.ori/lib/service/servicemp3.cpp	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/service/servicemp3.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/service/servicemp3.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -15,9 +15,9 @@
  
  #include <string>
@@ -10552,7 +10552,7 @@ diff -Naur enigma2.ori/lib/service/servicemp3.cpp enigma2/lib/service/servicemp3
  
 diff -Naur enigma2.ori/lib/service/servicemp3.h enigma2/lib/service/servicemp3.h
 --- enigma2.ori/lib/service/servicemp3.h	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/lib/service/servicemp3.h	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/lib/service/servicemp3.h	2011-12-15 19:04:08.000000000 +0100
 @@ -269,7 +269,7 @@
  
  	gint m_aspect, m_width, m_height, m_framerate, m_progressive;
@@ -10564,7 +10564,7 @@ diff -Naur enigma2.ori/lib/service/servicemp3.h enigma2/lib/service/servicemp3.h
  #endif
 diff -Naur enigma2.ori/main/Makefile.am enigma2/main/Makefile.am
 --- enigma2.ori/main/Makefile.am	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/main/Makefile.am	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/main/Makefile.am	2011-12-15 19:04:08.000000000 +0100
 @@ -50,8 +50,10 @@
  	@LIBXMLCCWRAP_LIBS@ \
  	@PTHREAD_LIBS@ \
@@ -10579,7 +10579,7 @@ diff -Naur enigma2.ori/main/Makefile.am enigma2/main/Makefile.am
  
 diff -Naur enigma2.ori/main/bsod.cpp enigma2/main/bsod.cpp
 --- enigma2.ori/main/bsod.cpp	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/main/bsod.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/main/bsod.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -192,28 +192,17 @@
  		xml.stringFromFile("dreamboxmodel", "/proc/stb/info/model");
  		xml.stringFromFile("kernelcmdline", "/proc/cmdline");
@@ -10616,7 +10616,7 @@ diff -Naur enigma2.ori/main/bsod.cpp enigma2/main/bsod.cpp
  		xml.open("crashlogs");
 diff -Naur enigma2.ori/main/enigma.cpp enigma2/main/enigma.cpp
 --- enigma2.ori/main/enigma.cpp	2011-12-14 02:00:10.000000000 +0100
-+++ enigma2/main/enigma.cpp	2011-12-14 17:20:56.000000000 +0100
++++ enigma2/main/enigma.cpp	2011-12-15 19:04:08.000000000 +0100
 @@ -231,7 +231,8 @@
  	python.execFile(eEnv::resolve("${libdir}/enigma2/python/mytest.py").c_str());
  
