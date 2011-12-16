@@ -1609,3 +1609,15 @@ diff -Naur xine-lib.ori/src/xine-engine/xine_interface.c xine-lib/src/xine-engin
  void xine_osd_hide(xine_osd_t *this, int64_t vpts) {
    this->osd.renderer->hide(&this->osd, vpts);
  }
+diff -Naur xine-lib.ori/version.sh xine-lib/version.sh
+--- xine-lib.ori/version.sh	2011-12-13 01:38:49.000000000 +0100
++++ xine-lib/version.sh	2011-12-16 19:15:09.000000000 +0100
+@@ -39,7 +39,7 @@
+ XINE_LT_REVISION=0
+ XINE_LT_AGE=0
+ 
+-test -f "`dirname $0`/.cvsversion" && XINE_VERSION_SUFFIX="hg"
++test -f "`dirname $0`/.cvsversion" && XINE_VERSION_SUFFIX="openpli-e2"
+ XINE_VERSION_SPEC="${XINE_VERSION_MAJOR}.${XINE_VERSION_MINOR}.${XINE_VERSION_SUB}${XINE_VERSION_PATCH}${XINE_VERSION_SUFFIX}"
+ 
+ ####
