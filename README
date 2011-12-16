@@ -79,6 +79,7 @@ with xine_sdl I get only video (SD and HD) in size 720x576 they don´t scale and
 
 2)
 Some remote control keys are remapped to local PC keyboard
+
 RED     ->  F1
 GREEN   ->  F2
 YELLOW  ->  F3
@@ -105,6 +106,9 @@ VIDEO   ->  V
 AUDIO   ->  A
 MUTE    ->  M
 TIMESHIFT ->  P
+
+QUIT ENIGMA2      ->  X
+FULL SCREEN MODE  ->  F11
 
 
 3)
