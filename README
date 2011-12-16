@@ -54,7 +54,7 @@ Where is Enigma2 ?
 
 Enigma2 will be installed in /usr/local/e2/
 Example configs in /usr/local/e2/etc/enigma2/
-The hole /proc/stb directory are located at /usr/local/e2/etc/tuxbox/stb/
+The hole /proc/stb directory are located at /usr/local/e2/etc/stb/
 
 
 ------------------------------
