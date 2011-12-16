@@ -20,8 +20,14 @@ REQPKG="autoconf automake build-essential gettext subversion mercurial git autop
 	"
 
 for p in $REQPKG; do
-	echo ">>> Installing $p"
-	sudo apt-get -y install $p
+	echo -n ">>> Checking \"$p\" : "
+	dpkg -s $p >/dev/null
+	if [ "$?" -eq "0" ]; then
+		echo "package is installed, skip it"
+	else
+		echo "package NOT present, installing it"
+		sudo apt-get -y install $p
+	fi
 done
 
 #sudo apt-get install python-setuptools
