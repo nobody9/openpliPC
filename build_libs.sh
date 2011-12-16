@@ -1,9 +1,9 @@
 #!/bin/sh
-#To build enigma2 on Ubuntu 10.10 32/64bit
+#To build enigma2 on Ubuntu 10.xx and 11.xx (32/64bit) 
 #Install these packages:
 #
 XINELIB_REF="04255996be730b37f80aa95a32c60636b827a8ba"
-XINELIB_PATCH="xinelib_20111214a.patch"
+XINELIB_PATCH="xinelib_20111216.patch"
 #
 echo "-----------------------------------------"
 echo "*** INSTALL REQUIRED PACKAGES ***"
