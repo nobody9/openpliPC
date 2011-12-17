@@ -35,7 +35,8 @@ libenigma_dvb_a_SOURCES = \
 	tstools.cpp \
 	volume.cpp \
 	ca_connector.cpp \
-	decsa.cpp
+	decsa.cpp \
+	streamserver.cpp
 
 dvbincludedir = $(pkgincludedir)/lib/dvb
 dvbinclude_HEADERS = \
@@ -71,4 +72,5 @@ dvbinclude_HEADERS = \
 	tstools.h \
 	volume.h \
 	ca_connector.h \
-	decsa.h
+	decsa.h \
+	streamserver.h
