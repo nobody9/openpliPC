@@ -43,8 +43,8 @@ If you are interested to have a logfile , simply do:
 
 
 
-3) Build Xine-libe and openpliPC Enigma2:
-It compile and install xine-libe and the openpliPC Enigma2.
+3) Build Xine-lib and openpliPC Enigma2:
+It compile and install xine-lib and the openpliPC Enigma2.
 xine-lib and enigma2 are included in openpliPC main repo and code
 is already patched ready to compile.
 Some tasks require root access (sudo). You will be asked for your password.
