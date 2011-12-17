@@ -175,7 +175,7 @@ diff -Naur enigma2.ori/data/setup.xml enigma2/data/setup.xml
  </setupxml>
 diff -Naur enigma2.ori/data/xine.conf enigma2/data/xine.conf
 --- enigma2.ori/data/xine.conf	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/data/xine.conf	2011-12-16 03:04:14.000000000 +0100
++++ enigma2/data/xine.conf	2011-12-17 07:03:49.000000000 +0100
 @@ -0,0 +1,364 @@
 +#
 +# xine config file
@@ -331,7 +331,7 @@ diff -Naur enigma2.ori/data/xine.conf enigma2/data/xine.conf
 +# number of audio buffers
 +# numeric, default: 230
 +audio.synchronization.slow_fast_audio:1
-+engine.buffers.audio_num_buffers:230
++engine.buffers.audio_num_buffers:250
 +
 +# number of video buffers
 +# numeric, default: 500
@@ -4896,7 +4896,7 @@ diff -Naur enigma2.ori/lib/dvb/decsa.cpp enigma2/lib/dvb/decsa.cpp
 +
 diff -Naur enigma2.ori/lib/dvb/decsa.h enigma2/lib/dvb/decsa.h
 --- enigma2.ori/lib/dvb/decsa.h	1970-01-01 01:00:00.000000000 +0100
-+++ enigma2/lib/dvb/decsa.h	2011-12-16 06:15:29.000000000 +0100
++++ enigma2/lib/dvb/decsa.h	2011-12-17 04:23:37.000000000 +0100
 @@ -0,0 +1,47 @@
 +#ifndef __dvb_decsa_h
 +#define __dvb_decsa_h
@@ -4912,7 +4912,7 @@ diff -Naur enigma2.ori/lib/dvb/decsa.h enigma2/lib/dvb/decsa.h
 +#define TS_SYNC_BYTE     0x47
 +
 +#define MAX_REL_WAIT 100 // time to wait if key in used on set
-+#define MAX_KEY_WAIT 200 // time to wait if key not ready on change
++#define MAX_KEY_WAIT 500 // time to wait if key not ready on change
 +
 +#define MAX_CSA_PIDS 8192
 +#define MAX_CSA_IDX  16
@@ -5697,7 +5697,16 @@ diff -Naur enigma2.ori/lib/dvb/dvbtime.cpp enigma2/lib/dvb/dvbtime.cpp
  		fclose(f);
 diff -Naur enigma2.ori/lib/dvb/frontend.cpp enigma2/lib/dvb/frontend.cpp
 --- enigma2.ori/lib/dvb/frontend.cpp	2011-12-14 02:00:09.000000000 +0100
-+++ enigma2/lib/dvb/frontend.cpp	2011-12-16 06:15:29.000000000 +0100
++++ enigma2/lib/dvb/frontend.cpp	2011-12-16 10:15:57.000000000 +0100
+@@ -1397,7 +1397,7 @@
+ #endif
+ 		else if (ioctl(m_fd, FE_GET_FRONTEND, &front)<0)
+ 		{
+-			eDebug("FE_GET_FRONTEND failed (%m)");
++//			eDebug("FE_GET_FRONTEND failed (%m)");
+ 			original = true;
+ 		}
+ 		if (original)
 @@ -1485,8 +1485,8 @@
  	int power=m_slotid;  // this is needed for read inputpower from the correct tuner !
  	char proc_name[64];
@@ -5718,6 +5727,17 @@ diff -Naur enigma2.ori/lib/dvb/frontend.cpp enigma2/lib/dvb/frontend.cpp
  					FILE *f=fopen(proc_name, "w");
  					if (f) // new interface exist?
  					{
+@@ -2556,8 +2556,8 @@
+ #if HAVE_DVB_API_VERSION < 3
+ 	return ::ioctl(m_secfd, SEC_SET_VOLTAGE, vlt);
+ #else
+-	if (m_type == feSatellite && ::ioctl(m_fd, FE_ENABLE_HIGH_LNB_VOLTAGE, increased) < 0)
+-		perror("FE_ENABLE_HIGH_LNB_VOLTAGE");
++/*	if (m_type == feSatellite && ::ioctl(m_fd, FE_ENABLE_HIGH_LNB_VOLTAGE, increased) < 0)
++		perror("FE_ENABLE_HIGH_LNB_VOLTAGE");*/
+ 	return ::ioctl(m_fd, FE_SET_VOLTAGE, vlt);
+ #endif
+ }
 diff -Naur enigma2.ori/lib/dvb/idemux.h enigma2/lib/dvb/idemux.h
 --- enigma2.ori/lib/dvb/idemux.h	2011-12-14 02:00:09.000000000 +0100
 +++ enigma2/lib/dvb/idemux.h	2011-12-16 06:15:29.000000000 +0100

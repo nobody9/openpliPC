@@ -743,8 +743,8 @@ diff -Naur xine-lib.ori/src/input/input_enigma.c xine-lib/src/input/input_enigma
 +        if (!this->enabled) {
 +          /* a new stream starts */
 +          xprintf(this->stream->xine, XINE_VERBOSITY_DEBUG, "\nnet_buf_ctrl: enigma_nbc_put_cb: starts buffering\n");
-+          this->enabled           = 0;
-+          this->buffering         = 0;
++          this->enabled           = 1;
++          this->buffering         = 1;
 +          this->video_first_pts   = 0;
 +          this->video_last_pts    = 0;
 +          this->audio_first_pts   = 0;
