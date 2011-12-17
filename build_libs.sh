@@ -30,6 +30,9 @@ for p in $REQPKG; do
 	fi
 done
 
+mkdir libs
+cd libs
+
 #Build and install libdvbsi++:
 PKG="libdvbsi++"
 echo "-----------------------------------------"
@@ -137,6 +140,7 @@ cd ..
 #insmod dvbsoftwareca.ko  # It will create ca0 device for adapter0
 
 
+cd ..
 echo "*********************<END>*********************"
 
 
