@@ -105,5 +105,7 @@ sudo mkdir -p $INSTALL_E2DIR/etc/tuxbox
 sudo cp share/fonts/* $INSTALL_E2DIR/share/fonts
 sudo cp -rf etc/* $INSTALL_E2DIR/etc
 
+ln -sf $INSTALL_E2DIR/bin/enigma2 ./enigma2bin
+
 echo ""
 echo "**********************<END>**********************"
