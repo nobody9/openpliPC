@@ -32,27 +32,33 @@ git pull https://github.com/nobody9/openpliPC.git
 
 
 2) Building needed openpliPC enigma2 libraries:
-./build_libs.sh
-If you are interested in a logfile , simply do:
-./build_libs.sh 2>&1 | tee build_libs.log
-
 It download, build and install all needed libraries
 Some tasks require root access (sudo). You will be asked for your password.
+This task must be run ONCE at the first time. These libs are compiled from
+its original sources and aren't patched anyway.
+
+./build_libs.sh
+If you are interested to have a logfile , simply do:
+./build_libs.sh 2>&1 | tee build_libs.log
 
 
-3) Build openpliPC Enigma2 and xine-lib:
+
+3) Build Xine-libe and openpliPC Enigma2:
+It compile and install xine-libe and the openpliPC Enigma2.
+xine-lib and enigma2 are included in openpliPC main repo and code
+is already patched ready to compile.
+Some tasks require root access (sudo). You will be asked for your password.
+
 ./build_openpliPC.sh 
-If you are interested in a logfile , simply do:
+If you are interested to have a logfile , simply do:
 ./build_openpliPC.sh.sh 2>&1 | tee build_log.log
 
-It compile and install the openpliPC Enigma2 and xine-lib source code.
-Some tasks require root access (sudo). You will be asked for your password.
 
 ------------------------------
 Where is Enigma2 ?
 ------------------------------
 
-Enigma2 will be installed in /usr/local/e2/
+Enigma2 will be installed in /usr/local/e2/ (see build_openpliPC.sh $INSTALL_E2DIR )
 Example configs in /usr/local/e2/etc/enigma2/
 The hole /proc/stb directory are located at /usr/local/e2/etc/stb/
 
