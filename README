@@ -31,7 +31,7 @@ cd openpliPC/
 git pull https://github.com/nobody9/openpliPC.git
 
 
-2) Building needed Enigma2 libraries:
+2) Building needed openpliPC enigma2 libraries:
 ./build_libs.sh
 If you are interested in a logfile , simply do:
 ./build_libs.sh 2>&1 | tee build_libs.log
@@ -40,12 +40,12 @@ It download, build and install all needed libraries
 Some tasks require root access (sudo). You will be asked for your password.
 
 
-3) Build Enigma2:
-./build_enigma2.sh 
+3) Build openpliPC Enigma2 and xine-lib:
+./build_openpliPC.sh 
 If you are interested in a logfile , simply do:
-./build_enigma.sh 2>&1 | tee build_log.log
+./build_openpliPC.sh.sh 2>&1 | tee build_log.log
 
-It fetch the openpli Enigma2 source code, patch it, compile and install.
+It compile and install the openpliPC Enigma2 and xine-lib source code.
 Some tasks require root access (sudo). You will be asked for your password.
 
 ------------------------------
