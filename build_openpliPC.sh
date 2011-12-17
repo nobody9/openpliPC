@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # where install Enigma2 tree
-INSTALL_E2DIR = "/usr/local/e2"
+INSTALL_E2DIR="/usr/local/e2"
 
 #define enigma2 ref and enigma2 patch
 ###REF="40eea73ce3269c031d231e8cf4ef307cfbc1466c"
