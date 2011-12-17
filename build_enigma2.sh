@@ -23,6 +23,33 @@ INSTALL_DIR = "/usr/local/e2"
 #echo "downloading OpenPli sources, please wait..."
 #echo "--------------------------------------"
 
+#Build and install xine-lib:
+PKG="xine-lib"
+echo "-----------------------------------------"
+echo "configuring OpenPliPC $PKG"
+echo "-----------------------------------------"
+#if [ -d $PKG ]; then
+#	echo "Erasing older build dir"
+#	rm -Rf $PKG
+#	rm -f $PKG*
+#fi
+#git clone git://projects.vdr-developer.org/$PKG.git
+cd $PKG
+#git checkout df-osd-handling+alter-vdpau-h264-decoder
+#git checkout $XINELIB_REF
+#patch -p1 < ../patches/$XINELIB_PATCH
+./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
+echo "-----------------------------------------"
+echo "build OpenPliPC $PKG, please wait..."
+echo "-----------------------------------------"
+make
+echo "--------------------------------------"
+echo "installing OpenPliPC $PKG"
+echo "--------------------------------------"
+
+sudo make install
+cd ..
+
 cd enigma2
 #git checkout $REF
  
