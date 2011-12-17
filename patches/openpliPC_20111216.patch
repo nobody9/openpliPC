@@ -335,7 +335,7 @@ diff -Naur enigma2.ori/data/xine.conf enigma2/data/xine.conf
 +
 +# number of video buffers
 +# numeric, default: 500
-+engine.buffers.video_num_buffers:1800
++engine.buffers.video_num_buffers:1500
 +
 +# default number of video frames
 +# numeric, default: 15

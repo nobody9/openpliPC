@@ -3,7 +3,7 @@
 #Install these packages:
 #
 XINELIB_REF="04255996be730b37f80aa95a32c60636b827a8ba"
-XINELIB_PATCH="xinelib_20111216.patch"
+XINELIB_PATCH="xinelib_20111217.patch"
 #
 echo "-----------------------------------------"
 echo "*** INSTALL REQUIRED PACKAGES ***"
