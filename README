@@ -70,6 +70,9 @@ Run enigma2
 Enigma2 requires to be launched as root user:
 sudo /usr/local/e2/bin/enigma2
 
+If you are inside openpliPC/ simply do:
+sudo ./e2bin
+
 If you are concerned about security, build and run Enigma2 in a Virtual Machine
 
 
