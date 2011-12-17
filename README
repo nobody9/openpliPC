@@ -76,6 +76,10 @@ with xine_vdpau I get osd, video (SD and HD) and sound,
 with xine_xshm I get video (SD and HD) and sound ,
 with xine_sdl I get only video (SD and HD) in size 720x576 they don´t scale and sound.
 
+VDPAU has the best results but it's only available with Nvidia graphics cards
+http://en.wikipedia.org/wiki/VDPAU
+http://en.wikipedia.org/wiki/Nvidia_PureVideo
+
 
 2)
 Some remote control keys are remapped to local PC keyboard
