@@ -177,6 +177,7 @@ Example ( http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2
   modprobe vtunerc on the i686
   vtunerc -f s2 &
   start openplipc 
+Guide for vtunerc client http://wiki.nessiedvb.org/wiki/doku.php?id=install_vtunerc
 
 
 ------------------------------
