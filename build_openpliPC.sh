@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # where install Enigma2 tree
 INSTALL_E2DIR="/usr/local/e2"

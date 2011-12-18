@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #To build enigma2 on Ubuntu 10.xx and 11.xx (32/64bit) 
 #Install these packages:
 #
