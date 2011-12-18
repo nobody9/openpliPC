@@ -53,10 +53,8 @@ Some tasks require root access (sudo). You will be asked for your password.
 If you are interested to have a logfile , simply do:
 ./build_openpliPC.sh.sh 2>&1 | tee build_log.log
 
-./build_openpliPC.sh has two command-line options:
-./build_openpliPC.sh -b     backup E2 config before new E2 build&install
-./build_openpliPC.sh -r     restore E2 config after new E2 build&install (previously saved with -b)
-./build_openpliPC.sh -b -r  backup config, build&install E2, restore old config
+./build_openpliPC.sh has some command-line options
+./build_openpliPC.sh -h  to see them
 
 
 ------------------------------

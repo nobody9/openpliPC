@@ -9,6 +9,7 @@ BACKUP_E2="etc/enigma2 etc/tuxbox/*.xml etc/tuxbox/nim_sockets"
 
 DO_BACKUP=0
 DO_RESTORE=0
+DO_XINE=1
 
 function e2_backup {
         echo "-----------------------------"
@@ -28,15 +29,37 @@ function e2_restore {
 	fi
 }
 
+function usage {
+	echo "Usage:"
+	echo " -b : backup E2 conf file before re-compile"
+	echo " -r : restore E2 conf file after re-compile"
+	echo " -x : don't compile xine-lib (compile only enigma2)"
+	echo " -h : this help"
+	echo ""
+	echo "common usage:"
+	echo "  $0 -b -r : make E2 backup, compile E2, restore E2 conf files"
+	echo ""
+}
 
 while [ "$1" != "" ]; do
     case $1 in
-        -b )  DO_BACKUP=1
-              ;;
-        -r )  DO_RESTORE=1
-              ;;
+        -b ) 	DO_BACKUP=1
+		shift
+        	;;
+        -r )  	DO_RESTORE=1
+		shift
+              	;;
+	-x )	DO_XINE=0
+		shift
+		;;
+	-h )  	usage
+	      	exit
+	      	;;
+	*  )  	echo "Unknown parameter"
+	      	usage
+	      	exit
+	      	;;
     esac
-    shift
 done
 
 if [ "$DO_BACKUP" -eq "1" ]; then
@@ -45,39 +68,32 @@ fi
 
 # ----------------------------------------------------------------------
 
-# Build and install xine-lib:
-PKG="xine-lib"
-echo "-----------------------------------------"
-echo "configuring OpenPliPC $PKG"
-echo "-----------------------------------------"
+if [ "$DO_XINE" -eq "1" ]; then
 
-#if [ -d $PKG ]; then
-#	echo "Erasing older build dir"
-#	rm -Rf $PKG
-#	rm -f $PKG*
-#fi
-#git clone git://projects.vdr-developer.org/$PKG.git
+	# Build and install xine-lib:
+	PKG="xine-lib"
+	echo "-----------------------------------------"
+	echo "configuring OpenPliPC $PKG"
+	echo "-----------------------------------------"
 
-cd $PKG
+	cd $PKG
 
-#git checkout df-osd-handling+alter-vdpau-h264-decoder
-#git checkout $XINELIB_REF
-#patch -p1 < ../patches/$XINELIB_PATCH
+	./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
 
-./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
+	echo "-----------------------------------------"
+	echo "build OpenPliPC $PKG, please wait..."
+	echo "-----------------------------------------"
 
-echo "-----------------------------------------"
-echo "build OpenPliPC $PKG, please wait..."
-echo "-----------------------------------------"
+	make
 
-make
+	echo "--------------------------------------"
+	echo "installing OpenPliPC $PKG"
+	echo "--------------------------------------"
 
-echo "--------------------------------------"
-echo "installing OpenPliPC $PKG"
-echo "--------------------------------------"
+	sudo make install
+	cd ..
 
-sudo make install
-cd ..
+fi
 
 # ----------------------------------------------------------------------
 
