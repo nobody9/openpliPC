@@ -170,14 +170,11 @@ take a look into it
 Using vtuner http://code.google.com/p/vtuner/ user can share his tuner over network connection.
 It's a client/server software. Server must be installed where you have a tuner (i.e. your STB like CT9x00 , DM800 ..) 
 and client must be installed where you have not the physical tuner (i.e. PC)
-Example ( http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2-on-ubuntu-104-32-bit/page__view__findpost__p__238841 )
-  kill enigma with init 4, kill your running cardemu
-  vtunerd 1 01 2 0 & on the dm8000
-  start your emu and then start enigma with init 3
-  modprobe vtunerc on the i686
-  vtunerc -f s2 &
-  start openplipc 
+Some external ref:
 Guide for vtunerc client http://wiki.nessiedvb.org/wiki/doku.php?id=install_vtunerc
+http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2-on-ubuntu-104-32-bit/page__view__findpost__p__238841 )
+http://openpli.org/forums/topic/20871-build-script-for-openpli-enigma2-on-ubuntu-104-32-bit/page__view__findpost__p__239211
+
 
 
 ------------------------------
