@@ -29,6 +29,7 @@ cd openpliPC/
 1b) Keep in sync previously cloned git repo:
 cd openpliPC/
 git pull https://github.com/nobody9/openpliPC.git
+git checkout old_xine_lib
 
 
 2) Building needed openpliPC enigma2 libraries:
