@@ -130,7 +130,11 @@ class pliExpertInfo(Poll, Converter, object):
 				showCryptoInfo = True
 				Sec_Text = "FTA"
 			res = ""			
-			searchIDs = (info.getInfoObject(iServiceInformation.sCAIDs))
+			try:
+				searchIDs = (info.getInfoObject(iServiceInformation.sCAIDs))
+			except:
+				searchIDs = 0
+				pass
 			for idline in self.idnames:
 				if int(decCI, 16) >= int(idline[0], 16) and int(decCI, 16) <= int(idline[1], 16):                    
 					color="\c0000??00"

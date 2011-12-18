@@ -28,7 +28,11 @@ class ServiceOrbitalPosition(Converter, object):
 		if ref:
 			transponder_info = info.getInfoObject(ref, iServiceInformation.sTransponderData)
 		else:
-			transponder_info = info.getInfoObject(iServiceInformation.sTransponderData)
+			try:
+				transponder_info = info.getInfoObject(iServiceInformation.sTransponderData)
+			except:
+				transponder_info = 0
+				pass
 		if transponder_info and "orbital_position" in transponder_info.keys():
 			pos = int(transponder_info["orbital_position"])
 			direction = 'E'
