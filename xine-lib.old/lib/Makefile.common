@@ -1,4 +1,0 @@
-LIBXINEPOSIX=$(top_builddir)/lib/libxineposix.la
-
-$(LIBXINEPOSIX):
-	$(MAKE) -C $(top_builddir)/lib libxineposix.la
