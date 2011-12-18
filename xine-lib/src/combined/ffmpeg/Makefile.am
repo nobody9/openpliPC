@@ -29,7 +29,7 @@ xineplug_decode_ff_la_LDFLAGS = $(AM_LDFLAGS) $(IMPURE_TEXT_LDFLAGS)
 
 # Generation of ffmpeg->xine codec mapping lists (see xine_*.list).
 
-AV_CPP = $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AVUTIL_CFLAGS)
+AV_CPP = $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)
 
 # Extract some CODEC_ID_* from avcodec.h. Requires some sed mangling.
 avcodec_audio.list: AV_CODECS:=/CODEC_ID_PCM_S16LE/,/CODEC_ID_DVD_SUBTITLE/

@@ -267,7 +267,7 @@ static char * get_help (void) {
   return _("This filter will perform a time stretch, playing the "
            "stream faster or slower by a factor. Pitch is optionally "
            "preserved, so it is possible, for example, to use it to "
-           "watch a movie in less time than it was originally shot.\n"
+           "watch a movie in less time than it was originaly shot.\n"
            );
 }
 

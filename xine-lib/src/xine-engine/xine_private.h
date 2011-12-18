@@ -29,23 +29,13 @@
 #ifndef XINE_PRIVATE_H__
 #define XINE_PRIVATE_H__
 
-#ifndef XINE_LIBRARY_COMPILE
-# error xine_private.h is for libxine private use only!
-#endif
-
 #include <config.h>
 #include <xine/xine_internal.h>
 
 #if SUPPORT_ATTRIBUTE_VISIBILITY_INTERNAL
 # define INTERNAL __attribute__((visibility("internal")))
-#elif SUPPORT_ATTRIBUTE_VISIBILITY_DEFAULT
-# define INTERNAL __attribute__((__visibility__("default")))
 #else
 # define INTERNAL
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 /**
@@ -103,16 +93,5 @@ void _x_audio_decoder_shutdown      (xine_stream_t *stream) INTERNAL;
  * @brief Benchmark available memcpy methods
  */
 void xine_probe_fast_memcpy(xine_t *xine) INTERNAL;
-
-/**
- * @brief Make file descriptors and sockets uninheritable
- */
-int _x_set_file_close_on_exec(int fd) INTERNAL;
-
-int _x_set_socket_close_on_exec(int s) INTERNAL;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -71,6 +71,8 @@ CONFIGURE_FLAGS := \
 	--with-wavpack \
 	--enable-ipv6 \
 	--with-external-dvdnav \
+	--disable-musepack \
+	--disable-xinerama \
 	$(DEB_BUILD_CONFIG_OPTIONS)
 
 configure: configure-stamp

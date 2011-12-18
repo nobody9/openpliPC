@@ -259,7 +259,7 @@ static char * get_static_help (void) {
            "and cpu usage.\n"
            "\n"
            "* Uses several algorithms from tvtime and dscaler projects.\n"
-           "Deinterlacing methods: (Not all methods are available for all platforms)\n"
+           "Deinterlacing methods: (Not all methods are available for all plataforms)\n"
            "\n"
            );
 }

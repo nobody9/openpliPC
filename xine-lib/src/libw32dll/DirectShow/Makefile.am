@@ -28,4 +28,3 @@ libds_filter_la_SOURCES = \
 	DS_Filter.c \
 	DS_AudioDecoder.c \
 	DS_VideoDecoder.c
-libds_filter_la_CFLAGS = $(AM_CFLAGS) -fno-strict-aliasing

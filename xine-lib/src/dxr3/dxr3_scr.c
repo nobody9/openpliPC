@@ -75,7 +75,7 @@ dxr3_scr_t *dxr3_scr_init(xine_t *xine)
   devnum = xine->config->register_num(xine->config,
     CONF_KEY, 0, CONF_NAME, CONF_HELP, 10, NULL, NULL);
   snprintf(tmpstr, sizeof(tmpstr), "/dev/em8300-%d", devnum);
-  if ((this->fd_control = xine_open_cloexec(tmpstr, O_WRONLY)) < 0) {
+  if ((this->fd_control = open(tmpstr, O_WRONLY)) < 0) {
     xprintf(this->xine, XINE_VERBOSITY_DEBUG,
 	    "dxr3_scr: Failed to open control device %s (%s)\n", tmpstr, strerror(errno));
     free(this);

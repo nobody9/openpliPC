@@ -94,7 +94,7 @@ static int extended_to_int(const unsigned char p[10])
         m = (m<<8) + p[2+i];;
     e = (((int)p[0]&0x7f)<<8) | p[1];
     if (e == 0x7fff && m)
-        return (int)(0.0/0.0);
+        return 0.0/0.0;
     e -= 16383 + 63;
 
     if (p[0]&0x80)

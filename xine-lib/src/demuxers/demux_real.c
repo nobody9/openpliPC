@@ -299,7 +299,7 @@ static mdpr_t *real_parse_mdpr(const char *data, const unsigned int size)
     goto fail;
 
   mdpr->type_specific_len=_X_BE_32(&data[34+mdpr->stream_name_size+mdpr->mime_type_size]);
-  if (size < 38 + mdpr->stream_name_size + mdpr->mime_type_size + mdpr->type_specific_len)
+  if (size < 38 + mdpr->stream_name_size + mdpr->mime_type_size + mdpr->type_specific_data)
     goto fail;
   mdpr->type_specific_data=xine_memdup(&data[38+mdpr->stream_name_size+mdpr->mime_type_size], mdpr->type_specific_len);
   if (!mdpr->type_specific_data)

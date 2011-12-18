@@ -104,7 +104,7 @@
 #define CD_LEADOUT_TRACK        0xAA
 #define CD_BLOCK_OFFSET         150
 
-#if !defined(HAVE_LIBAVUTIL_SHA_H)
+#if defined(HAVE_LIBAVUTIL_SHA1_H) && !defined(HAVE_LIBAVUTIL_SHA_H)
 /* old libavutil/sha1.h was found... */
 #define AVSHA AVSHA1
 #  define av_sha_init(c,b) 	av_sha1_init(c)
@@ -1485,7 +1485,7 @@ static void _cdda_parse_cddb_info (cdda_input_plugin_t *this, char *buffer, char
       int nyear;
       char *y = strstr (buffer, "YEAR:");
       if (y && sscanf (y + 5, "%4d", &nyear) == 1)
-	this->cddb.disc_year = _x_asprintf ("%d", nyear);
+	asprintf (&this->cddb.disc_year, "%d", nyear);
     }
   }
 }
@@ -1938,7 +1938,7 @@ static int cdda_open(cdda_input_plugin_t *this_gen,
 
   /* We use O_NONBLOCK for when /proc/sys/dev/cdrom/check_media is at 1 on
    * Linux systems */
-  fd = xine_open_cloexec(cdda_device, O_RDONLY | O_NONBLOCK);
+  fd = open (cdda_device, O_RDONLY | O_NONBLOCK);
   if (fd == -1) {
     return -1;
   }
@@ -2507,10 +2507,8 @@ static char ** cdda_class_get_autoplay_list (input_class_t *this_gen,
   num_tracks = toc->last_track - toc->first_track;
   if (toc->ignore_last_track)
     num_tracks--;
-  if (num_tracks >= MAX_TRACKS-1)
-    num_tracks = MAX_TRACKS - 2;
   for ( i = 0; i <= num_tracks; i++ )
-    this->autoplaylist[i] = _x_asprintf("cdda:/%d",i+toc->first_track);
+    asprintf(&this->autoplaylist[i],"cdda:/%d",i+toc->first_track);
 
   *num_files = toc->last_track - toc->first_track + 1;
 

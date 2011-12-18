@@ -31,22 +31,22 @@
         "pxor %%mm6, %%mm6\n\t"
         "pxor %%mm7, %%mm7\n\t"
 
-		"movq    -2(%%"XDX"), %%mm0\n\t"		// value a from top left		
-		"movq    -4(%%"XDX", %%"XCX"), %%mm1\n\t"	// value m from bottom right			
+		"movq    -2(%%"XBX"), %%mm0\n\t"		// value a from top left		
+		"movq    -4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value m from bottom right			
         
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
 		"psubusb %%mm0, %%mm1\n\t"
 		"por		%%mm1, %%mm3\n\t"					// abs(a,m)
 
-		"psubusb "_DiffThres", %%mm3\n\t"		// nonzero where abs(a,m) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm3\n\t"		// nonzero where abs(a,m) > Thres else 0
 		"pxor	%%mm4, %%mm4\n\t"
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where abs(a,m) < Thres, else 00	
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(a,m) > Thres, else 00
 
 
-		"movq    -4(%%"XDX"), %%mm0\n\t"		// value j
-		"movq    4(%%"XDX", %%"XCX"), %%mm1\n\t"	// value n
+		"movq    -4(%%"XBX"), %%mm0\n\t"		// value j
+		"movq    4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n
 		"movq	%%mm0, %%mm2\n\t"					
 		"pavgb	%%mm1, %%mm2\n\t"					// avg(j,n)
         "movq	%%mm0, %%mm3\n\t"
@@ -55,7 +55,7 @@
 		"por		%%mm1, %%mm0\n\t"					// abs(j,n)
 
         "movq    %%mm0, %%mm1\n\t"
-		"psubusb "_DiffThres", %%mm1\n\t"		// nonzero where abs(j,n) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm1\n\t"		// nonzero where abs(j,n) > Thres else 0
 		"pxor	%%mm3, %%mm3\n\t"
 		"pcmpeqb %%mm3, %%mm1\n\t"			// now ff where abs(j,n) < Thres, else 00	
 
@@ -75,31 +75,31 @@
         "por     %%mm0, %%mm7\n\t"
         
         // k & m
-		"movq    2(%%"XDX"), %%mm0\n\t"		// value c from top left		
-		"movq    4(%%"XDX", %%"XCX"), %%mm1\n\t"	// value n from bottom right			
+		"movq    2(%%"XBX"), %%mm0\n\t"		// value c from top left		
+		"movq    4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n from bottom right			
 
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
 		"psubusb %%mm0, %%mm1\n\t"
 		"por		%%mm1, %%mm3\n\t"					// abs(c,n)
 
-		"psubusb "_DiffThres", %%mm3\n\t"		// nonzero where abs(c,n) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm3\n\t"		// nonzero where abs(c,n) > Thres else 0
 		"pxor	%%mm4, %%mm4\n\t"
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where abs(c,n) < Thres, else 00	
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(c,n) > Thres, else 00
 
 
-		"movq    4(%%"XDX"), %%mm0\n\t"		// value k
-		"movq    -4(%%"XDX", %%"XCX"), %%mm1\n\t"	// value m
+		"movq    4(%%"XBX"), %%mm0\n\t"		// value k
+		"movq    -4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value m
 		"movq	%%mm0, %%mm2\n\t"					
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(k,m)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(k,m)
         "movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm0\n\t"
 		"psubusb %%mm3, %%mm1\n\t"
 		"por		%%mm1, %%mm0\n\t"					// abs(k,m)
 
         "movq    %%mm0, %%mm1\n\t"
-		"psubusb "_DiffThres", %%mm1\n\t"		// nonzero where abs(k,m) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm1\n\t"		// nonzero where abs(k,m) > Thres else 0
 		"pxor	%%mm3, %%mm3\n\t"
 		"pcmpeqb %%mm3, %%mm1\n\t"			// now ff where abs(k,m) < Thres, else 00	
 
@@ -120,30 +120,30 @@
 
 
         // c & d
-		"movq    (%%"XDX"), %%mm0\n\t"		// value b from top left		
-		"movq    2(%%"XDX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top left		
+		"movq    2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
 
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
 		"psubusb %%mm0, %%mm1\n\t"
 		"por		%%mm1, %%mm3\n\t"					// abs(b,f)
 
-		"psubusb "_DiffThres", %%mm3\n\t"		// nonzero where abs(b,f) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm3\n\t"		// nonzero where abs(b,f) > Thres else 0
 		"pxor	%%mm4, %%mm4\n\t"
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where abs(b,f) < Thres, else 00	
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(b,f) > Thres, else 00
 
-		"movq    2(%%"XDX"), %%mm0\n\t"		// value c
-		"movq    -2(%%"XDX", %%"XCX"), %%mm1\n\t"	// value d
+		"movq    2(%%"XBX"), %%mm0\n\t"		// value c
+		"movq    -2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value d
 		"movq	%%mm0, %%mm2\n\t"					
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(c,d)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(c,d)
         "movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm0\n\t"
 		"psubusb %%mm3, %%mm1\n\t"
 		"por		%%mm1, %%mm0\n\t"					// abs(c,d)
 
         "movq    %%mm0, %%mm1\n\t"
-		"psubusb "_DiffThres", %%mm1\n\t"		// nonzero where abs(c,d) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm1\n\t"		// nonzero where abs(c,d) > Thres else 0
 		"pxor	%%mm3, %%mm3\n\t"
         "pcmpeqb %%mm3, %%mm1\n\t"			// now ff where abs(c,d) < Thres, else 00	
 
@@ -163,30 +163,30 @@
         "por     %%mm0, %%mm7\n\t"
 
         // a & f
-		"movq    (%%"XDX"), %%mm0\n\t"		// value b from top left		
-		"movq    -2(%%"XDX", %%"XCX"), %%mm1\n\t"	// value d from bottom right			
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top left		
+		"movq    -2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value d from bottom right			
 
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
 		"psubusb %%mm0, %%mm1\n\t"
 		"por		%%mm1, %%mm3\n\t"					// abs(b,d)
 
-		"psubusb "_DiffThres", %%mm3\n\t"	// nonzero where abs(b,d) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm3\n\t"	// nonzero where abs(b,d) > Thres else 0
 		"pxor	%%mm4, %%mm4\n\t"
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where abs(b,d) < Thres, else 00	
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(b,d) > Thres, else 00
 
-		"movq    -2(%%"XDX"), %%mm0\n\t"		// value a
-		"movq    2(%%"XDX", %%"XCX"), %%mm1\n\t"	// value f
+		"movq    -2(%%"XBX"), %%mm0\n\t"		// value a
+		"movq    2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f
 		"movq	%%mm0, %%mm2\n\t"					
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(a,f)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(a,f)
         "movq	%%mm0, %%mm3\n\t"
         "psubusb	%%mm1, %%mm0\n\t"
 		"psubusb %%mm3, %%mm1\n\t"
 		"por		%%mm1, %%mm0\n\t"					// abs(a,f)
 
         "movq    %%mm0, %%mm1\n\t"
-		"psubusb "_DiffThres", %%mm1\n\t"		// nonzero where abs(a,f) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm1\n\t"		// nonzero where abs(a,f) > Thres else 0
 		"pxor	%%mm3, %%mm3\n\t"
 		"pcmpeqb %%mm3, %%mm1\n\t"			// now ff where abs(a,f) < Thres, else 00	
 
@@ -205,22 +205,22 @@
         "por     %%mm2, %%mm6\n\t"
         "por     %%mm0, %%mm7\n\t"
            
- 		"pand	"_YMask", %%mm5\n\t"		// mask out chroma from here
- 		"pand	"_YMask", %%mm6\n\t"			// mask out chroma from here
- 		"pand	"_YMask", %%mm7\n\t"			// mask out chroma from here
+ 		"pand	"MANGLE(YMask)", %%mm5\n\t"		// mask out chroma from here
+ 		"pand	"MANGLE(YMask)", %%mm6\n\t"			// mask out chroma from here
+ 		"pand	"MANGLE(YMask)", %%mm7\n\t"			// mask out chroma from here
 
 		// b,e
-		"movq    (%%"XDX"), %%mm0\n\t"		// value b from top 		
-		"movq    (%%"XDX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top 		
+		"movq    (%%"XBX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
 		"movq	%%mm0, %%mm2\n\t"					
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(b,e)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(b,e)
         "movq	%%mm0, %%mm3\n\t"
         "psubusb	%%mm1, %%mm0\n\t"
 		"psubusb %%mm3, %%mm1\n\t"
 		"por		%%mm1, %%mm0\n\t"					// abs(b,e)
 
         "movq    %%mm0, %%mm1\n\t"
-		"psubusb "_DiffThres", %%mm1\n\t"		// nonzero where abs(b,e) > Thres else 0
+		"psubusb "MANGLE(DiffThres)", %%mm1\n\t"		// nonzero where abs(b,e) > Thres else 0
 		"pxor	%%mm3, %%mm3\n\t"
 		"pcmpeqb %%mm3, %%mm1\n\t"		// now ff where abs(b,e) < Thres, else 00	
 
@@ -238,8 +238,8 @@
         "por     %%mm0, %%mm7\n\t"
 
 		// bob in any leftovers
-		"movq    (%%"XDX"), %%mm0\n\t"		// value b from top 		
-		"movq    (%%"XDX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top 		
+		"movq    (%%"XBX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
 
 
 // We will also calc here the max/min values to later limit comb
@@ -271,7 +271,7 @@
 		"por		%%mm2, %%mm3\n\t"			// abs diff
 //		pmaxub  %%mm3, %%mm4			// top or bottom pixel moved most
 		V_PMAXUB ("%%mm3", "%%mm4")			// top or bottom pixel moved most
-		"psubusb "_DiffThres", %%mm3\n\t"		// moved more than allowed? or goes to 0?
+		"psubusb "MANGLE(DiffThres)", %%mm3\n\t"		// moved more than allowed? or goes to 0?
 		"pxor	%%mm4, %%mm4\n\t"
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where low motion, else high motion
 		
@@ -283,19 +283,19 @@
 		V_PMAXUB ("%%mm6", "%%mm2")
 
         "psubusb %%mm3, %%mm2\n\t"			// maybe decrease it to 0000.. if no surround motion
-//		"movq	%%mm2, "_Min_Vals"\n\t"
+//		"movq	%%mm2, "MANGLE(Min_Vals)"\n\t"
 
 		"movq	%%mm0, %%mm2\n\t"
 		V_PMAXUB ("%%mm2", "%%mm1")
 //		pminub	%%mm6, %%mm2			// clip our current results so far to be below this
 		V_PMINUB ("%%mm6", "%%mm2", "%%mm4")
         "paddusb %%mm3, %%mm2\n\t"			// maybe increase it to ffffff if no surround motion
-//		"movq	%%mm2, "_Max_Vals"\n\t"
+//		"movq	%%mm2, "MANGLE(Max_Vals)"\n\t"
 #endif
 			
 		"movq	%%mm0, %%mm2\n\t"						
 //		pavgb	%%mm2, %%mm1					// avg(b,e)
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(b,e)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(b,e)
 				
         "movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"

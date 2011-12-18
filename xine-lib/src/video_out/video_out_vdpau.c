@@ -785,8 +785,6 @@ static void vdpau_process_overlays (vdpau_driver_t *this, vo_frame_t *frame)
     this->ovl_output_height = output_height;
   }
 
-  this->ovl_layer_surface = this->ovl_output_surface;
-
   if (novls > 1 && (this->ovl_dest_rect.x0 != ovl_rects[0].x0 || this->ovl_dest_rect.x1 != ovl_rects[0].x1 || this->ovl_dest_rect.y0 != ovl_rects[0].y0 || this->ovl_dest_rect.y1 != ovl_rects[0].y1)) {
     if (output_width > this->ovl_pixmap_size) {
       this->ovl_pixmap_size = output_width;

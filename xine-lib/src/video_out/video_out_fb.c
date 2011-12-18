@@ -808,17 +808,17 @@ static int open_fb_device(config_values_t *config, xine_t *xine)
 					XINE_CONFIG_SECURITY, NULL, NULL);
   if(strlen(device_name) > 3)
   {
-    fd = xine_open_cloexec(device_name, O_RDWR);
+    fd = open(device_name, O_RDWR);
   }
   else
   {
     device_name = "/dev/fb1";
-    fd = xine_open_cloexec(device_name, O_RDWR);
+    fd = open(device_name, O_RDWR);
 
     if(fd < 0)
     {
       device_name = "/dev/fb0";
-      fd = xine_open_cloexec(device_name, O_RDWR);
+      fd = open(device_name, O_RDWR);
     }
   }
 

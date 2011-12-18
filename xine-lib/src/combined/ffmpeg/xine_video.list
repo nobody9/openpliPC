@@ -21,8 +21,6 @@ I263			H263I			ITU H.263
 H263			H263			H.263
 RV10			RV10			Real Video 1.0
 RV20			RV20			Real Video 2.0
-RV30			RV30			Real Video 3.0
-RV40			RV40			Real Video 4.0
 IV31			INDEO3			Indeo Video 3.1
 IV32			INDEO3			Indeo Video 3.2
 SORENSON_V1		SVQ1			Sorenson Video 1
@@ -33,7 +31,6 @@ VP31			VP3			On2 VP3.1
 VP5			VP5			On2 VP5
 VP6			VP6			On2 VP6
 VP6F			VP6F			On2 VP6
-VP8			VP8			On2 VP8
 4XM			4XM			4X Video
 CINEPAK			CINEPAK			Cinepak
 MSVC			MSVIDEO1		Microsoft Video 1

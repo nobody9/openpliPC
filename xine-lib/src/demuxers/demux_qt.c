@@ -1744,12 +1744,11 @@ static void get_next_edit_list_entry(qt_trak *trak,
   int64_t *edit_list_duration,
   unsigned int global_timescale) {
 
-  *edit_list_media_time = 0;
-  *edit_list_duration = MAX_DURATION;
-
   /* if there is no edit list, set to max duration and get out */
   if (!trak->edit_list_table) {
 
+    *edit_list_media_time = 0;
+    *edit_list_duration = MAX_DURATION;
     debug_edit_list("  qt: no edit list table, initial = %d, %"PRId64"\n", *edit_list_media_time, *edit_list_duration);
     return;
 

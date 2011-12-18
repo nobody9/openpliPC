@@ -1519,14 +1519,6 @@ static void xine_dispose_internal (xine_stream_t *stream) {
   xine_list_iterator_t *ite;
 
   lprintf("stream: %p\n", stream);
-
-  pthread_mutex_lock(&stream->xine->streams_lock);
-  ite = xine_list_find(stream->xine->streams, stream);
-  if (ite) {
-    xine_list_remove(stream->xine->streams, ite);
-  }
-  pthread_mutex_unlock(&stream->xine->streams_lock);
-
   pthread_mutex_destroy (&stream->info_mutex);
   pthread_mutex_destroy (&stream->meta_mutex);
   pthread_mutex_destroy (&stream->frontend_lock);
@@ -1544,6 +1536,13 @@ static void xine_dispose_internal (xine_stream_t *stream) {
   stream->metronom->exit (stream->metronom);
 
   xine_list_delete(stream->event_queues);
+
+  pthread_mutex_lock(&stream->xine->streams_lock);
+  ite = xine_list_find(stream->xine->streams, stream);
+  if (ite) {
+    xine_list_remove(stream->xine->streams, ite);
+  }
+  pthread_mutex_unlock(&stream->xine->streams_lock);
 
   _x_refcounter_dispose(stream->refcounter);
 
@@ -1582,7 +1581,6 @@ void xine_dispose (xine_stream_t *stream) {
   if (stream->osd_renderer)
     stream->osd_renderer->close( stream->osd_renderer );
 
-  /* Remove the reference that the stream was created with. */
   _x_refcounter_dec(stream->refcounter);
 }
 

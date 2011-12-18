@@ -227,7 +227,7 @@ static video_decoder_t *dxr3_open_plugin(video_decoder_class_t *class_gen, xine_
   /* open later, because dxr3_video_out might have it open until we request a frame */
   this->fd_video = -1;
 
-  if ((this->fd_control = xine_open_cloexec(tmpstr, O_WRONLY)) < 0) {
+  if ((this->fd_control = open(tmpstr, O_WRONLY)) < 0) {
     xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
 	    _("dxr3_decode_video: Failed to open control device %s (%s)\n"), tmpstr, strerror(errno));
     free(this);
@@ -508,7 +508,7 @@ static void dxr3_decode_data(video_decoder_t *this_gen, buf_element_t *buf)
 
     /* open the device for the decoder */
     snprintf (tmpstr, sizeof(tmpstr), "/dev/em8300_mv-%d", this->devnum);
-    if ((this->fd_video = xine_open_cloexec(tmpstr, O_WRONLY)) < 0) {
+    if ((this->fd_video = open(tmpstr, O_WRONLY)) < 0) {
       xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
 	      _("dxr3_decode_video: Failed to open video device %s (%s)\n"), tmpstr, strerror(errno));
       return;

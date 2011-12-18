@@ -60,7 +60,7 @@ static int _x_io_tcp_connect_ipv4(xine_stream_t *stream, const char *host, int p
     return -1;
   }
 
-  s = xine_socket_cloexec(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (s == -1) {
     _x_message(stream, XINE_MSG_CONNECTION_REFUSED, "failed to create socket", strerror(errno), NULL);
     return -1;
@@ -144,7 +144,7 @@ int _x_io_tcp_connect(xine_stream_t *stream, const char *host, int port) {
 
   while (tmpaddr) {
 
-      s = xine_socket_cloexec(tmpaddr->ai_family, SOCK_STREAM, IPPROTO_TCP);
+      s = socket(tmpaddr->ai_family, SOCK_STREAM, IPPROTO_TCP);
       if (s == -1) {
 	  _x_message(stream, XINE_MSG_CONNECTION_REFUSED,
 		       "failed to create socket", strerror(errno), NULL);

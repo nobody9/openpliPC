@@ -375,7 +375,7 @@ static const char *config_translate_key (const char *key, char **tmp) {
   *tmp = NULL;
   if (!strncmp (key, "decoder.", 8) &&
       !strcmp (key + (trans = strlen (key)) - 9, "_priority")) {
-    *tmp = _x_asprintf ("engine.decoder_priorities.%.*s", trans - 17, key + 8);
+    asprintf (tmp, "engine.decoder_priorities.%.*s", trans - 17, key + 8);
     return *tmp;
   }
 

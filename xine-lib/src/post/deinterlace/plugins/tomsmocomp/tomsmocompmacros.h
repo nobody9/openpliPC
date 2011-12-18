@@ -114,7 +114,7 @@
     "por     %%xmm0,      %%xmm5\n\t"      /* and merge new & old vals */                \
     "por     %%xmm2,      %%xmm7\n\t"
 
-#define RESET_CHROMA "por "_UVMask", %%xmm7\n\t"
+#define RESET_CHROMA "por "MANGLE(UVMask)", %%xmm7\n\t"
 
 #else // ifdef IS_SSE2
 
@@ -126,7 +126,7 @@
     "psubusb %%mm1,      %%mm2\n\t"                                                     \
     "psubusb %%mm0,      %%mm3\n\t"                                                     \
     "por     %%mm3,      %%mm2\n\t"                                                     \
-    V_PAVGB ("%%mm0", "%%mm1", "%%mm3", _ShiftMask) /* avg of 2 pixels */               \
+    V_PAVGB ("%%mm0", "%%mm1", "%%mm3", MANGLE(ShiftMask)) /* avg of 2 pixels */               \
     "movq    %%mm2,      %%mm3\n\t"       /* another copy of our our weights */         \
     "pxor    %%mm1,      %%mm1\n\t"                                                     \
     "psubusb %%mm7,      %%mm3\n\t"       /* nonzero where old weights lower, else 0 */ \
@@ -144,14 +144,14 @@
     "movq    "PADDR2A",   %%mm1\n\t"      /* our pixel2 value */                        \
     "movq    "PADDR1B",   %%mm2\n\t"      /* our 4 pixels */                            \
     "movq    "PADDR2B",   %%mm3\n\t"      /* our pixel2 value */                        \
-    V_PAVGB("%%mm0", "%%mm2", "%%mm2", _ShiftMask)                                      \
-    V_PAVGB("%%mm1", "%%mm3", "%%mm3", _ShiftMask)                                      \
+    V_PAVGB("%%mm0", "%%mm2", "%%mm2", MANGLE(ShiftMask))                                      \
+    V_PAVGB("%%mm1", "%%mm3", "%%mm3", MANGLE(ShiftMask))                                      \
     "movq    %%mm0,       %%mm2\n\t"      /* another copy of our pixel1 value */        \
     "movq    %%mm1,       %%mm3\n\t"      /* another copy of our pixel1 value */        \
     "psubusb %%mm1,       %%mm2\n\t"                                                    \
     "psubusb %%mm0,       %%mm3\n\t"                                                    \
     "por     %%mm3,       %%mm2\n\t"                                                    \
-    V_PAVGB("%%mm0", "%%mm1", "%%mm3", _ShiftMask)   /* avg of 2 pixels */              \
+    V_PAVGB("%%mm0", "%%mm1", "%%mm3", MANGLE(ShiftMask))   /* avg of 2 pixels */              \
     "movq    %%mm2,       %%mm3\n\t"      /* another copy of our our weights */         \
     "pxor    %%mm1,       %%mm1\n\t"                                                    \
     "psubusb %%mm7,       %%mm3\n\t"      /* nonzero where old weights lower, else 0 */ \
@@ -164,7 +164,7 @@
     "por     %%mm0,       %%mm5\n\t"      /* and merge new & old vals */                \
     "por     %%mm2,       %%mm7\n\t"
 
-#define RESET_CHROMA "por "_UVMask", %%mm7\n\t"
+#define RESET_CHROMA "por "MANGLE(UVMask)", %%mm7\n\t"
 
 #endif
 

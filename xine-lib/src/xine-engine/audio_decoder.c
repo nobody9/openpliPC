@@ -41,7 +41,6 @@
 
 #include <xine/xine_internal.h>
 #include <xine/xineutils.h>
-#include "xine_private.h"
 
 static void *audio_decoder_loop (void *stream_gen) {
 
@@ -284,9 +283,6 @@ static void *audio_decoder_loop (void *stream_gen) {
           }
           stream->audio_track_map[i] = buf->type;
           stream->audio_track_map_entries++;
-          /* implicit channel change - reopen decoder below */
-          if ((i == 0) && (audio_channel_user == -1) && (stream->audio_channel_auto < 0))
-            stream->audio_decoder_streamtype = -1;
 
 	  ui_event.type        = XINE_EVENT_UI_CHANNELS_CHANGED;
 	  ui_event.data_length = 0;

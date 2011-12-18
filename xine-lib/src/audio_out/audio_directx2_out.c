@@ -388,7 +388,7 @@ static int audio_fill(dx2_driver_t *this, char *data, size_t size) {
   err = IDirectSoundBuffer_Lock(this->dsbuffer, this->write_pos, size, &ptr1, &size1, &ptr2, &size2, 0);
   /* try to restore the buffer, if necessary */
   if (err == DSERR_BUFFERLOST) {
-    xine_log(this->class->xine, XINE_LOG_MSG, _(LOG_MODULE ": buffer lost, trying to restore\n"));
+    xine_log(this->class->xine, XINE_LOG_MSG, _(LOG_MODULE ": buffer lost, tryig to restore\n"));
     IDirectSoundBuffer_Restore(this->dsbuffer);
   err = IDirectSoundBuffer_Lock(this->dsbuffer, this->write_pos, size, &ptr1, &size1, &ptr2, &size2, 0);  }
   if (err != DS_OK) {

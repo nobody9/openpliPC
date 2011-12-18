@@ -2087,7 +2087,7 @@ static int vdr_plugin_open_fifo_mrl(input_plugin_t *this_gen)
   filename = strdup(filename);
 
   _x_mrl_unescape (filename);
-  this->fh = xine_open_cloexec(filename, O_RDONLY | O_NONBLOCK);
+  this->fh = open(filename, O_RDONLY | O_NONBLOCK);
 
   lprintf("filename '%s'\n", filename);
 
@@ -2126,9 +2126,9 @@ static int vdr_plugin_open_fifo_mrl(input_plugin_t *this_gen)
 
   {
     char *filename_control = 0;
-    filename_control = _x_asprintf("%s.control", filename);
+    asprintf(&filename_control, "%s.control", filename);
 
-    this->fh_control = xine_open_cloexec(filename_control, O_RDONLY);
+    this->fh_control = open(filename_control, O_RDONLY);
 
     if (this->fh_control == -1) {
       xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
@@ -2146,9 +2146,9 @@ static int vdr_plugin_open_fifo_mrl(input_plugin_t *this_gen)
 
   {
     char *filename_result = 0;
-    filename_result = _x_asprintf("%s.result", filename);
+    asprintf(&filename_result, "%s.result", filename);
 
-    this->fh_result = xine_open_cloexec(filename_result, O_WRONLY);
+    this->fh_result = open(filename_result, O_WRONLY);
 
     if (this->fh_result == -1) {
       perror("failed");
@@ -2168,9 +2168,9 @@ static int vdr_plugin_open_fifo_mrl(input_plugin_t *this_gen)
 
   {
     char *filename_event = 0;
-    filename_event = _x_asprintf("%s.event", filename);
+    asprintf(&filename_event, "%s.event", filename);
 
-    this->fh_event = xine_open_cloexec(filename_event, O_WRONLY);
+    this->fh_event = open(filename_event, O_WRONLY);
 
     if (this->fh_event == -1) {
       perror("failed");
@@ -2198,7 +2198,7 @@ static int vdr_plugin_open_socket(vdr_input_plugin_t *this, struct hostent *host
   struct sockaddr_in sain;
   struct in_addr iaddr;
 
-  if ((fd = xine_socket_cloexec(PF_INET, SOCK_STREAM, 0)) == -1)
+  if ((fd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
   {
     xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
             _("%s: failed to create socket for port %d (%s)\n"), LOG_MODULE,

@@ -1245,7 +1245,7 @@ static vo_driver_t *vidixfb_open_plugin (video_driver_class_t *class_gen, const 
     XINE_CONFIG_SECURITY, NULL, NULL);
 
   /* Open fb device for reading */
-  if((fd = xine_open_cloexec("/dev/fb0", O_RDONLY)) < 0) {
+  if((fd = open("/dev/fb0", O_RDONLY)) < 0) {
     xprintf(this->xine, XINE_VERBOSITY_DEBUG,
 	    "video_out_vidix: unable to open frame buffer device \"%s\": %s\n", device, strerror(errno));
     return NULL;

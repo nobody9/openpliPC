@@ -181,32 +181,6 @@ void xine_usec_sleep(unsigned usec) XINE_PROTECTED;
  */
 char *xine_strcat_realloc (char **dest, char *append) XINE_PROTECTED;
 
-/**
- * asprintf wrapper
- * allocate a string large enough to hold the output, and return a pointer to
- * it. This pointer should be passed to free when it is no longer needed.
- * return NULL on error.
- */
-char *_x_asprintf(const char *format, ...) XINE_PROTECTED XINE_MALLOC XINE_FORMAT_PRINTF(1, 2);
-
-/**
- * opens a file, ensuring that the descriptor will be closed
- * automatically after a fork/execute.
- */
-int xine_open_cloexec(const char *name, int flags) XINE_PROTECTED;
-
-/**
- * creates a file, ensuring that the descriptor will be closed
- * automatically after a fork/execute.
- */
-int xine_create_cloexec(const char *name, int flags, mode_t mode) XINE_PROTECTED;
-
-/**
- * creates a socket, ensuring that the descriptor will be closed
- * automatically after a fork/execute.
- */
-int xine_socket_cloexec(int domain, int type, int protocol) XINE_PROTECTED;
-
 /*
  * Color Conversion Utility Functions
  * The following data structures and functions facilitate the conversion

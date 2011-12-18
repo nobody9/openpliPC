@@ -73,14 +73,13 @@ typedef struct {
   off_t                data_start;
   off_t                filesize;
 
-  xine_bmiheader       bih;
-  unsigned char        vqa_header[VQA_HEADER_SIZE];
+  unsigned char        bih[sizeof(xine_bmiheader) + VQA_HEADER_SIZE];
   xine_waveformatex    wave;
 
   int64_t              video_pts;
   unsigned int         audio_frames;
   unsigned int         iteration;
-} demux_vqa_t;
+} demux_vqa_t ;
 
 typedef struct {
   demux_class_t     demux_class;
@@ -90,6 +89,8 @@ typedef struct {
 static int open_vqa_file(demux_vqa_t *this) {
   unsigned char scratch[12];
   unsigned int chunk_size;
+  xine_bmiheader *bih = (xine_bmiheader *)this->bih;
+  unsigned char *vqa_header = this->bih + sizeof(xine_bmiheader);
 
   if (_x_demux_read_header(this->input, scratch, 12) != 12)
     return 0;
@@ -107,15 +108,15 @@ static int open_vqa_file(demux_vqa_t *this) {
     this->filesize = 1;
 
   /* load the VQA header */
-  if (this->input->read(this->input, this->vqa_header, VQA_HEADER_SIZE) !=
+  if (this->input->read(this->input, vqa_header, VQA_HEADER_SIZE) !=
     VQA_HEADER_SIZE)
     return 0;
 
-  this->bih.biSize = sizeof(xine_bmiheader) + VQA_HEADER_SIZE;
-  this->bih.biWidth = _X_LE_16(&this->vqa_header[6]);
-  this->bih.biHeight = _X_LE_16(&this->vqa_header[8]);
-  this->wave.nSamplesPerSec = _X_LE_16(&this->vqa_header[24]);
-  this->wave.nChannels = this->vqa_header[26];
+  bih->biSize = sizeof(xine_bmiheader) + VQA_HEADER_SIZE;
+  bih->biWidth = _X_LE_16(&vqa_header[6]);
+  bih->biHeight = _X_LE_16(&vqa_header[8]);
+  this->wave.nSamplesPerSec = _X_LE_16(&vqa_header[24]);
+  this->wave.nChannels = vqa_header[26];
   this->wave.wBitsPerSample = 16;
 
   /* skip the FINF chunk */
@@ -239,6 +240,7 @@ static int demux_vqa_send_chunk(demux_plugin_t *this_gen) {
 static void demux_vqa_send_headers(demux_plugin_t *this_gen) {
   demux_vqa_t *this = (demux_vqa_t *) this_gen;
   buf_element_t *buf;
+  xine_bmiheader *bih = (xine_bmiheader *)this->bih;
 
   this->video_fifo  = this->stream->video_fifo;
   this->audio_fifo  = this->stream->audio_fifo;
@@ -250,9 +252,9 @@ static void demux_vqa_send_headers(demux_plugin_t *this_gen) {
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_HAS_AUDIO,
                        (this->wave.nChannels) ? 1 : 0);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_VIDEO_WIDTH,
-                       this->bih.biWidth);
+                       bih->biWidth);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_VIDEO_HEIGHT,
-                       this->bih.biHeight);
+                       bih->biHeight);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_AUDIO_CHANNELS,
                        this->wave.nChannels);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE,
@@ -268,8 +270,7 @@ static void demux_vqa_send_headers(demux_plugin_t *this_gen) {
   buf->decoder_flags = BUF_FLAG_HEADER|BUF_FLAG_STDHEADER|BUF_FLAG_FRAMERATE|
                        BUF_FLAG_FRAME_END;
   buf->decoder_info[0] = VQA_PTS_INC;  /* initial video_step */
-  memcpy(buf->content, &this->bih, sizeof(xine_bmiheader));
-  memcpy(buf->content + sizeof(xine_bmiheader), this->vqa_header, VQA_HEADER_SIZE);
+  memcpy(buf->content, this->bih, sizeof(xine_bmiheader) + VQA_HEADER_SIZE);
   buf->size = sizeof(xine_bmiheader) + VQA_HEADER_SIZE;
   buf->type = BUF_VIDEO_VQA;
   this->video_fifo->put (this->video_fifo, buf);

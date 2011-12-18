@@ -587,12 +587,12 @@ static tuner_t *XINE_MALLOC tuner_init(xine_t * xine, int adapter)
     this->xine = xine;
     this->adapter_num = adapter;
 
-    this->demux_device = _x_asprintf("/dev/dvb/adapter%i/demux0",this->adapter_num);
-    this->dvr_device = _x_asprintf("/dev/dvb/adapter%i/dvr0",this->adapter_num);
-    video_device = _x_asprintf("/dev/dvb/adapter%i/video0",this->adapter_num);
+    asprintf(&this->demux_device,"/dev/dvb/adapter%i/demux0",this->adapter_num);
+    asprintf(&this->dvr_device,"/dev/dvb/adapter%i/dvr0",this->adapter_num);
+    asprintf(&video_device,"/dev/dvb/adapter%i/video0",this->adapter_num);
 
-    frontend_device = _x_asprintf("/dev/dvb/adapter%i/frontend0",this->adapter_num);
-    if ((this->fd_frontend = xine_open_cloexec(frontend_device, O_RDWR)) < 0) {
+    asprintf(&frontend_device,"/dev/dvb/adapter%i/frontend0",this->adapter_num);
+    if ((this->fd_frontend = open(frontend_device, O_RDWR)) < 0) {
       xprintf(this->xine, XINE_VERBOSITY_DEBUG, "FRONTEND DEVICE: %s\n", strerror(errno));
       tuner_dispose(this);
       this = NULL;
@@ -608,7 +608,7 @@ static tuner_t *XINE_MALLOC tuner_init(xine_t * xine, int adapter)
     }
 
     for (x = 0; x < MAX_FILTERS; x++) {
-      this->fd_pidfilter[x] = xine_open_cloexec(this->demux_device, O_RDWR);
+      this->fd_pidfilter[x] = open(this->demux_device, O_RDWR);
       if (this->fd_pidfilter[x] < 0) {
         xprintf(this->xine, XINE_VERBOSITY_DEBUG, "DEMUX DEVICE PIDfilter: %s\n", strerror(errno));
         tuner_dispose(this);
@@ -617,7 +617,7 @@ static tuner_t *XINE_MALLOC tuner_init(xine_t * xine, int adapter)
       }
    }
     for (x = 0; x < MAX_SUBTITLES; x++) {
-      this->fd_subfilter[x] = xine_open_cloexec(this->demux_device, O_RDWR);
+      this->fd_subfilter[x] = open(this->demux_device, O_RDWR);
       if (this->fd_subfilter[x] < 0) {
         xprintf(this->xine, XINE_VERBOSITY_DEBUG, "DEMUX DEVICE Subtitle filter: %s\n", strerror(errno));
       }
@@ -638,7 +638,7 @@ static tuner_t *XINE_MALLOC tuner_init(xine_t * xine, int adapter)
    if(this->feinfo.type==FE_OFDM) xprintf(this->xine,XINE_VERBOSITY_DEBUG,"TER Card\n");
    if(this->feinfo.type==FE_ATSC) xprintf(this->xine,XINE_VERBOSITY_DEBUG,"US Card\n");
 
-   if ((test_video=xine_open_cloexec(video_device, O_RDWR)) < 0) {
+   if ((test_video=open(video_device, O_RDWR)) < 0) {
        xprintf(this->xine,XINE_VERBOSITY_DEBUG,"input_dvb: Card has no hardware decoder\n");
    }else{
        xprintf(this->xine,XINE_VERBOSITY_DEBUG,"input_dvb: Card HAS HARDWARE DECODER\n");
@@ -2126,7 +2126,7 @@ static int switch_channel(dvb_input_plugin_t *this, int channel) {
 
   for (x = 0; x < MAX_FILTERS; x++) {
     close(this->tuner->fd_pidfilter[x]);
-    this->tuner->fd_pidfilter[x] = xine_open_cloexec(this->tuner->demux_device, O_RDWR);
+    this->tuner->fd_pidfilter[x] = open(this->tuner->demux_device, O_RDWR);
    }
 
   if (!tuner_set_channel (this, &this->channels[channel])) {
@@ -2160,7 +2160,7 @@ static int switch_channel(dvb_input_plugin_t *this, int channel) {
 
   this->channel = channel;
 
-  this->fd = xine_open_cloexec(this->tuner->dvr_device, O_RDONLY | O_NONBLOCK);
+  this->fd = open (this->tuner->dvr_device, O_RDONLY | O_NONBLOCK);
   this->tuned_in = 1;
 
   pthread_mutex_unlock (&this->channel_change_mutex);
@@ -2234,7 +2234,7 @@ static void do_record (dvb_input_plugin_t *this) {
     }
 
     /* start recording */
-    this->record_fd = xine_create_cloexec(filename, O_APPEND | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    this->record_fd = open (filename, O_CREAT | O_APPEND | O_WRONLY, 0644);
 
     this->stream->osd_renderer->clear (this->rec_osd);
 
@@ -2566,12 +2566,8 @@ static off_t dvb_plugin_read (input_plugin_t *this_gen,
 
   ts_rewrite_packets (this, buf,total);
 
-  if ((this->record_fd > -1) && (!this->record_paused))
-    if (write (this->record_fd, buf, total) != total) {
-      do_record(this);
-      xprintf(this->class->xine, XINE_VERBOSITY_LOG,
-	      "input_dvb: Recording failed\n");
-    }
+  if ((this->record_fd)&&(!this->record_paused))
+    write (this->record_fd, buf, total);
 
   pthread_mutex_unlock( &this->channel_change_mutex );
 
@@ -2984,7 +2980,7 @@ static int dvb_plugin_open(input_plugin_t * this_gen)
       return 0;
     }
 
-    if ((this->fd = xine_open_cloexec(this->tuner->dvr_device, O_RDONLY |O_NONBLOCK)) < 0) {
+    if ((this->fd = open(this->tuner->dvr_device, O_RDONLY |O_NONBLOCK)) < 0) {
       xprintf(this->class->xine, XINE_VERBOSITY_LOG,
              _("input_dvb: cannot open dvr device '%s'\n"), this->tuner->dvr_device);
       return 0;
@@ -3228,7 +3224,7 @@ static char **dvb_class_get_autoplay_list(input_class_t * this_gen,
          ch < num_channels && ch < MAX_AUTOCHANNELS;
          ++ch, ++apch) {
       free(class->autoplaylist[apch]);
-      class->autoplaylist[apch] = _x_asprintf("dvb://%s", channels[ch].name);
+      asprintf(&(class->autoplaylist[apch]), "dvb://%s", channels[ch].name);
       _x_assert(class->autoplaylist[apch] != NULL);
     }
 
@@ -3236,10 +3232,10 @@ static char **dvb_class_get_autoplay_list(input_class_t * this_gen,
       free(class->autoplaylist[0]);
       if (default_channel != -1)
 	/* plugin has been used before - channel is valid */
-	class->autoplaylist[0] = _x_asprintf("dvb://%s", channels[default_channel].name);
+	asprintf (&(class->autoplaylist[0]), "dvb://%s", channels[default_channel].name);
       else
 	/* set a reasonable default - the first channel */
-	class->autoplaylist[0] = _x_asprintf("dvb://%s", num_channels ? channels[0].name : "0");
+	asprintf (&(class->autoplaylist[0]), "dvb://%s", num_channels ? channels[0].name : "0");
     }
 
     free_channel_list(channels, num_channels);

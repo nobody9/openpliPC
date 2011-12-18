@@ -32,8 +32,8 @@
 #include <xine/osd.h>
 #define MAX_REGIONS 7
 
-#define SPU_MAX_WIDTH 1920
-#define SPU_MAX_HEIGHT 1080
+#define SPU_MAX_WIDTH 720
+#define SPU_MAX_HEIGHT 576
 
 /*#define LOG*/
 #define LOG_MODULE "spudvb"

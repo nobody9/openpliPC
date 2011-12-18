@@ -111,8 +111,6 @@ xine_event_queue_t *xine_event_new_queue (xine_stream_t *stream) {
 
   xine_event_queue_t *queue;
 
-  _x_refcounter_inc(stream->refcounter);
-
   queue = malloc (sizeof (xine_event_queue_t));
 
   pthread_mutex_init (&queue->lock, NULL);
@@ -187,8 +185,6 @@ void xine_event_dispose_queue (xine_event_queue_t *queue) {
     pthread_join (*queue->listener_thread, &p);
     free (queue->listener_thread);
   }
-
-  _x_refcounter_dec(stream->refcounter);
 
   /*
    * clean up pending events

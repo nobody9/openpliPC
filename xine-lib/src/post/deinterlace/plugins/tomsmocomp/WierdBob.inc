@@ -14,22 +14,22 @@
 		// selected for the	smallest of abs(a,f), abs(c,d), or abs(b,e), etc.
 
 		// a,f
-		"movq    -2(%%"XDX"), %%mm0\n\t"		// value a from top left		
-		"movq    2(%%"XDX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
+		"movq    -2(%%"XBX"), %%mm0\n\t"		// value a from top left		
+		"movq    2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
 		"movq	%%mm0, %%mm6\n\t"					
 //		pavgb	%%mm6, %%mm1					// avg(a,f), also best so far
-		V_PAVGB ("%%mm6", "%%mm1", "%%mm7", _ShiftMask)	// avg(a,f), also best so far
+		V_PAVGB ("%%mm6", "%%mm1", "%%mm7", MANGLE(ShiftMask))	// avg(a,f), also best so far
         "movq	%%mm0, %%mm7\n\t"
 		"psubusb	 %%mm1, %%mm7\n\t"
 		"psubusb %%mm0, %%mm1\n\t"
 		"por		%%mm1, %%mm7\n\t"					// abs diff, also best so far
 
 		// c,d
-		"movq    2(%%"XDX"), %%mm0\n\t"		// value a from top left		
-		"movq    -2(%%"XDX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
+		"movq    2(%%"XBX"), %%mm0\n\t"		// value a from top left		
+		"movq    -2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
 		"movq	%%mm0, %%mm2\n\t"						
 //		pavgb	%%mm2, %%mm1					// avg(c,d)
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(c,d)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(c,d)
         "movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
 		"psubusb %%mm0, %%mm1\n\t"
@@ -49,15 +49,15 @@
 
 		"por		%%mm2, %%mm6\n\t"			// and merge new & old vals keeping best
 		"por		%%mm1, %%mm7\n\t"
-		"por		"_UVMask", %%mm7\n\t"			// but we know chroma is worthless so far
-		"pand	"_YMask", %%mm5\n\t"			// mask out chroma from here also
+		"por		"MANGLE(UVMask)", %%mm7\n\t"			// but we know chroma is worthless so far
+		"pand	"MANGLE(YMask)", %%mm5\n\t"			// mask out chroma from here also
 
 		// j,n
-		"movq    -4(%%"XDX"), %%mm0\n\t"		// value j from top left		
-		"movq    4(%%"XDX", %%"XCX"), %%mm1\n\t"	// value n from bottom right			
+		"movq    -4(%%"XBX"), %%mm0\n\t"		// value j from top left		
+		"movq    4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n from bottom right			
 		"movq	%%mm0, %%mm2\n\t"						
 //		pavgb	%%mm2, %%mm1					// avg(j,n)
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(j,n)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(j,n)
         "movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
 		"psubusb %%mm0, %%mm1\n\t"
@@ -79,11 +79,11 @@
 		"por		%%mm1, %%mm7\n\t"			// "
 
 		// k, m
-		"movq    4(%%"XDX"), %%mm0\n\t"		// value k from top right		
-		"movq    -4(%%"XDX", %%"XCX"), %%mm1\n\t"	// value n from bottom left			
+		"movq    4(%%"XBX"), %%mm0\n\t"		// value k from top right		
+		"movq    -4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n from bottom left			
 		"movq	%%mm0, %%mm4\n\t"						
 //		pavgb	%%mm4, %%mm1					// avg(k,m)
-		V_PAVGB ("%%mm4", "%%mm1", "%%mm3", _ShiftMask)	// avg(k,m)
+		V_PAVGB ("%%mm4", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(k,m)
 
         "movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
@@ -108,8 +108,8 @@
 		"por		%%mm1, %%mm7\n\t"			// "
 
 		// b,e
-		"movq    (%%"XDX"), %%mm0\n\t"		// value b from top 		
-		"movq    (%%"XDX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top 		
+		"movq    (%%"XBX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
 
 // We will also calc here the max/min values to later limit comb
 // so the max excursion will not exceed the Max_Comb constant
@@ -140,7 +140,7 @@
 		"por		%%mm2, %%mm3\n\t"			// abs diff
 //		pmaxub  %%mm3, %%mm4			// top or bottom pixel moved most
 		V_PMAXUB ("%%mm3", "%%mm4")			// top or bottom pixel moved most
-		"psubusb "_Max_Mov", %%mm3\n\t"		// moved more than allowed? or goes to 0?
+		"psubusb "MANGLE(Max_Mov)", %%mm3\n\t"		// moved more than allowed? or goes to 0?
 		"pxor	%%mm4, %%mm4\n\t"
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where low motion, else high motion
 		
@@ -152,19 +152,19 @@
 		V_PMAXUB ("%%mm6", "%%mm2")
 
 		"psubusb %%mm3, %%mm2\n\t"			// maybe decrease it to 0000.. if no surround motion
-//		"movq	%%mm2, "_Min_Vals"\n\t"
+//		"movq	%%mm2, "MANGLE(Min_Vals)"\n\t"
 
 		"movq	%%mm0, %%mm2\n\t"
 		V_PMAXUB ("%%mm2", "%%mm1")
 //		pminub	%%mm6, %%mm2			// clip our current results so far to be below this
 		V_PMINUB ("%%mm6", "%%mm2", "%%mm4")
         "paddusb %%mm3, %%mm2\n\t"			// maybe increase it to ffffff if no surround motion
-//		"movq	%%mm2, "_Max_Vals"\n\t"
+//		"movq	%%mm2, "MANGLE(Max_Vals)"\n\t"
 #endif
         
 		"movq	%%mm0, %%mm2\n\t"						
 //		pavgb	%%mm2, %%mm1					// avg(b,e)
-		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(b,e)
+		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", MANGLE(ShiftMask))	// avg(b,e)
 				
         "movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"

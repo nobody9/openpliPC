@@ -263,7 +263,7 @@ static xine_mrl_t **smb_class_get_dir (input_class_t *this_gen,
 				dir_files[num_dir_files].link   = NULL;
 				dir_files[num_dir_files].type = mrl_file | mrl_file_directory;
 				dir_files[num_dir_files].origin = strdup(current_path);
-				dir_files[num_dir_files].mrl    = _x_asprintf("%s/%s", current_path, pdirent->name);
+				asprintf(&(dir_files[num_dir_files].mrl), "%s/%s", current_path, pdirent->name);
 				dir_files[num_dir_files].size   = pdirent->dirlen;
 				num_dir_files ++;
 			}else if (pdirent->smbc_type == SMBC_SERVER){
@@ -271,14 +271,14 @@ static xine_mrl_t **smb_class_get_dir (input_class_t *this_gen,
 					dir_files[num_dir_files].link   = NULL;
 					dir_files[num_dir_files].type = mrl_file | mrl_file_directory;
 					dir_files[num_dir_files].origin = strdup("smb:/");
-					dir_files[num_dir_files].mrl    = strdup("smb://..");
+					asprintf(&(dir_files[num_dir_files].mrl), "%s/%s", "smb:/", "..");
 					dir_files[num_dir_files].size   = pdirent->dirlen;
 					num_dir_files ++;
 				}
 				dir_files[num_dir_files].link   = NULL;
 				dir_files[num_dir_files].type   = mrl_file | mrl_file_directory;
 				dir_files[num_dir_files].origin = strdup("smb:/");
-				dir_files[num_dir_files].mrl    = _x_asprintf("smb://%s", pdirent->name);
+				asprintf(&(dir_files[num_dir_files].mrl), "%s/%s", "smb:/", pdirent->name);
 				dir_files[num_dir_files].size   = pdirent->dirlen;
 				num_dir_files ++;
 			} else if (pdirent->smbc_type == SMBC_FILE_SHARE){
@@ -286,7 +286,7 @@ static xine_mrl_t **smb_class_get_dir (input_class_t *this_gen,
 					dir_files[num_dir_files].link   = NULL;
 					dir_files[num_dir_files].type   = mrl_file | mrl_file_directory;
 					dir_files[num_dir_files].origin = strdup(current_path);
-					dir_files[num_dir_files].mrl    = _x_asprintf("%s/..", current_path);
+					asprintf(&(dir_files[num_dir_files].mrl), "%s/%s", current_path, "..");
 					dir_files[num_dir_files].type   |= mrl_file_directory;
 					dir_files[num_dir_files].size   = pdirent->dirlen;
 					num_dir_files ++;
@@ -295,7 +295,7 @@ static xine_mrl_t **smb_class_get_dir (input_class_t *this_gen,
 					dir_files[num_dir_files].link   = NULL;
 					dir_files[num_dir_files].type   = mrl_file | mrl_file_directory;
 					dir_files[num_dir_files].origin = strdup(current_path);
-					dir_files[num_dir_files].mrl    = _x_asprintf("%s/%s", current_path, pdirent->name);
+					asprintf(&(dir_files[num_dir_files].mrl), "%s/%s", current_path, pdirent->name);
 					dir_files[num_dir_files].size   = pdirent->dirlen;
 					num_dir_files ++;
 				}
@@ -303,14 +303,14 @@ static xine_mrl_t **smb_class_get_dir (input_class_t *this_gen,
 				dir_files[num_dir_files].link   = NULL;
 				dir_files[num_dir_files].type   = mrl_file | mrl_file_directory;
 				dir_files[num_dir_files].origin = strdup(current_path);
-				dir_files[num_dir_files].mrl    = _x_asprintf("%s/%s", current_path, pdirent->name);
+				asprintf(&(dir_files[num_dir_files].mrl), "%s/%s", current_path, pdirent->name);
 				dir_files[num_dir_files].size   = pdirent->dirlen;
 				num_dir_files ++;
 			}else if (pdirent->smbc_type == SMBC_FILE){
 				norm_files[num_norm_files].link   = NULL;
 				norm_files[num_norm_files].type   = mrl_file | mrl_file_normal;
 				norm_files[num_norm_files].origin = strdup(current_path);
-				norm_files[num_norm_files].mrl    = _x_asprintf("%s/%s", current_path, pdirent->name);
+				asprintf(&(norm_files[num_norm_files].mrl), "%s/%s", current_path, pdirent->name);
 				norm_files[num_norm_files].size   = pdirent->dirlen;
 				num_norm_files ++;
 			}
@@ -320,7 +320,7 @@ static xine_mrl_t **smb_class_get_dir (input_class_t *this_gen,
 		if (num_dir_files == 0) {
 			dir_files[num_dir_files].link   = NULL;
 			dir_files[num_dir_files].origin = strdup(current_path);
-			dir_files[num_dir_files].mrl    = _x_asprintf("%s/..", current_path);
+			asprintf(&(dir_files[num_dir_files].mrl), "%s/%s", current_path, "..");
 			dir_files[num_dir_files].type = mrl_file | mrl_file_directory;
 			dir_files[num_dir_files].size   = 0;
 			num_dir_files ++;

@@ -20,4 +20,3 @@ libdmo_filter_la_SOURCES = \
 	dmo.c \
 	dmo_guids.c \
 	DMO_VideoDecoder.c
-libdmo_filter_la_CFLAGS = $(AM_CFLAGS) -fno-strict-aliasing

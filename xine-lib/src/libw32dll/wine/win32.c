@@ -184,7 +184,7 @@ static void longcount_stub(long long* z)
 
 int LOADER_DEBUG=1; // active only if compiled with -DDETAILED_OUT
 //#define DETAILED_OUT
-static inline void XINE_FORMAT_PRINTF(1, 2) dbgprintf(const char* fmt, ...)
+static inline void XINE_FORMAT_PRINTF(1, 2) dbgprintf(char* fmt, ...)
 {
 #ifdef DETAILED_OUT
     if(LOADER_DEBUG)

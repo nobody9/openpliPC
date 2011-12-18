@@ -292,7 +292,7 @@ static int setup_dga(pgx64_driver_t *this)
     devname = dga_draw_devname(this->dgadraw);
     DGA_DRAW_UNLOCK(this->dgadraw);
 
-    if ((this->devfd = xine_open_cloexec(devname, O_RDWR)) < 0) {
+    if ((this->devfd = open(devname, O_RDWR)) < 0) {
       xprintf(this->class->xine, XINE_VERBOSITY_LOG, _("video_out_pgx64: Error: can't open framebuffer device '%s'\n"), devname);
       XDgaUnGrabDrawable(this->dgadraw);
       XUnlockDisplay(this->display);

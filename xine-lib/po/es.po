@@ -14,6 +14,7 @@ msgstr ""
 "PO-Revision-Date: 2008-04-02 01:05+0200\n"
 "Last-Translator: Carlos E. R. M. <carloser@users.sourceforge.net>\n"
 "Language-Team: Spanish <none>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -457,7 +458,7 @@ msgstr "No puedo poner el volumen de sonido"
 
 #: src/audio_out/audio_directx2_out.c:391
 #, c-format
-msgid ": buffer lost, trying to restore\n"
+msgid ": buffer lost, tryig to restore\n"
 msgstr ": búfer perdido, intentando restaurar\n"
 
 #: src/audio_out/audio_directx2_out.c:395
@@ -1033,8 +1034,8 @@ msgid ""
 "xine-lib:demux_mpeg_pes: Unrecognised stream_id 0x%02x. Please report this "
 "to xine developers.\n"
 msgstr ""
-"xine-lib:demux_mpeg_pes: Identificador de flujo de bits no reconocido 0x%"
-"02x. Por favor, repórtelo a los desarrolladores de xine.\n"
+"xine-lib:demux_mpeg_pes: Identificador de flujo de bits no reconocido 0x"
+"%02x. Por favor, repórtelo a los desarrolladores de xine.\n"
 
 #: src/demuxers/demux_mpeg_pes.c:427
 #, c-format
@@ -3598,7 +3599,7 @@ msgstr "complemento decodificador de vídeo plano de bits en bruto"
 msgid ""
 "This filter will perform a time stretch, playing the stream faster or slower "
 "by a factor. Pitch is optionally preserved, so it is possible, for example, "
-"to use it to watch a movie in less time than it was originally shot.\n"
+"to use it to watch a movie in less time than it was originaly shot.\n"
 msgstr ""
 "Este filtro estirará el tiempo, reproduciendo el flujo de datos mas rápido o "
 "más lento por un factor.Es paso se puede preservar opcionalmente, de modo "
@@ -3745,7 +3746,7 @@ msgid ""
 "usage.\n"
 "\n"
 "* Uses several algorithms from tvtime and dscaler projects.\n"
-"Deinterlacing methods: (Not all methods are available for all platforms)\n"
+"Deinterlacing methods: (Not all methods are available for all plataforms)\n"
 "\n"
 msgstr ""
 "Complemento avanzado tvtime/desentrelazador con detección de conversión de "
@@ -4701,8 +4702,8 @@ msgstr ""
 msgid ""
 "video_out_pgx64: Error: ioctl failed (VIS_GETIDENTIFIER), bad device (%s)\n"
 msgstr ""
-"video_out_pgx64: Error: falló ioctl (VIS_GETIDENTIFIER), mal dispositivo (%"
-"s)\n"
+"video_out_pgx64: Error: falló ioctl (VIS_GETIDENTIFIER), mal dispositivo "
+"(%s)\n"
 
 #: src/video_out/video_out_pgx64.c:316
 #, c-format

@@ -70,7 +70,7 @@ struct spu_decoder_class_s {
   void (*dispose) (spu_decoder_class_t *self);
 };
 
-#define default_spu_decoder_class_dispose (void (*) (spu_decoder_class_t *this))free
+#define default_spu_decoder_class_dispose (void (*) (spu_decoder_class_t *self))free
 
 struct spu_decoder_s {
 

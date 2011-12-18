@@ -520,8 +520,6 @@ int _x_get_spu_channel (xine_stream_t *stream) XINE_PROTECTED;
 
 /* sent by dvb frontend to inform ts demuxer of new pids */
 #define XINE_EVENT_PIDS_CHANGE	          0x80000000
-/* sent by BluRay input plugin to inform ts demuxer about end of clip */
-#define XINE_EVENT_END_OF_CLIP            0x80000001
 
 /*
  * pids change event - inform ts demuxer of new pids

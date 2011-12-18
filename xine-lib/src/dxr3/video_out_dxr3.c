@@ -271,7 +271,7 @@ static vo_driver_t *dxr3_vo_open_plugin(video_driver_class_t *class_gen, const v
 
   snprintf(tmpstr, sizeof(tmpstr), "/dev/em8300-%d", class->devnum);
   llprintf(LOG_VID, "Entering video init, devname = %s.\n", tmpstr);
-  if ((this->fd_control = xine_open_cloexec(tmpstr, O_WRONLY)) < 0) {
+  if ((this->fd_control = open(tmpstr, O_WRONLY)) < 0) {
 
     xprintf(this->class->xine, XINE_VERBOSITY_LOG,
 	    _("video_out_dxr3: Failed to open control device %s (%s)\n"), tmpstr, strerror(errno));
@@ -280,7 +280,7 @@ static vo_driver_t *dxr3_vo_open_plugin(video_driver_class_t *class_gen, const v
   }
 
   snprintf (tmpstr, sizeof(tmpstr), "/dev/em8300_mv-%d", class->devnum);
-  if ((this->fd_video = xine_open_cloexec(tmpstr, O_WRONLY | O_SYNC )) < 0) {
+  if ((this->fd_video = open (tmpstr, O_WRONLY | O_SYNC )) < 0) {
     xprintf(this->class->xine, XINE_VERBOSITY_LOG,
 	    _("video_out_dxr3: Failed to open video device %s (%s)\n"), tmpstr, strerror(errno));
     return 0;
@@ -637,7 +637,7 @@ static void dxr3_update_frame_format(vo_driver_t *this_gen, vo_frame_t *frame_ge
 
     /* open the device for the encoder */
     snprintf(tmpstr, sizeof(tmpstr), "/dev/em8300_mv-%d", this->class->devnum);
-    if ((this->fd_video = xine_open_cloexec(tmpstr, O_WRONLY)) < 0)
+    if ((this->fd_video = open(tmpstr, O_WRONLY)) < 0)
       xprintf(this->class->xine, XINE_VERBOSITY_DEBUG,
 	      "video_out_dxr3: Failed to open video device %s (%s)\n", tmpstr, strerror(errno));
 
@@ -832,7 +832,7 @@ static void dxr3_overlay_end(vo_driver_t *this_gen, vo_frame_t *frame_gen)
   /* try to open the dxr3 spu device */
   if (!this->fd_spu) {
     snprintf (tmpstr, sizeof(tmpstr), "/dev/em8300_sp-%d", this->class->devnum);
-    if ((this->fd_spu = xine_open_cloexec(tmpstr, O_WRONLY)) < 0) {
+    if ((this->fd_spu = open (tmpstr, O_WRONLY)) < 0) {
       xprintf(this->class->xine, XINE_VERBOSITY_DEBUG,
 	      "video_out_dxr3: Failed to open spu device %s (%s)\n"
 	      "video_out_dxr3: Overlays are not available\n", tmpstr, strerror(errno));
@@ -1336,7 +1336,7 @@ static int dxr3_overlay_read_state(dxr3_overlay_t *this)
    * (used by .overlay/res file) */
   setlocale(LC_NUMERIC, "C");
 
-  fname = _x_asprintf("%s/.overlay/res_%dx%dx%d", getenv("HOME"),
+  asprintf(&fname, "%s/.overlay/res_%dx%dx%d", getenv("HOME"),
     this->screen_xres, this->screen_yres, this->screen_depth);
   llprintf(LOG_OVR, "attempting to open %s\n", fname);
   if (!(fp = fopen(fname, "r"))) {

@@ -783,7 +783,7 @@ static audio_decoder_t *open_plugin (audio_decoder_class_t *class_gen, xine_stre
     this->a52_flags_map[i] |= A52_ADJUST_LEVEL;
   */
 #ifdef DEBUG_A52
-  a52file = xine_create_cloexec("test.a52", O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+  a52file = open ("test.a52", O_CREAT | O_WRONLY | O_TRUNC, 0644);
 #endif
   return &this->audio_decoder;
 }

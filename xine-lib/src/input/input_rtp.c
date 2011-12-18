@@ -171,7 +171,7 @@ typedef struct {
 static int host_connect_attempt(struct in_addr ia, int port,
 				const char *interface,
 				xine_t *xine) {
-  int s = xine_socket_cloexec(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  int s=socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
   union {
     struct sockaddr_in in;
     struct sockaddr sa;
@@ -180,7 +180,7 @@ static int host_connect_attempt(struct in_addr ia, int port,
   int multicast = 0;  /* boolean, assume unicast */
 
   if(s == -1) {
-    LOG_MSG(xine, _("xine_socket_cloexec(): %s.\n"), strerror(errno));
+    LOG_MSG(xine, _("socket(): %s.\n"), strerror(errno));
     return -1;
   }
 

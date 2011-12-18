@@ -949,34 +949,6 @@ static int32_t parse_private_stream_1(demux_mpeg_pes_t *this, uint8_t *p, buf_el
       }
       return this->packet_len + result;
 
-    /* EVOB AC3/E-AC-3 */
-    } else if ((p[0]&0xf0) == 0xc0) {
-
-      track = p[0] & 0x0F; /* hack : ac3 track */
-      buf->decoder_info[1] = p[1]; /* Number of frame headers */
-      buf->decoder_info[2] = p[2] << 8 | p[3]; /* First access unit pointer */
-
-      buf->content   = p+4;
-      buf->size      = this->packet_len-4;
-      if (p[4] == 0x0b && p[5] == 0x77 && ((p[9] >> 3) & 0x1f) <= 8) {
-        buf->type      = BUF_AUDIO_A52 + track;
-      } else {
-        buf->type      = BUF_AUDIO_EAC3 + track;
-        buf->decoder_flags |= BUF_FLAG_FRAME_END;
-      }
-      buf->pts       = this->pts;
-      if( !this->preview_mode )
-        check_newpts( this, this->pts, PTS_AUDIO );
-
-      if(this->audio_fifo) {
-        this->audio_fifo->put (this->audio_fifo, buf);
-        lprintf ("A52/EAC3 PACK put on fifo\n");
-
-      } else {
-        buf->free_buffer(buf);
-      }
-      return this->packet_len + result;
-
     } else if ((p[0]&0xf0) == 0xa0) {
 
       int pcm_offset;

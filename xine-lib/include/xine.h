@@ -1871,11 +1871,14 @@ typedef struct {
   char                str[256]; /* might be longer */
 } xine_ui_data_t;
 
-
 typedef struct {
   int                 pid;
   int                 streamtype;
 } xine_streamtype_data_t;
+
+typedef struct {
+  int64_t             framerate;
+} xine_framerate_data_t;
 
 /*
  * Send messages to UI. used mostly to report errors.
@@ -1954,11 +1957,6 @@ typedef struct {
   int                 enabled;      /* buffer disabled by engine */
   int                 type;         /* 0=buffer put, 1=buffer get */
 } xine_nbc_stats_data_t;
-
-
-typedef struct {
-  int64_t             framerate;
-} xine_framerate_data_t;
 
 /*
  * mrl reference data is sent by demuxers when a reference stream is found.

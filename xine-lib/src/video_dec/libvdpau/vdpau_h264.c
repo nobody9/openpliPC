@@ -378,7 +378,18 @@ static int vdpau_decoder_init(video_decoder_t *this_gen)
   event.data_length = sizeof(data);
   data.width = this->width;
   data.height = this->height;
-  data.aspect = this->ratio>1.77?3:2;
+
+  if (fabs(this->ratio-1.0)<0.1)
+    data.aspect = XINE_VO_ASPECT_SQUARE;
+  else if (fabs(this->ratio-1.33)<0.1)
+    data.aspect = XINE_VO_ASPECT_4_3;
+  else if (fabs(this->ratio-1.77)<0.1)
+    data.aspect = XINE_VO_ASPECT_ANAMORPHIC;
+  else if (fabs(this->ratio-2.11)<0.1)
+    data.aspect = XINE_VO_ASPECT_DVB;
+  else
+    data.aspect = XINE_VO_ASPECT_AUTO;
+
   xine_event_send( this->stream, &event );
 
   switch(this->completed_pic->sps_nal->sps.profile_idc) {

@@ -76,8 +76,7 @@ typedef struct {
   off_t                data_start;
   off_t                data_size;
 
-  xine_bmiheader       bih;
-  unsigned char        vmd_header[VMD_HEADER_SIZE];
+  unsigned char        bih[sizeof(xine_bmiheader) + VMD_HEADER_SIZE];
   xine_waveformatex    wave;
 
   unsigned int         audio_frames;
@@ -90,7 +89,7 @@ typedef struct {
   int64_t              video_pts_inc;
   int64_t              total_pts;
 
-} demux_vmd_t;
+} demux_vmd_t ;
 
 typedef struct {
   demux_class_t     demux_class;
@@ -99,7 +98,8 @@ typedef struct {
 /* returns 1 if the VMD file was opened successfully, 0 otherwise */
 static int open_vmd_file(demux_vmd_t *this) {
 
-  unsigned char *vmd_header = this->vmd_header;
+  xine_bmiheader *bih = (xine_bmiheader *)this->bih;
+  unsigned char *vmd_header = this->bih + sizeof(xine_bmiheader);
   off_t toc_offset;
   unsigned char *raw_frame_table;
   unsigned int raw_frame_table_size;
@@ -122,9 +122,9 @@ static int open_vmd_file(demux_vmd_t *this) {
   if ( !(this->data_size = this->input->get_length(this->input)) )
     this->data_size = 1;
 
-  this->bih.biSize = sizeof(xine_bmiheader) + VMD_HEADER_SIZE;
-  this->bih.biWidth = _X_LE_16(&vmd_header[12]);
-  this->bih.biHeight = _X_LE_16(&vmd_header[14]);
+  bih->biSize = sizeof(xine_bmiheader) + VMD_HEADER_SIZE;
+  bih->biWidth = _X_LE_16(&vmd_header[12]);
+  bih->biHeight = _X_LE_16(&vmd_header[14]);
   this->wave.nSamplesPerSec = _X_LE_16(&vmd_header[804]);
   this->wave.nChannels =  (vmd_header[811] & 0x80) ? 2 : 1;
   this->wave.nBlockAlign = _X_LE_16(&vmd_header[806]);
@@ -323,6 +323,7 @@ static int demux_vmd_send_chunk(demux_plugin_t *this_gen) {
 static void demux_vmd_send_headers(demux_plugin_t *this_gen) {
   demux_vmd_t *this = (demux_vmd_t *) this_gen;
   buf_element_t *buf;
+  xine_bmiheader *bih = (xine_bmiheader *)this->bih;
 
   this->video_fifo  = this->stream->video_fifo;
   this->audio_fifo  = this->stream->audio_fifo;
@@ -334,9 +335,9 @@ static void demux_vmd_send_headers(demux_plugin_t *this_gen) {
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_HAS_AUDIO,
                        (this->wave.nSamplesPerSec) ? 1 : 0);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_VIDEO_WIDTH,
-                       this->bih.biWidth);
+                       bih->biWidth);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_VIDEO_HEIGHT,
-                       this->bih.biHeight);
+                       bih->biHeight);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_AUDIO_CHANNELS,
                        this->wave.nChannels);
   _x_stream_info_set(this->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE,
@@ -352,8 +353,7 @@ static void demux_vmd_send_headers(demux_plugin_t *this_gen) {
   buf->decoder_flags = BUF_FLAG_HEADER|BUF_FLAG_STDHEADER|BUF_FLAG_FRAMERATE|
                        BUF_FLAG_FRAME_END;
   buf->decoder_info[0] = this->video_pts_inc;  /* initial duration */
-  memcpy(buf->content, &this->bih, sizeof(xine_bmiheader));
-  memcpy(buf->content + sizeof(xine_bmiheader), this->vmd_header, VMD_HEADER_SIZE);
+  memcpy(buf->content, this->bih, sizeof(xine_bmiheader) + VMD_HEADER_SIZE);
   buf->size = sizeof(xine_bmiheader) + VMD_HEADER_SIZE;
   buf->type = BUF_VIDEO_VMD;
   this->video_fifo->put (this->video_fifo, buf);

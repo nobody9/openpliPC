@@ -266,7 +266,7 @@ static input_plugin_t *rtsp_class_get_instance (input_class_t *cls_gen, xine_str
   /* since we handle only real streams yet, we can savely add
    * an .rm extention to force handling by demux_real.
    */
-  this->public_mrl = _x_asprintf("%s.rm", this->mrl);
+  asprintf(&this->public_mrl, "%s.rm", this->mrl);
 
   this->nbc     = nbc_init (stream);
 

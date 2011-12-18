@@ -65,6 +65,5 @@ libwine_la_SOURCES = \
 	vfl.c \
 	win32.c \
 	stubs.s \
-	wrapper.S
-libwine_la_CFLAGS = $(AM_CFLAGS) -fno-strict-aliasing
+	wrapper.S 
 libwine_la_CPPFLAGS = $(AM_CPPFLAGS) $(XDG_BASEDIR_CPPFLAGS)

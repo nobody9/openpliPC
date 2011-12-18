@@ -238,7 +238,18 @@ static void update_metadata( vdpau_vc1_decoder_t *this_gen )
     event.data_length = sizeof(data);
     data.width = sequence->coded_width;
     data.height = sequence->coded_height;
-    data.aspect = sequence->ratio>1.77?3:2;
+
+    if (fabs(sequence->ratio-1.0)<0.1)
+      data.aspect = XINE_VO_ASPECT_SQUARE;
+    else if (fabs(sequence->ratio-1.33)<0.1)
+      data.aspect = XINE_VO_ASPECT_4_3;
+    else if (fabs(sequence->ratio-1.77)<0.1)
+      data.aspect = XINE_VO_ASPECT_ANAMORPHIC;
+    else if (fabs(sequence->ratio-2.11)<0.1)
+      data.aspect = XINE_VO_ASPECT_DVB;
+    else
+      data.aspect = XINE_VO_ASPECT_AUTO;
+
     xine_event_send( this_gen->stream, &event );
   }
 }
@@ -258,7 +269,7 @@ static void sequence_header_advanced( vdpau_vc1_decoder_t *this_gen, uint8_t *bu
   bits_reader_set( &sequence->br, buf, len );
   skip_bits( &sequence->br, 15 );
   sequence->picture.vdp_infos.postprocflag = read_bits( &sequence->br, 1 );
-  sequence->coded_width = (read_bits( &sequence->br, 12 )+1)<<1;
+  sequence->coded_width = read_bits( &sequence->br, 12 )<<1;
   sequence->coded_height = (read_bits( &sequence->br, 12 )+1)<<1;
   sequence->picture.vdp_infos.pulldown = read_bits( &sequence->br, 1 );
   sequence->picture.vdp_infos.interlace = read_bits( &sequence->br, 1 );

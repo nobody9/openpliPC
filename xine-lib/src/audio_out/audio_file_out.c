@@ -30,7 +30,6 @@
 #include <math.h>
 #include <unistd.h>
 #include <inttypes.h>
-#include <sys/stat.h>
 
 #include <xine/xine_internal.h>
 #include <xine/xineutils.h>
@@ -40,18 +39,6 @@
 #define AO_OUT_FILE_IFACE_VERSION 9
 
 #define GAP_TOLERANCE        INT_MAX
-
-#ifdef WIN32
-#ifndef S_IWUSR
-#define S_IWUSR 0x0000
-#endif
-#ifndef S_IRGRP
-#define S_IRGRP 0x0000
-#endif
-#ifndef S_IROTH
-#define S_IROTH 0x0000
-#endif
-#endif
 
 /* Taken (hStudlyCapsAndAll) from sox's wavwritehdr */
 
@@ -128,7 +115,7 @@ static int ao_file_open(ao_driver_t *this_gen, uint32_t bits, uint32_t rate, int
 	if (!this->fname)
 		this->fname = "xine-out.wav";
 
-	this->fd = xine_create_cloexec(this->fname, O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+	this->fd = open(this->fname, O_WRONLY|O_TRUNC|O_CREAT, 0644);
 
 	if (this->fd == -1) {
 		xprintf (this->xine, XINE_VERBOSITY_LOG, "audio_file_out: Failed to open file '%s': %s\n",

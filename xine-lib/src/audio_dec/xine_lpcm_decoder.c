@@ -120,12 +120,8 @@ static void lpcm_decode_data (audio_decoder_t *this_gen, buf_element_t *buf) {
       num_channels = channels[(buf->decoder_info[2] >> (16+4)) & 0x0f];
       switch ((buf->decoder_info[2] >> (24+6)) & 0x03) {
         case 1:  bits_per_sample = 16; break;
-        case 2:  /*bits_per_sample = 20; break;*/
-                 /* fall thru. Samples are 0-padded to 24 bits, and
-                  * converted later to 16 bits by dropping 8 lowest bits.
-                  * this needs to be changed if audio out some day accepts 24bit samples.
-                  */
-        case 3:  bits_per_sample = 24; break;
+        case 2:  bits_per_sample = 20; break;
+        case 3:  bits_per_sample = 24; special_dvd_audio = 1; break;
         default: bits_per_sample =  0; break;
       }
       switch ((buf->decoder_info[2] >> 16) & 0x0f) {

@@ -510,28 +510,36 @@ static void pvr_adjust_realtime_speed(pvr_input_plugin_t *this, fifo_buffer_t *f
 #define PVR_FILENAME      "%s%08d_%08d.vob"
 
 static char *make_temp_name(pvr_input_plugin_t *this, int page) {
+  char *filename;
 
-  return _x_asprintf(PVR_FILENAME, this->tmp_prefix, this->session, page);
+  asprintf(&filename, PVR_FILENAME, this->tmp_prefix, this->session, page);
+
+  return filename;
 }
 
 #define SAVE_BASE_FILENAME     "ch%03d %02d-%02d-%04d %02d:%02d:%02d"
 
 static char *make_base_save_name(int channel, time_t tm) {
   struct tm rec_time;
+  char *filename;
 
   localtime_r(&tm, &rec_time);
 
-  return _x_asprintf(SAVE_BASE_FILENAME,
+  asprintf(&filename, SAVE_BASE_FILENAME,
            channel, rec_time.tm_mon+1, rec_time.tm_mday,
            rec_time.tm_year+1900, rec_time.tm_hour, rec_time.tm_min,
            rec_time.tm_sec);
+  return filename;
 }
 
 #define SAVE_FILENAME      "%s%s_%04d.vob"
 
 static char *make_save_name(pvr_input_plugin_t *this, char *base, int page) {
+  char *filename;
 
-  return _x_asprintf(SAVE_FILENAME, this->save_prefix, base, page);
+  asprintf(&filename, SAVE_FILENAME, this->save_prefix, base, page);
+
+  return filename;
 }
 
 /*
@@ -576,7 +584,7 @@ static int pvr_break_rec_page (pvr_input_plugin_t *this) {
 
   lprintf("opening pvr file for writing (%s)\n", filename);
 
-  this->rec_fd = xine_create_cloexec(filename, O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  this->rec_fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0666 );
   if( this->rec_fd == -1 ) {
     xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
 	    _("input_pvr: error creating pvr file (%s)\n"), filename);
@@ -733,7 +741,7 @@ static int pvr_play_file(pvr_input_plugin_t *this, fifo_buffer_t *fifo, uint8_t 
 
          lprintf("opening pvr file for reading (%s)\n", filename);
 
-         this->play_fd = xine_open_cloexec(filename, O_RDONLY);
+         this->play_fd = open(filename, O_RDONLY );
          if( this->play_fd == -1 ) {
            xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
 		   _("input_pvr: error opening pvr file (%s)\n"), filename);
@@ -1001,7 +1009,7 @@ static void pvr_event_handler (pvr_input_plugin_t *this) {
 
         /* as of ivtv 0.10.6: must close and reopen to set input */
         close(this->dev_fd);
-        this->dev_fd = xine_open_cloexec(this->class->devname, O_RDWR);
+        this->dev_fd = open (this->class->devname, O_RDWR);
         if (this->dev_fd < 0) {
           xprintf(this->stream->xine, XINE_VERBOSITY_DEBUG,
                   "input_pvr: error opening device %s\n", this->class->devname );
@@ -1148,7 +1156,7 @@ static void pvr_event_handler (pvr_input_plugin_t *this) {
 
        /* how lame. we must close and reopen to change bitrate. */
        close(this->dev_fd);
-       this->dev_fd = xine_open_cloexec(this->class->devname, O_RDWR);
+       this->dev_fd = open (this->class->devname, O_RDWR);
        if (this->dev_fd == -1) {
          xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
 		 _("input_pvr: error opening device %s\n"), this->class->devname );
@@ -1408,7 +1416,7 @@ static int pvr_plugin_open (input_plugin_t *this_gen ) {
 
   this->saved_id = 0;
 
-  this->dev_fd = xine_open_cloexec(this->class->devname, O_RDWR);
+  this->dev_fd = open (this->class->devname, O_RDWR);
   if (this->dev_fd == -1) {
     xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
 	    _("input_pvr: error opening device %s\n"), this->class->devname );

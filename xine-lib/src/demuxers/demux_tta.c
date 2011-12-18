@@ -99,7 +99,7 @@ static int open_tta_file(demux_tta_t *this) {
   }
 
   this->seektable = xine_xcalloc(this->totalframes, sizeof(uint32_t));
-  this->input->read(this->input, (uint8_t*)this->seektable, sizeof(uint32_t)*this->totalframes);
+  this->input->read(this->input, this->seektable, sizeof(uint32_t)*this->totalframes);
 
   /* Skip the CRC32 */
   this->input->seek(this->input, 4, SEEK_CUR);

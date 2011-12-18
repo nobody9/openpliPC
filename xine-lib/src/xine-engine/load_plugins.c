@@ -388,7 +388,7 @@ static void _insert_node (xine_t *this,
 
     snprintf(key, sizeof(key), "engine.decoder_priorities.%s", info->id);
     for (i = 0; catalog->prio_desc[i]; i++);
-    catalog->prio_desc[i] = _x_asprintf(_("priority for %s decoder"), info->id);
+    asprintf(&catalog->prio_desc[i], _("priority for %s decoder"), info->id);
     this->config->register_num (this->config,
 				key,
 				0,
@@ -1199,7 +1199,7 @@ static void save_catalog (xine_t *this) {
 
   if ( ! cachefile ) return;
 
-  cachefile_new = _x_asprintf("%s.new", cachefile);
+  asprintf(&cachefile_new, "%s.new", cachefile);
 
   if( (fp = fopen(cachefile_new,"w")) != NULL ) {
     int i;
@@ -1298,7 +1298,7 @@ void _x_scan_plugins (xine_t *this) {
       } else
         len = strlen(q);
       if (q[0] == '~' && q[1] == '/')
-	dir = _x_asprintf ("%s%.*s", homedir, (int)(len - 1), q + 1);
+	asprintf (&dir, "%s%.*s", homedir, (int)(len - 1), q + 1);
       else
 	dir = strndup (q, len);
       push_if_dir (plugindirs, dir); /* store or free it */
@@ -1306,11 +1306,11 @@ void _x_scan_plugins (xine_t *this) {
   } else {
     char *dir;
     int i;
-    dir = _x_asprintf ("%s/.xine/plugins", homedir);
+    asprintf (&dir, "%s/.xine/plugins", homedir);
     push_if_dir (plugindirs, dir);
     for (i = 0; i <= XINE_LT_AGE; ++i)
     {
-      dir = _x_asprintf ("%s.%d", XINE_PLUGINROOT, XINE_LT_AGE - i);
+      asprintf (&dir, "%s.%d", XINE_PLUGINROOT, XINE_LT_AGE - i);
       push_if_dir (plugindirs, dir);
     }
   }

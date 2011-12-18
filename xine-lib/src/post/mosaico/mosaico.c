@@ -179,7 +179,7 @@ static post_plugin_t *mosaico_open_plugin(post_class_t *class_gen, int inputs,
     this->pip[i].y = 50;
     this->pip[i].w = 150;
     this->pip[i].h = 150;
-    this->pip[i].input_name = _x_asprintf("video in %d", i+1);
+    asprintf(&(this->pip[i].input_name), "video in %d", i+1);
 
     port = _x_post_intercept_video_port(&this->post, video_target[0], &input, NULL);
     port->new_port.close  = mosaico_close;

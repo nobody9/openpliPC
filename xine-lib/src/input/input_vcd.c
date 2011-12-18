@@ -832,7 +832,7 @@ static int vcd_plugin_open (input_plugin_t *this_gen) {
   char               *filename;
   int                 fd;
 
-  fd = xine_open_cloexec(cls->device, O_RDONLY|O_EXCL);
+  fd = open (cls->device, O_RDONLY|O_EXCL);
   if (fd == -1) {
     return 0;
   }
@@ -966,7 +966,7 @@ static xine_mrl_t **vcd_class_get_dir (input_class_t *this_gen, const char *file
     return NULL;
 
 
-  fd = xine_open_cloexec(this->device, O_RDONLY|O_EXCL);
+  fd = open (this->device, O_RDONLY|O_EXCL);
 
   if (fd == -1) {
     xprintf (this->xine, XINE_VERBOSITY_LOG,
@@ -1000,7 +1000,8 @@ static xine_mrl_t **vcd_class_get_dir (input_class_t *this_gen, const char *file
       memset(this->mrls[(i-1)], 0, sizeof(xine_mrl_t));
     }
 
-    this->mrls[i-1]->mrl  = _x_asprintf("vcdo:/%d", i);
+    asprintf(&(this->mrls[i-1]->mrl), "vcdo:/%d", i);
+
     this->mrls[i-1]->type = mrl_vcd;
 
     /* hack */
@@ -1027,7 +1028,7 @@ static char ** vcd_class_get_autoplay_list (input_class_t *this_gen, int *num_fi
   int i, fd;
 
 
-  fd = xine_open_cloexec(this->device, O_RDONLY|O_EXCL);
+  fd = open (this->device, O_RDONLY|O_EXCL);
 
   if (fd == -1) {
     xprintf (this->xine, XINE_VERBOSITY_LOG,
@@ -1054,7 +1055,7 @@ static char ** vcd_class_get_autoplay_list (input_class_t *this_gen, int *num_fi
 
   /* FIXME: check if track 0 contains valid data */
   for (i = 1; i < this->total_tracks; i++)
-    this->filelist[i-1] = _x_asprintf("vcdo:/%d", i);
+    asprintf(&this->filelist[i-1], "vcdo:/%d", i);
 
   /* printf ("%d tracks\n", this->total_tracks); */
 

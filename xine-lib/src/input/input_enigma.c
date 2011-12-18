@@ -40,8 +40,8 @@
 #include "net_buf_ctrl.h"
 
 #define ENIGMA_ABS_FIFO_DIR     "/tmp"
-#define DEFAULT_PTS_START       1500
-#define BUFSIZE                 2048
+#define DEFAULT_PTS_START       150000
+#define BUFSIZE                 1024
 #define FILE_FLAGS O_RDONLY
 #define FIFO_PUT                0
 
@@ -170,9 +170,8 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
           this->audio_last_pts    = 0;
           this->video_fifo_length = 0;
           this->audio_fifo_length = 0;
-         // nbc_set_speed_pause(this);
+          nbc_set_speed_pause(this);
           this->progress = 0;
-		 // this->progress = 100;
           //report_progress (this->stream, progress);
         }
         break;
@@ -237,8 +236,6 @@ nbc_t *enigma_nbc_init (xine_stream_t *stream) {
   nbc_t *this = calloc(1, sizeof (nbc_t));
   fifo_buffer_t *video_fifo = stream->video_fifo;
   fifo_buffer_t *audio_fifo = stream->audio_fifo;
-  
-  
   double video_fifo_factor, audio_fifo_factor;
   cfg_entry_t *entry;
 

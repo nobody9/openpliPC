@@ -216,8 +216,8 @@ struct osd_renderer_s {
   int (*show_unscaled) (osd_object_t *osd, int64_t vpts );
 
 
-
   int (*show_scaled) (osd_object_t *osd, int64_t vpts );
+
 
   /*
    * see xine.h for defined XINE_OSD_CAP_ values.

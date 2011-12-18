@@ -366,19 +366,6 @@ static void *video_decoder_loop (void *stream_gen) {
     case BUF_CONTROL_NOP:
       break;
 
-    case BUF_CONTROL_RESET_TRACK_MAP:
-      if (stream->spu_track_map_entries)
-      {
-        xine_event_t ui_event;
-
-        stream->spu_track_map_entries = 0;
-
-        ui_event.type        = XINE_EVENT_UI_CHANNELS_CHANGED;
-        ui_event.data_length = 0;
-        xine_event_send(stream, &ui_event);
-      }
-      break;
-
     default:
 
       if ( (buf->type & 0xFF000000) == BUF_VIDEO_BASE ) {

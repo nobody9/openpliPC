@@ -59,32 +59,16 @@ struct nbc_s {
   int              audio_in_disc;
 
   pthread_mutex_t  mutex;
-
-  /* follow live dvb delivery speed.
-     0 = fix disabled
-     1 = play at normal speed
-     2 = play 0.5% slower to fill video fifo
-     3 = play 0.5% faster to empty video fifo
-     4..6 = same as 1..3 but watch audio fifo instead
-     7 = pause */
-  int dvbspeed;
-  int dvbs_center, dvbs_width, dvbs_audio_fill, dvbs_video_fill;
-  int64_t dvbs_audio_in, dvbs_audio_out;
-  int64_t dvbs_video_in, dvbs_video_out;
 };
-
 
 typedef struct nbc_s nbc_t;
 
 nbc_t *nbc_init (xine_stream_t *xine) XINE_MALLOC;
 
 void nbc_close (nbc_t *this);
+
 void nbc_set_speed_pause (nbc_t *this);
 void nbc_set_speed_normal (nbc_t *this);
-void dvbspeed_init (nbc_t *this);
-void dvbspeed_close (nbc_t *this);
-void dvbspeed_put (nbc_t *this, fifo_buffer_t * fifo, buf_element_t *b);
-void dvbspeed_get (nbc_t *this, fifo_buffer_t * fifo, buf_element_t *b);
 void nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *this_gen);
 void nbc_compute_fifo_length(nbc_t *this, fifo_buffer_t *fifo, buf_element_t *buf, int action);
 void nbc_alloc_cb (fifo_buffer_t *fifo, void *this_gen);

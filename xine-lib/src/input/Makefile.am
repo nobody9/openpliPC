@@ -104,7 +104,6 @@ xineplug_inp_stdin_fifo_la_SOURCES = input_stdin_fifo.c net_buf_ctrl.c
 xineplug_inp_stdin_fifo_la_LIBADD = $(XINE_LIB) $(PTHREAD_LIBS) $(LTLIBINTL)
 
 xineplug_inp_rtp_la_SOURCES = input_rtp.c net_buf_ctrl.c
-xineplug_inp_rtp_la_CFLAGS = $(AM_CFLAGS) -fno-strict-aliasing
 xineplug_inp_rtp_la_LIBADD = $(XINE_LIB) $(NET_LIBS) $(PTHREAD_LIBS) $(LTLIBINTL)
 
 xineplug_inp_http_la_SOURCES = input_http.c net_buf_ctrl.c http_helper.c

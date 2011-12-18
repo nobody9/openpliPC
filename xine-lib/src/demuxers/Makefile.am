@@ -112,7 +112,6 @@ xineplug_dmx_games_la_SOURCES = group_games.c demux_eawve.c \
 				demux_vqa.c demux_wc3movie.c demux_str.c \
 				demux_film.c demux_smjpeg.c demux_4xm.c \
 				demux_vmd.c
-xineplug_dmx_games_la_CFLAGS = $(AM_CFLAGS) -fno-strict-aliasing
 xineplug_dmx_games_la_LIBADD = $(XINE_LIB) $(LTLIBINTL)
 
 xineplug_dmx_audio_la_SOURCES = group_audio.c demux_aud.c demux_aiff.c \

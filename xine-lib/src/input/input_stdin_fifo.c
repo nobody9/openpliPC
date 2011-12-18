@@ -251,10 +251,10 @@ static int stdin_plugin_open (input_plugin_t *this_gen ) {
   lprintf ("trying to open '%s'...\n", this->mrl);
 
   if (this->fh == -1) {
-    const char *filename;
+    char *filename;
 
-    filename = (const char *) &this->mrl[5];
-    this->fh = xine_open_cloexec(filename, FILE_FLAGS);
+    filename = (char *) &this->mrl[5];
+    this->fh = open (filename, FILE_FLAGS);
 
     lprintf("filename '%s'\n", filename);
 

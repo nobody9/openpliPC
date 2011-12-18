@@ -1381,8 +1381,8 @@ check_solaris_vold_device(dvd_input_class_t *this)
       (volume_action = getenv("VOLUME_ACTION")) != NULL &&
       strcmp(volume_action, "insert") == 0) {
 
-    device = _x_asprintf("%s/%s", volume_device, volume_name);
-    if (!device || stat(device, &stb) != 0 || !S_ISCHR(stb.st_mode)) {
+    asprintf(&device, "%s/%s", volume_device, volume_name);
+    if (stat(device, &stb) != 0 || !S_ISCHR(stb.st_mode)) {
       free(device);
       return;
     }

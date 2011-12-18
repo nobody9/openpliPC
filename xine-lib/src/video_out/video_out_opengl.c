@@ -705,7 +705,7 @@ static void *getdladdr (const GLubyte *_funcName) {
 
 #elif defined(__APPLE__)
   char *temp;
-  temp = _x_asprintf("_%s", funcName);
+  asprintf(&temp, "_%s", funcName);
   void *res = NULL;
   if (NSIsSymbolNameDefined (temp)) {
     NSSymbol symbol = NSLookupAndBindSymbol (temp);

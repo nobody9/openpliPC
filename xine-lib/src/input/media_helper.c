@@ -99,7 +99,7 @@ int media_eject_media (xine_t *xine, const char *device)
   media_umount_media(device);
   /* printf("input_dvd: umount result: %s\n", strerror(errno)); */
 
-  if ((fd = xine_open_cloexec(device, O_RDONLY|O_NONBLOCK)) > -1) {
+  if ((fd = open (device, O_RDONLY|O_NONBLOCK)) > -1) {
 
 #if defined (__linux__)
     int ret, status;

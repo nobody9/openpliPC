@@ -136,7 +136,7 @@ static inline void mute_channel (int16_t *const s16, const int num_channels) {
     s16[i] = 0;
 }
 
-static void dts_decode_frame (dts_decoder_t *this, const int64_t pts) {
+static void dts_decode_frame (dts_decoder_t *this, const int64_t pts, const int preview_mode) {
 
   audio_buffer_t *audio_buffer;
   uint32_t  ac5_spdif_type=0;
@@ -441,9 +441,9 @@ static void dts_decode_data (audio_decoder_t *this_gen, buf_element_t *buf) {
 
     case 3:  /* Ready for decode */
 #if 0
-          dtsdec_decode_frame (this, this->pts_list[0]);
+          dtsdec_decode_frame (this, this->pts_list[0], buf->decoder_flags & BUF_FLAG_PREVIEW);
 #else
-          dts_decode_frame (this, this->pts);
+          dts_decode_frame (this, this->pts, buf->decoder_flags & BUF_FLAG_PREVIEW);
 #endif
     case 4:  /* Clear up ready for next frame */
           this->pts = 0;

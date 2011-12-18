@@ -1333,29 +1333,6 @@ static int parse_track_entry(demux_matroska_t *this, matroska_track_t *track) {
       lprintf("MATROSKA_CODEC_ID_V_MPEG2\n");
       track->buf_type = BUF_VIDEO_MPEG;
       init_codec = init_codec_video;
-    } else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_V_VP8)) {
-      xine_bmiheader *bih;
-
-      lprintf("MATROSKA_CODEC_ID_V_VP8\n");
-      if (track->codec_private_len > 0x7fffffff - sizeof(xine_bmiheader))
-        track->codec_private_len = 0x7fffffff - sizeof(xine_bmiheader);
-
-      /* create a bitmap info header struct for vp8 */
-      bih = calloc(1, sizeof(xine_bmiheader) + track->codec_private_len);
-      bih->biSize = sizeof(xine_bmiheader) + track->codec_private_len;
-      bih->biCompression = ME_FOURCC('v', 'p', '8', '0');
-      bih->biWidth = track->video_track->pixel_width;
-      bih->biHeight = track->video_track->pixel_height;
-      _x_bmiheader_le2me(bih);
-
-      /* add bih extra data */
-      memcpy(bih + 1, track->codec_private, track->codec_private_len);
-      free(track->codec_private);
-      track->codec_private = (uint8_t *)bih;
-      track->codec_private_len = bih->biSize;
-      track->buf_type = BUF_VIDEO_VP8;
-
-      init_codec = init_codec_video;
     } else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_V_REAL_RV10)) {
     } else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_V_REAL_RV20)) {
     } else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_V_REAL_RV30)) {
@@ -3009,7 +2986,7 @@ static demux_plugin_t *open_plugin (demux_class_t *class_gen, xine_stream_t *str
   if (ebml->max_size_len > 8)
     goto error;
   /* handle both Matroska and WebM here; we don't (presently) differentiate */
-  if (!ebml->doctype || (strcmp(ebml->doctype, "matroska") && strcmp(ebml->doctype, "webm")))
+  if (strcmp(ebml->doctype, "matroska") && strcmp(ebml->doctype, "webm"))
     goto error;
 
   this->event_queue = xine_event_new_queue(this->stream);
@@ -3019,7 +2996,7 @@ static demux_plugin_t *open_plugin (demux_class_t *class_gen, xine_stream_t *str
 error:
   dispose_ebml_parser(ebml);
 
-  if (this != NULL && this->event_queue != NULL) {
+  if (NULL != this) {
     xine_event_dispose_queue(this->event_queue);
     free(this);
   }

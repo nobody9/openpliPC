@@ -160,7 +160,7 @@ static int realtime_samplecounter_available(xine_t *xine, char *dev)
   if (silence == NULL)
     goto error;
 
-  if ((fd = xine_open_cloexec(dev, O_WRONLY|O_NONBLOCK)) < 0)
+  if ((fd = open(dev, O_WRONLY|O_NONBLOCK)) < 0)
     goto error;
 
   /* We wanted non blocking open but now put it back to normal */
@@ -449,7 +449,7 @@ static int ao_sun_open(ao_driver_t *this_gen,
    * open audio device
    */
 
-  this->audio_fd = xine_open_cloexec(this->audio_dev, O_WRONLY|O_NONBLOCK);
+  this->audio_fd = open(this->audio_dev, O_WRONLY|O_NONBLOCK);
   if(this->audio_fd < 0) {
     xprintf(this->xine, XINE_VERBOSITY_LOG,
 	    _("audio_sun_out: opening audio device %s failed: %s\n"), this->audio_dev, strerror(errno));
@@ -939,8 +939,8 @@ static ao_driver_t *ao_sun_open_plugin (audio_driver_class_t *class_gen, const v
   /*
    * open the device
    */
-  this->audio_dev = devname;
-  this->audio_fd = xine_open_cloexec(devname, O_WRONLY|O_NONBLOCK);
+
+  this->audio_fd = open(this->audio_dev = devname, O_WRONLY|O_NONBLOCK);
 
   if(this->audio_fd < 0)
   {

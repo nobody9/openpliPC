@@ -191,7 +191,6 @@ extern "C" {
 #define BUF_VIDEO_VC1		0x02650000
 #define BUF_VIDEO_VMNC		0x02660000
 #define BUF_VIDEO_SNOW		0x02670000
-#define BUF_VIDEO_VP8		0x02680000
 /*@}*/
 
 /**
@@ -268,7 +267,6 @@ extern "C" {
 #define BUF_AUDIO_AMR_NB	0x033F0000
 #define BUF_AUDIO_AMR_WB	0x03400000
 #define BUF_AUDIO_EAC3		0x03410000
-#define BUF_AUDIO_AAC_LATM	0x03420000
 /*@}*/
 
 /**

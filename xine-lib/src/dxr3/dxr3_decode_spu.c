@@ -236,7 +236,7 @@ static spu_decoder_t *dxr3_spudec_open_plugin(spu_decoder_class_t *class_gen, xi
   else {
     /* open dxr3 spu device */
     snprintf(tmpstr, sizeof(tmpstr), "/dev/em8300_sp-%d", this->devnum);
-    if ((this->fd_spu = xine_open_cloexec(tmpstr, O_WRONLY)) < 0) {
+    if ((this->fd_spu = open(tmpstr, O_WRONLY)) < 0) {
       xprintf(this->stream->xine, XINE_VERBOSITY_LOG,
 	      _("dxr3_decode_spu: Failed to open spu device %s (%s)\n"), tmpstr, strerror(errno));
       pthread_mutex_unlock(&this->dxr3_vo->spu_device_lock);

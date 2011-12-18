@@ -290,7 +290,7 @@ static inline post_video_port_t *_x_post_video_frame_to_port(vo_frame_t *frame) 
 static inline post_video_port_t *_x_post_ovl_manager_to_port(video_overlay_manager_t *manager) {
 #ifdef POST_INTERNAL
   return (post_video_port_t *)( (uint8_t *)manager -
-    (uint8_t*)&(((post_video_port_t *)NULL)->manager_storage) );
+    (unsigned)&(((post_video_port_t *)NULL)->manager_storage) );
 #else
   return (post_video_port_t *)( (uint8_t *)manager - sizeof(post_video_port_t) );
 #endif

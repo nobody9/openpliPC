@@ -134,6 +134,7 @@ typedef struct oss_driver_s {
   int              buffer_size;
 
   struct {
+    char          *name;
     int            fd;
     int            prop;
     int            volume;
@@ -189,7 +190,7 @@ static int ao_oss_open(ao_driver_t *this_gen,
    * open audio device
    */
 
-  this->audio_fd = xine_open_cloexec(this->audio_dev, O_WRONLY|O_NONBLOCK);
+  this->audio_fd=open(this->audio_dev,O_WRONLY|O_NONBLOCK);
   if (this->audio_fd < 0) {
     xprintf(this->xine, XINE_VERBOSITY_LOG,
 	    _("audio_oss_out: Opening audio device %s: %s\n"), this->audio_dev, strerror(errno));
@@ -373,7 +374,7 @@ static int ao_oss_delay(ao_driver_t *this_gen) {
 
   count_info    info;
   oss_driver_t *this = (oss_driver_t *) this_gen;
-  int           bytes_left = 0;
+  int           bytes_left;
   int           frames;
   struct        timeval tv;
 
@@ -506,6 +507,7 @@ static void ao_oss_exit(ao_driver_t *this_gen) {
   if (this->audio_fd != -1)
     close(this->audio_fd);
 
+  free (this->mixer.name);
   free (this);
 }
 
@@ -779,7 +781,7 @@ static ao_driver_t *open_plugin (audio_driver_class_t *class_gen, const void *da
   xprintf(class->xine, XINE_VERBOSITY_LOG,
 	  _("audio_oss_out: using device >%s<\n"), this->audio_dev);
 
-  audio_fd = xine_open_cloexec(this->audio_dev, O_WRONLY|O_NONBLOCK);
+  audio_fd = open(this->audio_dev, O_WRONLY|O_NONBLOCK);
 
   if (audio_fd < 0) {
     xprintf(class->xine, XINE_VERBOSITY_LOG,
@@ -892,7 +894,7 @@ static ao_driver_t *open_plugin (audio_driver_class_t *class_gen, const void *da
 	    _("audio_oss_out: Audio driver realtime sync disabled...\n"
 	      "audio_oss_out: ...probing output buffer size: %d bytes\naudio_oss_out: ...there may be audio/video synchronization issues\n"), this->buffer_size);
 
-    audio_fd = xine_open_cloexec(this->audio_dev, O_WRONLY|O_NONBLOCK);
+    audio_fd=open(this->audio_dev, O_WRONLY|O_NONBLOCK);
 
     if(audio_fd < 0)
     {
@@ -1017,7 +1019,6 @@ static ao_driver_t *open_plugin (audio_driver_class_t *class_gen, const void *da
    */
   {
     char mixer_name[32];
-    char mixer_dev[32];
     int mixer_num;
     int audio_devs;
     char *parse;
@@ -1039,14 +1040,15 @@ static ao_driver_t *open_plugin (audio_driver_class_t *class_gen, const void *da
       parse[0] = '\0';
       parse += 3;
       if (devname_val == 0)
-	snprintf(mixer_dev, sizeof(mixer_dev), "%smixer%s", mixer_name, parse);
+	asprintf(&this->mixer.name, "%smixer%s", mixer_name, parse);
       else if (mixer_num == -1)
-	snprintf(mixer_dev, sizeof(mixer_dev), "%smixer", mixer_name);
+	asprintf(&this->mixer.name, "%smixer", mixer_name);
       else
-	snprintf(mixer_dev, sizeof(mixer_dev), "%smixer%d", mixer_name, mixer_num);
+	asprintf(&this->mixer.name, "%smixer%d", mixer_name, mixer_num);
     }
+    _x_assert(this->mixer.name);
 
-    this->mixer.fd = xine_open_cloexec(mixer_dev, O_RDONLY);
+    this->mixer.fd = open(this->mixer.name, O_RDONLY);
 
     if(this->mixer.fd != -1) {
 
@@ -1074,7 +1076,7 @@ static ao_driver_t *open_plugin (audio_driver_class_t *class_gen, const void *da
 
     } else
       xprintf (class->xine, XINE_VERBOSITY_LOG,
-	       _("audio_oss_out: open() mixer %s failed: %s\n"), mixer_dev, strerror(errno));
+	       _("audio_oss_out: open() mixer %s failed: %s\n"), this->mixer.name, strerror(errno));
 
     this->mixer.mute = 0;
     this->mixer.volume = ao_oss_get_property (&this->ao_driver, this->mixer.prop);

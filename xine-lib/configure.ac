@@ -246,10 +246,6 @@ AC_ARG_WITH([external-libxdg-basedir],
 have_xdg_basedir=no
 if test x"$with_external_libxdg_basedir" != x"no"; then
     PKG_CHECK_MODULES([XDG_BASEDIR], [libxdg-basedir >= 1], [have_xdg_basedir=yes], [have_xdg_basedir=no])
-
-    if test x"$have_xdg_basedir" = x"no" -a x"$with_external_libxdg_basedir" = x"yes"; then
-	AC_MSG_ERROR([--with-external-libxdg-basedir used but no libxdg-basedir found])
-    fi
 fi
 if test x"$have_xdg_basedir" = xyes; then
     XDG_BASEDIR_REQUIRES="libxdg-basedir"

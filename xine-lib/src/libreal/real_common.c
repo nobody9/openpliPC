@@ -155,7 +155,7 @@ void *_x_real_codec_open(xine_stream_t *const stream, const char *const path,
   char *codecpath = NULL;
   void *codecmodule = NULL;
 
-  codecpath = _x_asprintf("%s/%s", path, codec_name);
+  asprintf(&codecpath, "%s/%s", path, codec_name);
   if ( (codecmodule = dlopen(codecpath, RTLD_NOW)) ) {
     free(codecpath);
     return codecmodule;
@@ -167,7 +167,7 @@ void *_x_real_codec_open(xine_stream_t *const stream, const char *const path,
   free(codecpath);
 
   if ( codec_alternate ) {
-    codecpath = _x_asprintf("%s/%s", path, codec_alternate);
+    asprintf(&codecpath, "%s/%s", path, codec_alternate);
     if ( (codecmodule = dlopen(codecpath, RTLD_NOW)) ) {
       free(codecpath);
       return codecmodule;
@@ -175,8 +175,6 @@ void *_x_real_codec_open(xine_stream_t *const stream, const char *const path,
 
     xprintf (stream->xine, XINE_VERBOSITY_DEBUG,
 	     LOG_MODULE ": error loading %s: %s\n", codecpath, dlerror());
-
-    free(codecpath);
   }
 
   _x_message(stream, XINE_MSG_LIBRARY_LOAD_ERROR, codec_name, NULL);

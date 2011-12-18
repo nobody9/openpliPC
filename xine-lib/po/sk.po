@@ -406,7 +406,7 @@ msgstr ""
 
 #: src/audio_out/audio_directx2_out.c:391
 #, c-format
-msgid ": buffer lost, trying to restore\n"
+msgid ": buffer lost, tryig to restore\n"
 msgstr ""
 
 #: src/audio_out/audio_directx2_out.c:395
@@ -3170,7 +3170,7 @@ msgstr ""
 msgid ""
 "This filter will perform a time stretch, playing the stream faster or slower "
 "by a factor. Pitch is optionally preserved, so it is possible, for example, "
-"to use it to watch a movie in less time than it was originally shot.\n"
+"to use it to watch a movie in less time than it was originaly shot.\n"
 msgstr ""
 
 #: src/post/audio/stretch.c:676
@@ -3287,7 +3287,7 @@ msgid ""
 "usage.\n"
 "\n"
 "* Uses several algorithms from tvtime and dscaler projects.\n"
-"Deinterlacing methods: (Not all methods are available for all platforms)\n"
+"Deinterlacing methods: (Not all methods are available for all plataforms)\n"
 "\n"
 msgstr ""
 "Pokročilý tvtime/odprekladací modul s detekcoiu pulldown\n"

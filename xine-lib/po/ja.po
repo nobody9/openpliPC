@@ -407,7 +407,7 @@ msgstr "有効な UID を設定できません"
 
 #: src/audio_out/audio_directx2_out.c:392
 #, c-format
-msgid ": buffer lost, trying to restore\n"
+msgid ": buffer lost, tryig to restore\n"
 msgstr ""
 
 #: src/audio_out/audio_directx2_out.c:396
@@ -2765,7 +2765,7 @@ msgid "bitplane: This anim-type is not supported at the moment\n"
 msgstr ""
 
 #: src/post/audio/stretch.c:267
-msgid "This filter will perform a time stretch, playing the stream faster or slower by a factor. Pitch is optionally preserved, so it is possible, for example, to use it to watch a movie in less time than it was originally shot.\n"
+msgid "This filter will perform a time stretch, playing the stream faster or slower by a factor. Pitch is optionally preserved, so it is possible, for example, to use it to watch a movie in less time than it was originaly shot.\n"
 msgstr ""
 
 #: src/post/audio/upmix.c:138
@@ -2833,7 +2833,7 @@ msgid ""
 "  Cheap_mode: This will skip the expensive YV12->YUY2 image conversion, tricking tvtime/dscaler routines like if they were still handling YUY2 images. Of course, this is not correct, not all pixels will be evaluated by the algorithms to decide the regions to deinterlace and chroma will be processed separately. Nevertheless, it allows people with not so fast systems to try deinterlace algorithms, in a tradeoff between quality and cpu usage.\n"
 "\n"
 "* Uses several algorithms from tvtime and dscaler projects.\n"
-"Deinterlacing methods: (Not all methods are available for all platforms)\n"
+"Deinterlacing methods: (Not all methods are available for all plataforms)\n"
 "\n"
 msgstr ""
 

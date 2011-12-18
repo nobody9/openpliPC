@@ -232,7 +232,7 @@ static int asf_header_get_stream_id(asf_header_t *header_pub, uint16_t stream_nu
 static int asf_header_parse_file_properties(asf_header_t *header, uint8_t *buffer, int buffer_len) {
   asf_reader_t reader;
   asf_file_t *asf_file;
-  uint32_t flags = 0;
+  uint32_t flags;
 
   if (buffer_len < 80) {
     lprintf("invalid asf file properties object\n");
@@ -284,7 +284,7 @@ static int asf_header_parse_file_properties(asf_header_t *header, uint8_t *buffe
 
 static int asf_header_parse_stream_properties(asf_header_t *header, uint8_t *buffer, int buffer_len) {
   asf_reader_t reader;
-  uint16_t flags = 0;
+  uint16_t flags;
   uint32_t junk;
   GUID guid;
   asf_stream_t *asf_stream = NULL;
@@ -353,7 +353,7 @@ exit_error:
 
 static int asf_header_parse_stream_extended_properties(asf_header_t *header, uint8_t *buffer, int buffer_len) {
   asf_reader_t reader;
-  uint32_t flags = 0;
+  uint32_t flags;
   uint16_t stream_number;
   int i;
   int stream_id;

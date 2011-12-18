@@ -348,11 +348,11 @@ static void mpc_decode_data (audio_decoder_t *this_gen, buf_element_t *buf) {
       this->bits_per_sample,
       this->sample_rate,
       _x_ao_channels2mode(this->channels));
-
-    /* if the audio still isn't open, do not go any further with the decode */
-    if (!this->output_open)
-      return;
   }
+
+  /* if the audio still isn't open, do not go any further with the decode */
+  if (!this->output_open)
+    return;
 
   /* If we run out of space in our internal buffer we discard what's
    * already been read */

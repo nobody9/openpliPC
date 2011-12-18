@@ -201,13 +201,14 @@ int ebml_skip(ebml_parser_t *ebml, ebml_elem_t *elem) {
 
 int ebml_read_elem_head(ebml_parser_t *ebml, ebml_elem_t *elem) {
 
-  int ret_id  = ebml_read_elem_id(ebml, &elem->id);
+  if (!ebml_read_elem_id(ebml, &elem->id))
+    return 0;
 
-  int ret_len = ebml_read_elem_len(ebml, &elem->len);
+  if (!ebml_read_elem_len(ebml, &elem->len))
+    return 0;
 
   elem->start = ebml->input->get_current_pos(ebml->input);
-
-  return (ret_id && ret_len);
+  return 1;
 }
 
 
@@ -465,7 +466,6 @@ int ebml_check_header(ebml_parser_t *ebml) {
       default:
         xprintf(ebml->xine, XINE_VERBOSITY_LOG,
                 "ebml: Unknown data type 0x%x in EBML header (ignored)\n", elem.id);
-	ebml_skip(ebml, &elem);
     }
     next_level = ebml_get_next_level(ebml, &elem);
   }

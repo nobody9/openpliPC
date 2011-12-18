@@ -11,6 +11,7 @@ msgstr ""
 "PO-Revision-Date: 2008-01-01 15:18+0100\n"
 "Last-Translator: Christophe Giraud <chris256gnu@gmail.com>\n"
 "Language-Team: french <fr@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -459,7 +460,7 @@ msgstr "Impossible de régler le volume sonore"
 
 #: src/audio_out/audio_directx2_out.c:391
 #, c-format
-msgid ": buffer lost, trying to restore\n"
+msgid ": buffer lost, tryig to restore\n"
 msgstr ": buffer perdu, tentative de restauration\n"
 
 #: src/audio_out/audio_directx2_out.c:395
@@ -2663,8 +2664,8 @@ msgid ""
 "heavy post processing can actually make the image worse by blurring it too "
 "much."
 msgstr ""
-"Vous pouvez ajuster le niveau de post-traitement a appliqué au vidéo MPEG-"
-"4.\n"
+"Vous pouvez ajuster le niveau de post-traitement a appliqué au vidéo "
+"MPEG-4.\n"
 "De hautes valeurs donnent une meilleure qualité d'image mais sollicite "
 "davantage le processeur.De faibles valeurs peuvent provoquer une dégradation "
 "de l'image comme par exemple l'apparition d'artefacts. Dans le cas d'une "
@@ -3115,7 +3116,7 @@ msgstr ""
 msgid ""
 "This filter will perform a time stretch, playing the stream faster or slower "
 "by a factor. Pitch is optionally preserved, so it is possible, for example, "
-"to use it to watch a movie in less time than it was originally shot.\n"
+"to use it to watch a movie in less time than it was originaly shot.\n"
 msgstr ""
 
 #: src/post/audio/stretch.c:676
@@ -3231,7 +3232,7 @@ msgid ""
 "usage.\n"
 "\n"
 "* Uses several algorithms from tvtime and dscaler projects.\n"
-"Deinterlacing methods: (Not all methods are available for all platforms)\n"
+"Deinterlacing methods: (Not all methods are available for all plataforms)\n"
 "\n"
 msgstr ""
 
@@ -3895,8 +3896,8 @@ msgstr ""
 #, c-format
 msgid "video_out_pgx64: Error: can't open framebuffer device '%s'\n"
 msgstr ""
-"video_out_pgx64: Erreur: ne peut pas ouvrir le périphérique framebuffer '%"
-"s'\n"
+"video_out_pgx64: Erreur: ne peut pas ouvrir le périphérique framebuffer "
+"'%s'\n"
 
 #: src/video_out/video_out_pgx64.c:303
 #, c-format
