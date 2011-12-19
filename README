@@ -42,7 +42,6 @@ If you are interested to have a logfile , simply do:
 ./build_libs.sh 2>&1 | tee build_libs.log
 
 
-
 3) Build Xine-lib and openpliPC Enigma2:
 It compile and install xine-lib and the openpliPC Enigma2.
 xine-lib and enigma2 are included in openpliPC main repo and code
@@ -56,6 +55,12 @@ If you are interested to have a logfile , simply do:
 ./build_openpliPC.sh has some command-line options
 ./build_openpliPC.sh -h  to see them
 
+
+4) If you are interested you can compile vdapauinfo and qvdpautest
+(building qvdpautest require install qt4-dev-tools (100 MB))
+./build_vdpauinfotest.sh
+
+You can find binaries under libs/vdpauinfo-0.0.6/ and libs/qvdpautest-0.5.1/
 
 ------------------------------
 Where is Enigma2 ?
