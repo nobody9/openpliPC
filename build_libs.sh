@@ -30,7 +30,6 @@ for p in $REQPKG; do
 	fi
 done
 
-mkdir libs
 cd libs
 
 #Build and install libdvbsi++:
