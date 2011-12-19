@@ -23,13 +23,14 @@ BUILDING openpliPC
 1a) download openpliPC git repo as local user (not root):
 git clone https://github.com/nobody9/openpliPC.git
 cd openpliPC/
+git checkout old_xine_lib
 
  - OR -
 
 1b) Keep in sync previously cloned git repo:
 cd openpliPC/
 git pull https://github.com/nobody9/openpliPC.git
-git checkout old_xine_lib
+
 
 
 2) Building needed openpliPC enigma2 libraries:
