@@ -1035,7 +1035,9 @@ void xine_config_save (xine_t *xine, const char *filename) {
 
       buf = (char *) malloc(config_stat.st_size + 1);
       if((rlen = fread(buf, 1, config_stat.st_size, f_config)) && ((off_t)rlen == config_stat.st_size)) {
-	(void) fwrite(buf, 1, rlen, f_backup);
+	if (rlen != fwrite(buf, 1, rlen, f_backup)) {
+	  lprintf("backing up configfile to %s failed\n", temp);
+	}
       }
       free(buf);
 

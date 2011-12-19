@@ -188,7 +188,6 @@ typedef struct
 {
   input_class_t       input_class;
   xine_t             *xine;
-  const char         *mrls[ 2 ];
 }
 vdr_input_class_t;
 
@@ -2908,13 +2907,13 @@ static input_plugin_t *vdr_class_get_instance(input_class_t *cls_gen, xine_strea
 /*
  * vdr input plugin class stuff
  */
-static char **vdr_class_get_autoplay_list(input_class_t *this_gen,
+static const char * const *vdr_class_get_autoplay_list(input_class_t *this_gen,
                                           int *num_files)
 {
-  vdr_input_class_t *class = (vdr_input_class_t *)this_gen;
+  static const char * const mrls[] = {"vdr:/" VDR_ABS_FIFO_DIR "/stream#demux:mpeg_pes", NULL};
 
   *num_files = 1;
-  return (char **)class->mrls;
+  return mrls;
 }
 
 void *vdr_input_init_plugin(xine_t *xine, void *data)
@@ -2926,9 +2925,6 @@ void *vdr_input_init_plugin(xine_t *xine, void *data)
   this = (vdr_input_class_t *)xine_xmalloc(sizeof (vdr_input_class_t));
 
   this->xine = xine;
-
-  this->mrls[ 0 ] = "vdr:/" VDR_ABS_FIFO_DIR "/stream#demux:mpeg_pes";
-  this->mrls[ 1 ] = 0;
 
   this->input_class.get_instance      = vdr_class_get_instance;
   this->input_class.identifier        = "VDR";

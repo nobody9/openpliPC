@@ -146,6 +146,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <arpa/inet.h>
+
+#ifdef HAVE_FFMPEG_AVUTIL_H
+#  include <crc.h>
+#else
+#  include <libavutil/crc.h>
+#endif
 
 #define LOG_MODULE "demux_ts"
 #define LOG_VERBOSE
@@ -318,8 +325,6 @@ typedef struct {
     char lang[4];
 } demux_ts_audio_track;
 
-
-
 typedef struct {
 
   demux_class_t     demux_class;
@@ -329,15 +334,15 @@ typedef struct {
   xine_t           *xine;
   config_values_t  *config;
 
+  const AVCRC      *av_crc;
 } demux_ts_class_t;
-
 
 typedef struct {
   /*
    * The first field must be the "base class" for the plugin!
    */
   demux_plugin_t   demux_plugin;
-  demux_ts_class_t *class;
+
   xine_stream_t   *stream;
 
   config_values_t *config;
@@ -348,12 +353,15 @@ typedef struct {
   input_plugin_t  *input;
   unsigned int     read_retries;
 
+  demux_ts_class_t *class;
+
   int              status;
 
   int              hdmv;       /* -1 = unknown, 0 = mpeg-ts, 1 = hdmv/m2ts */
   int              pkt_size;   /* TS packet size */
   int              pkt_offset; /* TS packet offset */
 
+  int              blockSize;
   int              rate;
   unsigned int     media_num;
   demux_ts_media   media[MAX_PIDS];
@@ -366,7 +374,6 @@ typedef struct {
   uint32_t         pmt_pid[MAX_PMTS];
   uint8_t         *pmt[MAX_PMTS];
   uint8_t         *pmt_write_ptr[MAX_PMTS];
-  uint32_t         crc32_table[256];
   uint32_t         last_pmt_crc;
   /*
    * Stuff to do with the transport header. As well as the video
@@ -614,28 +621,6 @@ static void demux_ts_tbre_update (demux_ts_t *this, unsigned int mode, int64_t n
   /* remember where and when */
   this->tbre_lastpos  = this->frame_pos;
   this->tbre_lasttime = now;
-}
-
-static void demux_ts_build_crc32_table(demux_ts_t*this) {
-  uint32_t  i, j, k;
-
-  for( i = 0 ; i < 256 ; i++ ) {
-    k = 0;
-    for (j = (i << 24) | 0x800000 ; j != 0x80000000 ; j <<= 1) {
-      k = (k << 1) ^ (((k ^ j) & 0x80000000) ? 0x04c11db7 : 0);
-    }
-    this->crc32_table[i] = k;
-  }
-}
-
-static uint32_t demux_ts_compute_crc32(demux_ts_t*this, uint8_t *data,
-				       int32_t length, uint32_t crc32) {
-  int32_t i;
-
-  for(i = 0; i < length; i++) {
-    crc32 = (crc32 << 8) ^ this->crc32_table[(crc32 >> 24) ^ data[i]];
-  }
-  return crc32;
 }
 
 /* redefine abs as macro to handle 64-bit diffs.
@@ -904,8 +889,7 @@ static void demux_ts_parse_pat (demux_ts_t*this, unsigned char *original_pkt,
   }
 
   /* Check CRC. */
-  calc_crc32 = demux_ts_compute_crc32 (this, pkt+5, section_length+3-4,
-                                       0xffffffff);
+  calc_crc32 = htonl(av_crc(this->class->av_crc, 0xffffffff, pkt+5, section_length+3-4));
   if (crc32 != calc_crc32) {
     xprintf (this->stream->xine, XINE_VERBOSITY_DEBUG,
 	     "demux_ts: demux error! PAT with invalid CRC32: packet_crc32: %.8x calc_crc32: %.8x\n",
@@ -1439,7 +1423,7 @@ static void demux_ts_parse_pmt (demux_ts_t     *this,
   unsigned char *stream;
   unsigned int	 i;
   int		 count;
-  char		*ptr = NULL;
+  uint8_t	*ptr = NULL;
   unsigned char  len;
   unsigned int   offset=0;
   int            mi;
@@ -1560,9 +1544,9 @@ printf("Program Number is %i, looking for %i\n",program_number,this->program_num
   crc32 |= (uint32_t) this->pmt[program_count][section_length+3-1] ;
 
   /* Check CRC. */
-  calc_crc32 = demux_ts_compute_crc32 (this,
-                                       this->pmt[program_count],
-                                       section_length+3-4, 0xffffffff);
+  calc_crc32 = htonl(av_crc(this->class->av_crc, 0xffffffff,
+			    this->pmt[program_count], section_length+3-4));
+
   if (crc32 != calc_crc32) {
     xprintf (this->stream->xine, XINE_VERBOSITY_DEBUG,
 	     "demux_ts: demux error! PMT with invalid CRC32: packet_crc32: %#.8x calc_crc32: %#.8x\n",
@@ -2426,8 +2410,6 @@ static void demux_ts_send_headers (demux_plugin_t *this_gen) {
 
   this->send_newpts = 1;
 
-  demux_ts_build_crc32_table (this);
-
   this->status = DEMUX_OK ;
 
   this->scrambled_npids   = 0;
@@ -2591,7 +2573,6 @@ static int detect_ts(uint8_t *buf, size_t len, int ts_size)
   return ts_detected;
 }
 
-
 static demux_plugin_t *open_plugin (demux_class_t *class_gen,
 				    xine_stream_t *stream,
 				    input_plugin_t *input) {
@@ -2695,7 +2676,6 @@ static demux_plugin_t *open_plugin (demux_class_t *class_gen,
 /*
  * ts demuxer class
  */
-
 static void *init_class (xine_t *xine, void *data) {
 
   demux_ts_class_t     *this;
@@ -2705,14 +2685,22 @@ static void *init_class (xine_t *xine, void *data) {
   this->xine   = xine;
 
   this->demux_class.open_plugin     = open_plugin;
-  this->demux_class.description = N_("TS stream demux plugin");;
-  this->demux_class.identifier  = "MPEG_TS";
-  this->demux_class.mimetypes   = "video/mp2t: m2t: MPEG2 transport stream;";
-  this->demux_class.extensions  = "ts m2t trp m2ts mts dvb:// dvbs:// dvbc:// dvbt:// enigma:/";;
+  this->demux_class.description     = N_("MPEG Transport Stream demuxer");
+  this->demux_class.identifier      = "MPEG_TS";
+  this->demux_class.mimetypes       = "video/mp2t: m2t: MPEG2 transport stream;";
+
+  /* accept dvb streams; also handle the special dvbs,dvbt and dvbc
+   * mrl formats: the content is exactly the same but the input plugin
+   * uses a different tuning algorithm [Pragma]
+   */
+  this->demux_class.extensions      = "ts m2t trp m2ts mts dvb:// dvbs:// dvbc:// dvbt://";
   this->demux_class.dispose         = default_demux_class_dispose;
+
+  this->av_crc = av_crc_get_table(AV_CRC_32_IEEE);
 
   return this;
 }
+
 
 /*
  * exported plugin catalog entry

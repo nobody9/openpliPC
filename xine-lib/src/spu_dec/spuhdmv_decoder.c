@@ -259,7 +259,7 @@ static void segbuf_parse_segment_header(segment_buffer_t *buf)
     if ( buf->segment_type < 0x14 ||
          ( buf->segment_type > 0x18 &&
            buf->segment_type != 0x80)) {
-      XINE_HDMV_ERROR("unknown segment type, resetting\n");
+      XINE_HDMV_ERROR("unknown segment type 0x%02x, resetting\n", buf->segment_type);
       segbuf_reset(buf);
     }
   } else {

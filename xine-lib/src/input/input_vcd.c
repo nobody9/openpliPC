@@ -1058,7 +1058,7 @@ static char ** vcd_class_get_autoplay_list (input_class_t *this_gen, int *num_fi
 
   /* printf ("%d tracks\n", this->total_tracks); */
 
-  return this->filelist;
+  return (const char * const *)this->filelist;
 }
 
 static void *init_class (xine_t *xine, void *data) {

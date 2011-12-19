@@ -87,6 +87,8 @@ typedef struct {
 typedef struct		dvb_spu_class_s {
   spu_decoder_class_t	class;
   xine_t	       *xine;
+
+  int                   ignore_pts;
 } dvb_spu_class_t;
 
 typedef struct dvb_spu_decoder_s {
@@ -105,9 +107,8 @@ typedef struct dvb_spu_decoder_s {
   char                 *pes_pkt_wrptr;
   unsigned int	pes_pkt_size;
 
-  uint64_t		pts;
-  uint64_t		vpts;
-  uint64_t		end_vpts;
+  int64_t		vpts;
+  int64_t		end_vpts;
 
   pthread_t	dvbsub_timer_thread;
   struct timespec       dvbsub_hide_timeout;
@@ -896,7 +897,7 @@ static void draw_subtitles (dvb_spu_decoder_t * this)
   }
 
   pthread_mutex_lock(&this->dvbsub_osd_mutex);
-  lprintf("this->vpts=%llu\n",this->vpts);
+  lprintf("this->vpts=%"PRId64"\n",this->vpts);
   for ( r=0; r<MAX_REGIONS; r++ ) {
     lprintf("region=%d, visible=%d, osd=%d, empty=%d\n", r, this->dvbsub->page.regions[r].is_visible, this->dvbsub->regions[r].osd?1:0, this->dvbsub->regions[r].empty );
     if ( this->dvbsub->page.regions[r].is_visible && this->dvbsub->regions[r].osd && !this->dvbsub->regions[r].empty ) {
@@ -949,27 +950,29 @@ static void spudec_decode_data (spu_decoder_t * this_gen, buf_element_t * buf)
     }
     return;
   }
-  else {
-    if (buf->decoder_info[2]) {
-      memset (this->pes_pkt, 0xff, 64*1024);
-      this->pes_pkt_wrptr = this->pes_pkt;
-      this->pes_pkt_size = buf->decoder_info[2];
-      this->pts = buf->pts;
 
-      xine_fast_memcpy (this->pes_pkt, buf->content, buf->size);
+  /* accumulate data */
+  if (buf->decoder_info[2]) {
+    memset (this->pes_pkt, 0xff, 64*1024);
+    this->pes_pkt_wrptr = this->pes_pkt;
+    this->pes_pkt_size = buf->decoder_info[2];
+
+    xine_fast_memcpy (this->pes_pkt, buf->content, buf->size);
+    this->pes_pkt_wrptr += buf->size;
+
+    this->vpts = 0;
+  }
+  else {
+    if (this->pes_pkt && (this->pes_pkt_wrptr != this->pes_pkt)) {
+      xine_fast_memcpy (this->pes_pkt_wrptr, buf->content, buf->size);
       this->pes_pkt_wrptr += buf->size;
     }
-    else {
-      if (this->pes_pkt && (this->pes_pkt_wrptr != this->pes_pkt)) {
-	xine_fast_memcpy (this->pes_pkt_wrptr, buf->content, buf->size);
-	this->pes_pkt_wrptr += buf->size;
-      }
-    }
   }
+
   /* don't ask metronom for a vpts but rather do the calculation
    * because buf->pts could be too far in future and metronom won't accept
    * further backwards pts (see metronom_got_spu_packet) */
-  if (buf->pts) {
+  if (!this->class->ignore_pts && buf->pts > 0) {
     metronom_t *metronom = this->stream->metronom;
     int64_t vpts_offset = metronom->get_option( metronom, METRONOM_VPTS_OFFSET );
     int64_t spu_offset = metronom->get_option( metronom, METRONOM_SPU_OFFSET );
@@ -977,7 +980,7 @@ static void spudec_decode_data (spu_decoder_t * this_gen, buf_element_t * buf)
     metronom_clock_t *clock = this->stream->xine->clock;
     int64_t curvpts = clock->get_current_time( clock );
     /* if buf->pts is unreliable, show page asap (better than nothing) */
-    lprintf("spu_vpts=%lld - current_vpts=%lld\n", vpts, curvpts);
+    lprintf("spu_vpts=%"PRId64" - current_vpts=%"PRId64"\n", vpts, curvpts);
     if ( vpts<=curvpts || (vpts-curvpts)>(5*90000) )
       this->vpts = 0;
     else
@@ -985,7 +988,7 @@ static void spudec_decode_data (spu_decoder_t * this_gen, buf_element_t * buf)
   }
 
   /* completely ignore pts since it makes a lot of problems with various providers */
-  this->vpts = 0;
+  /* this->vpts = 0; */
 
   /* process the pes section */
 
@@ -1175,6 +1178,15 @@ static spu_decoder_t *dvb_spu_class_open_plugin (spu_decoder_class_t * class_gen
   return (spu_decoder_t *) this;
 }
 
+static void dvb_spu_decoder_class_dispose (spu_decoder_class_t * this_gen)
+{
+  dvb_spu_class_t *this = (dvb_spu_class_t *) this_gen;
+
+  this->xine->config->unregister_callback(this->xine->config, "subtitles.dvb.ignore_pts");
+
+  free (this);
+}
+
 static void *init_spu_decoder_plugin (xine_t * xine, void *data)
 {
 
@@ -1184,7 +1196,7 @@ static void *init_spu_decoder_plugin (xine_t * xine, void *data)
   this->class.open_plugin = dvb_spu_class_open_plugin;
   this->class.identifier  = "spudvb";
   this->class.description = N_("DVB subtitle decoder plugin");
-  this->class.dispose = default_spu_decoder_class_dispose;
+  this->class.dispose = dvb_spu_decoder_class_dispose;
 
   this->xine = xine;
 

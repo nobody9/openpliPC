@@ -53,12 +53,6 @@
 # include "a52.h"
 #endif
 
-#ifdef HAVE_A52DEC_A52_INTERNAL_H
-# include <a52dec/a52_internal.h>
-#else
-# include "a52_internal.h"
-#endif
-
 #include <xine/buffer.h>
 #include <xine/xineutils.h>
 

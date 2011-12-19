@@ -1105,9 +1105,9 @@ xine_mrl_t **xine_get_browse_mrls (xine_t *self,
 const char *const *xine_get_autoplay_input_plugin_ids (xine_t *self) XINE_PROTECTED;
 
 /* get autoplay MRL list from input plugin named <plugin_id> */
-char **xine_get_autoplay_mrls (xine_t *self,
-			       const char *plugin_id,
-			       int *num_mrls) XINE_PROTECTED;
+const char * const *xine_get_autoplay_mrls (xine_t *self,
+					    const char *plugin_id,
+					    int *num_mrls) XINE_PROTECTED;
 
 /* get a list of file extensions for file types supported by xine
  * the list is separated by spaces

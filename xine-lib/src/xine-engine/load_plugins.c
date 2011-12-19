@@ -2028,8 +2028,8 @@ void xine_close_video_driver (xine_t *this, xine_video_port_t  *vo_port) {
  * get autoplay mrl list from input plugin
  */
 
-char **xine_get_autoplay_mrls (xine_t *this, const char *plugin_id,
-			       int *num_mrls) {
+const char * const *xine_get_autoplay_mrls (xine_t *this, const char *plugin_id,
+					    int *num_mrls) {
 
   plugin_catalog_t     *catalog;
   plugin_node_t        *node;

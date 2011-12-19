@@ -72,7 +72,7 @@ struct input_class_s {
    * generate autoplay list, optional: may be NULL
    * return value: list of MRLs
    */
-  char ** (*get_autoplay_list) (input_class_t *self, int *num_files);
+  const char * const * (*get_autoplay_list) (input_class_t *self, int *num_files);
 
   /*
    * close down, free all resources

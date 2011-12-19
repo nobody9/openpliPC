@@ -70,6 +70,18 @@ xine-lib (1.1.90) (Unreleased)
   * Report more video output capabilities via (port)->get_capabilities():
     colour controls, zooming, colour keying.
 
+xine-lib (1.1.21) 2011-??-??
+  * mpeg-ts fixes and enhancements
+  * Improved syncing of DVB subtitles
+  * BluRay support (requires libbluray)
+
+xine-lib (1.1.20.1) 2011-??-??
+  * Various bug fixes.
+  * Use the current ImageMagick API (if using ImageMagick).
+  * Fix PVR plugin input building (needs V4L2).
+  * Fixes related to unknown audio & subtitle languages.
+  * Memory leak fixes
+
 xine-lib (1.1.20) 2011-11-13
   * Imagine that there's a large poppy here.
   * Ensure that file and socket descriptors are marked as CLOEXEC.

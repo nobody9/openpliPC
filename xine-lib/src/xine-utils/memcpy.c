@@ -1,4 +1,4 @@
-/*
+;/*
  * Copyright (C) 2001-2004 the xine project
  *
  * This file is part of xine, a free video player.
@@ -403,11 +403,23 @@ static const struct {
   { "ppcasm", ppcasm_memcpy, 0 },
   { "ppcasm_cached", ppcasm_cacheable_memcpy, MM_ACCEL_PPC_CACHE32 },
 #endif /* ARCH_PPC && !HOST_OS_DARWIN */
+  { "", NULL, 0 }
 };
 
 static uint64_t memcpy_timing[sizeof(memcpy_method)/sizeof(memcpy_method[0])] = { 0, };
 
-#if (defined(ARCH_X86) || defined(ARCH_X86_64)) && defined(HAVE_SYS_TIMES_H)
+#ifdef HAVE_POSIX_TIMERS
+/* Prefer clock_gettime() where available. */
+static int64_t _x_gettime(void)
+{
+  struct timespec tm;
+  return (clock_gettime (CLOCK_THREAD_CPUTIME_ID, &tm) == -1)
+       ? times (NULL)
+       : (int64_t)tm.tv_sec * 1e9 + tm.tv_nsec;
+}
+#  define rdtsc(x) _x_gettime()
+
+#elif (defined(ARCH_X86) || defined(ARCH_X86_64)) && defined(HAVE_SYS_TIMES_H)
 static int64_t rdtsc(int config_flags)
 {
   int64_t x;
@@ -510,7 +522,13 @@ void xine_probe_fast_memcpy(xine_t *xine)
   memset(buf1,0,BUFSIZE);
   memset(buf2,0,BUFSIZE);
 
-  for(i = 1; i < sizeof(memcpy_method)/sizeof(memcpy_method[0]); i++)
+  /* some initial activity to ensure that we're not running slowly :-) */
+  for(j=0;j<50;j++) {
+    memcpy_method[1].function(buf2,buf1,BUFSIZE);
+    memcpy_method[1].function(buf1,buf2,BUFSIZE);
+  }
+
+  for(i=1; memcpy_method[i].name[0]; i++)
   {
     if( (config_flags & memcpy_method[i].cpu_require) !=
          memcpy_method[i].cpu_require )

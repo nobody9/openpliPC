@@ -31,6 +31,7 @@ AC_DEFUN([XINE_LIB_SUMMARY], [
     test x"$have_v4l" = x"yes"      && echo "   - v4l"
     test x"$have_v4l2" = x"yes"     && echo "   - v4l2"
     echo "   - cdda"
+    test x"$have_libbluray" = x"yes" && echo "   - bluray"
     echo ""
 
     dnl Demuxers

@@ -8,7 +8,7 @@ AC_DEFUN([XINE_DECODER_PLUGINS], [
     if test x"$enable_a52dec" != x"no"; then
         if test x"$enable_a52dec" != x"internal"; then
             AC_CHECK_LIB([a52], [a52_init],
-                         [AC_CHECK_HEADERS([a52dec/a52.h a52dec/a52_internal.h], [have_external_a52dec=yes], [have_external_a52dec=no],
+                         [AC_CHECK_HEADERS([a52dec/a52.h], [have_external_a52dec=yes], [have_external_a52dec=no],
                                            [#ifdef HAVE_SYS_TYPES_H
                                             # include <sys/types.h>
                                             #endif
@@ -132,6 +132,7 @@ AC_DEFUN([XINE_DECODER_PLUGINS], [
             dnl the flags for plain GraphicsMagick
             WAND_CFLAGS="$GRAPHICSMAGICKWAND_CFLAGS"
             WAND_LIBS="$GRAPHICSMAGICKWAND_LIBS"
+            AC_DEFINE([HAVE_GRAPHICSMAGICK], [1], [Define this if you have GraphicsMagick installed])
         fi
         if test x"$with_imagemagick" = x"yes" && test x"$have_imagemagick" = x"no"; then
             AC_MSG_ERROR([ImageMagick support requested, but neither Wand, MagickWand, nor GraphicsMagick were found])

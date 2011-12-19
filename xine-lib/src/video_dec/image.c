@@ -54,6 +54,17 @@
 #include <xine/xineutils.h>
 #include "bswap.h"
 
+#ifdef HAVE_GRAPHICSMAGICK
+# define MAGICK_VERSION 0x670
+#else
+# if !defined(MagickLibVersion) || MagickLibVersion < 0x671
+#  define MAGICK_VERSION 0x670
+#else
+#  define MAGICK_VERSION MagickLibVersion
+# endif
+#endif
+
+
 typedef struct {
   video_decoder_class_t   decoder_class;
 
@@ -101,14 +112,23 @@ static void image_decode_data (video_decoder_t *this_gen, buf_element_t *buf) {
     /*
      * this->image -> rgb data
      */
+#if MAGICK_VERSION < 0x671
     InitializeMagick(NULL);
+#else
+    MagickWandGenesis();
+#endif
     wand = NewMagickWand();
     status = MagickReadImageBlob(wand, this->image, this->index);
+
     this->index = 0;
 
     if (!status) {
       DestroyMagickWand(wand);
+#if MAGICK_VERSION < 0x671
       DestroyMagick();
+#else
+      MagickWandTerminus();
+#endif
       lprintf("error loading image\n");
       return;
     }
@@ -116,9 +136,15 @@ static void image_decode_data (video_decoder_t *this_gen, buf_element_t *buf) {
     width = MagickGetImageWidth(wand) & ~1; /* must be even for init_yuv_planes */
     height = MagickGetImageHeight(wand);
     img_buf = malloc(width * height * 3);
+#if MAGICK_VERSION < 0x671
     MagickGetImagePixels(wand, 0, 0, width, height, "RGB", CharPixel, img_buf);
     DestroyMagickWand(wand);
     DestroyMagick();
+#else
+    MagickExportImagePixels(wand, 0, 0, width, height, "RGB", CharPixel, img_buf);
+    DestroyMagickWand(wand);
+    MagickWandTerminus();
+#endif
 
     _x_stream_info_set(this->stream, XINE_STREAM_INFO_VIDEO_WIDTH, width);
     _x_stream_info_set(this->stream, XINE_STREAM_INFO_VIDEO_HEIGHT, height);

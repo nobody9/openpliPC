@@ -98,7 +98,13 @@
 #include <time.h>
 #include <pthread.h>
 #include <sys/ioctl.h>
-#include <linux/videodev2.h>
+#ifdef HAVE_SYS_VIDEOIO_H
+# include <sys/videoio.h>
+#elif defined(HAVE_SYS_VIDEODEV2_H)
+# include <sys/videodev2.h>
+#else
+# include <linux/videodev2.h>
+#endif
 
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
 

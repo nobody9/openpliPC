@@ -841,7 +841,7 @@ static xine_mrl_t **file_class_get_dir (input_class_t *this_gen,
 	this->mrls[num_files] = calloc(1, sizeof(xine_mrl_t));
       }
       else
-	memset(this->mrls[num_files], 0, sizeof(xine_mrl_t));
+	MRL_ZERO(this->mrls[num_files]);
 
       MRL_DUPLICATE(&dir_files[i], this->mrls[num_files]);
 
@@ -859,7 +859,7 @@ static xine_mrl_t **file_class_get_dir (input_class_t *this_gen,
 	this->mrls[num_files] = calloc(1, sizeof(xine_mrl_t));
       }
       else
-	memset(this->mrls[num_files], 0, sizeof(xine_mrl_t));
+	MRL_ZERO(this->mrls[num_files]);
 
       MRL_DUPLICATE(&hide_files[i], this->mrls[num_files]);
 
@@ -877,7 +877,7 @@ static xine_mrl_t **file_class_get_dir (input_class_t *this_gen,
 	this->mrls[num_files] = calloc(1, sizeof(xine_mrl_t));
       }
       else
-	memset(this->mrls[num_files], 0, sizeof(xine_mrl_t));
+	MRL_ZERO(this->mrls[num_files]);
 
       MRL_DUPLICATE(&norm_files[i], this->mrls[num_files]);
 
@@ -945,7 +945,12 @@ static void file_class_dispose (input_class_t *this_gen) {
 
   config->unregister_callback(config, "media.files.origin_path");
 
+  while(this->mrls_allocated_entries) {
+    MRL_ZERO(this->mrls[this->mrls_allocated_entries - 1]);
+    free(this->mrls[this->mrls_allocated_entries--]);
+  }
   free (this->mrls);
+
   free (this);
 }
 

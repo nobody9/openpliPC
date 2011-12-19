@@ -1189,6 +1189,8 @@ static const audio_db_t audio_db[] = {
 },
 {
   {
+    ME_FOURCC('E', 'A', 'C', '3'),
+    ME_FOURCC('e', 'c', '-', '3'),
     0
   },
   BUF_AUDIO_EAC3,

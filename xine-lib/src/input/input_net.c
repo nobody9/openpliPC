@@ -113,7 +113,10 @@ typedef struct {
 static int host_connect_attempt_ipv4(struct in_addr ia, int port, xine_t *xine) {
 
   int                s;
-  struct sockaddr_in sin;
+  union {
+    struct sockaddr_in in;
+    struct sockaddr    sa;
+  } sa;
 
   s = xine_socket_cloexec(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (s==-1) {
@@ -122,14 +125,14 @@ static int host_connect_attempt_ipv4(struct in_addr ia, int port, xine_t *xine) 
     return -1;
   }
 
-  sin.sin_family = AF_INET;
-  sin.sin_addr   = ia;
-  sin.sin_port   = htons(port);
+  sa.in.sin_family = AF_INET;
+  sa.in.sin_addr   = ia;
+  sa.in.sin_port   = htons(port);
 
 #ifndef WIN32
-  if (connect(s, (struct sockaddr *)&sin, sizeof(sin))==-1 && errno != EINPROGRESS)
+  if (connect(s, &sa.sa, sizeof(sa.in))==-1 && errno != EINPROGRESS)
 #else
-  if (connect(s, (struct sockaddr *)&sin, sizeof(sin))==-1 && WSAGetLastError() != WSAEINPROGRESS)
+  if (connect(s, &sa.sa, sizeof(sa.in))==-1 && WSAGetLastError() != WSAEINPROGRESS)
 #endif
   {
     xine_log(xine, XINE_LOG_MSG,

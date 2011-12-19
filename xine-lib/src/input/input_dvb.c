@@ -3178,7 +3178,7 @@ static int dvb_class_eject_media (input_class_t *this_gen) {
 }
 
 
-static char **dvb_class_get_autoplay_list(input_class_t * this_gen,
+static const char * const *dvb_class_get_autoplay_list(input_class_t * this_gen,
 						  int *num_files)
 {
     dvb_input_class_t *class = (dvb_input_class_t *) this_gen;
@@ -3247,7 +3247,7 @@ static char **dvb_class_get_autoplay_list(input_class_t * this_gen,
     *num_files = num_channels + lastchannel_enable.num_value;
     class->numchannels = *num_files;
 
-   return class->autoplaylist;
+    return (const char * const *)class->autoplaylist;
 }
 
 static void *init_class (xine_t *xine, void *data) {

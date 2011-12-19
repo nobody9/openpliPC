@@ -157,10 +157,6 @@
 #  endif /* _MSC_VER */
 #endif
 
-/* Array to hold MRLs returned by get_autoplay_list */
-#define MAX_DIR_ENTRIES 1250
-#define MAX_STR_LEN     255
-
 #if defined (__FreeBSD__)
 # define off64_t off_t
 # define lseek64 lseek
@@ -235,8 +231,6 @@ typedef struct {
   int32_t             language;
   int32_t             region;
   int32_t             play_single_chapter;
-
-  const char         *filelist[MAX_DIR_ENTRIES];
 
 } dvd_input_class_t;
 
@@ -1709,17 +1703,16 @@ static xine_mrl_t **dvd_class_get_dir (input_class_t *this_gen,
 }
 #endif
 
-static char **dvd_class_get_autoplay_list (input_class_t *this_gen,
+static const char * const *dvd_class_get_autoplay_list (input_class_t *this_gen,
 					    int *num_files) {
 
-  dvd_input_class_t *this = (dvd_input_class_t *) this_gen;
+  static const char * const filelist[] = {"dvd:/", NULL};
+
   trace_print("get_autoplay_list entered\n");
 
-  this->filelist[0] = "dvd:/";
-  this->filelist[1] = NULL;
   *num_files = 1;
 
-  return this->filelist;
+  return filelist;
 }
 
 static void dvd_class_dispose(input_class_t *this_gen) {

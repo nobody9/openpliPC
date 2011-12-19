@@ -87,17 +87,19 @@ static int _x_io_tcp_connect_ipv4(xine_stream_t *stream, const char *host, int p
 
   for (i = 0; h->h_addr_list[i]; i++) {
     struct in_addr ia;
-    struct sockaddr_in sin;
-
+    union {
+      struct sockaddr    sa;
+      struct sockaddr_in in;
+    } saddr;
     memcpy (&ia, h->h_addr_list[i], 4);
-    sin.sin_family = AF_INET;
-    sin.sin_addr   = ia;
-    sin.sin_port   = htons(port);
+    saddr.in.sin_family = AF_INET;
+    saddr.in.sin_addr   = ia;
+    saddr.in.sin_port   = htons(port);
 
 #ifndef WIN32
-    if (connect(s, (struct sockaddr *)&sin, sizeof(sin))==-1 && errno != EINPROGRESS) {
+    if (connect(s, &saddr.sa, sizeof(saddr.in))==-1 && errno != EINPROGRESS) {
 #else
-    if (connect(s, (struct sockaddr *)&sin, sizeof(sin))==-1 && WSAGetLastError() != WSAEWOULDBLOCK) {
+    if (connect(s, &saddr.sa, sizeof(saddr.in))==-1 && WSAGetLastError() != WSAEWOULDBLOCK) {
       if (stream)
         xprintf(stream->xine, XINE_VERBOSITY_DEBUG, "io_helper: WSAGetLastError() = %d\n", WSAGetLastError());
 #endif /* WIN32 */

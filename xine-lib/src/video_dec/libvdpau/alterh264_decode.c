@@ -328,6 +328,7 @@ static void reset_sequence( sequence_t *sequence )
     dpb_reset( sequence );
     memset( &sequence->cur_pic, 0, sizeof(dpb_frame_t) );
     sequence->reset = VO_NEW_SEQUENCE_FLAG;
+    sequence->color_standard = VDP_COLOR_STANDARD_ITUR_BT_601;
 }
 
 
@@ -1791,8 +1792,10 @@ static void vdpau_h264_alter_decode_data (video_decoder_t *this_gen, buf_element
  */
 static void vdpau_h264_alter_flush (video_decoder_t *this_gen)
 {
-  lprintf( "vdpau_h264_alter_flush\n" );
-  //dpb_draw_frames( this, MAX_POC, DPB_DRAW_REFS );
+  vdpau_h264_alter_decoder_t *this = (vdpau_h264_alter_decoder_t *) this_gen;
+  
+  printf( "vdpau_h264_alter_flush\n" );
+  dpb_draw_frames( this, MAX_POC, DPB_DRAW_REFS );
 }
 
 
@@ -1813,7 +1816,7 @@ static void vdpau_h264_alter_reset (video_decoder_t *this_gen)
  */
 static void vdpau_h264_alter_discontinuity (video_decoder_t *this_gen) {
   vdpau_h264_alter_decoder_t *this = (vdpau_h264_alter_decoder_t *) this_gen;
-  lprintf( "vdpau_h264_alter_discontinuity\n" );
+  printf( "vdpau_h264_alter_discontinuity\n" );
 
   dpb_clear_all_pts( &this->sequence );
   this->sequence.reset = VO_NEW_SEQUENCE_FLAG;
@@ -1896,7 +1899,6 @@ static video_decoder_t *open_plugin (video_decoder_class_t *class_gen, xine_stre
   this->sequence.buf = (uint8_t*)malloc(this->sequence.bufsize);
   this->sequence.vdp_runtime_nr = runtime_nr;
   this->sequence.reset = VO_NEW_SEQUENCE_FLAG;
-  this->sequence.color_standard = VDP_COLOR_STANDARD_ITUR_BT_601;
   this->sequence.reset = VO_NEW_SEQUENCE_FLAG;
   this->sequence.ratio = 0.0;
   this->sequence.video_step = 3600;

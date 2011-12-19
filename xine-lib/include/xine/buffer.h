@@ -723,7 +723,7 @@ void _x_bmiheader_le2me( xine_bmiheader *bih ) XINE_PROTECTED;
 /** Convert xine_waveformatex struct from little endian */
 void _x_waveformatex_le2me( xine_waveformatex *wavex ) XINE_PROTECTED;
 
-static __inline int _x_is_fourcc(void *ptr, void *tag) {
+static __inline int _x_is_fourcc(const void *ptr, const void *tag) {
   return memcmp(ptr, tag, 4) == 0;
 }
 
