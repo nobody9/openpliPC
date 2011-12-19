@@ -49,4 +49,16 @@ public:
   bool Lock(cMutex *Mutex);
 };
 
+class cTimeMs {
+private:
+  uint64_t begin;
+public:
+  cTimeMs(int Ms = 0);
+      ///< Creates a timer with ms resolution and an initial timeout of Ms.
+  static uint64_t Now(void);
+  void Set(int Ms = 0);
+  bool TimedOut(void);
+  uint64_t Elapsed(void);
+};
+
 #endif

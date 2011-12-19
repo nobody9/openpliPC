@@ -187,3 +187,60 @@ bool cMutexLock::Lock(cMutex *Mutex)
   return false;
 }
 
+// --- cTimeMs ---------------------------------------------------------------
+
+cTimeMs::cTimeMs(int Ms)
+{
+  Set(Ms);
+}
+
+uint64_t cTimeMs::Now(void)
+{
+#if _POSIX_TIMERS > 0 && defined(_POSIX_MONOTONIC_CLOCK)
+#define MIN_RESOLUTION 5 // ms
+  static bool initialized = false;
+  static bool monotonic = false;
+  struct timespec tp;
+  if (!initialized) {
+     // check if monotonic timer is available and provides enough accurate resolution:
+     if (clock_getres(CLOCK_MONOTONIC, &tp) == 0) {
+        long Resolution = tp.tv_nsec;
+        // require a minimum resolution:
+        if (tp.tv_sec == 0 && tp.tv_nsec <= MIN_RESOLUTION * 1000000) {
+           if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0) {
+              monotonic = true;
+           }
+        }
+     }
+     initialized = true;
+  }
+  if (monotonic) {
+     if (clock_gettime(CLOCK_MONOTONIC, &tp) == 0)
+        return (uint64_t(tp.tv_sec)) * 1000 + tp.tv_nsec / 1000000;
+     monotonic = false;
+     // fall back to gettimeofday()
+  }
+#else
+#  warning Posix monotonic clock not available
+#endif
+  struct timeval t;
+  if (gettimeofday(&t, NULL) == 0)
+     return (uint64_t(t.tv_sec)) * 1000 + t.tv_usec / 1000;
+  return 0;
+}
+
+void cTimeMs::Set(int Ms)
+{
+  begin = Now() + Ms;
+}
+
+bool cTimeMs::TimedOut(void)
+{
+  return Now() >= begin;
+}
+
+uint64_t cTimeMs::Elapsed(void)
+{
+  return Now() - begin;
+}
+
