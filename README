@@ -60,7 +60,10 @@ If you are interested to have a logfile , simply do:
 (building qvdpautest require install qt4-dev-tools (100 MB))
 ./build_vdpauinfotest.sh
 
-You can find binaries under libs/vdpauinfo-0.0.6/ and libs/qvdpautest-0.5.1/
+After build you can find binaries under libs/vdpauinfo-0.0.6/ and libs/qvdpautest-0.5.1/
+qvdpautest must run into libs/qvdpautest-0.5.1/
+ cd libs/qvdpautest-0.5.1/
+ ./qvdpautest
 
 ------------------------------
 Where is Enigma2 ?
