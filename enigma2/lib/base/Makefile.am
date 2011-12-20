@@ -28,8 +28,9 @@ libenigma_base_a_SOURCES = \
 	thread.cpp \
 	tsRingbuffer.cpp \
 	condVar.cpp \
-	httpstream.cpp
-
+	httpstream.cpp \
+	socketbase.cpp
+	
 EXTRA_DIST = \
 	eenv.cpp.in
 
@@ -61,4 +62,5 @@ baseinclude_HEADERS = \
 	thread.h \
 	tsRingbuffer.h \
 	condVar.h \
-	httpstream.h
+	httpstream.h \
+	socketbase.h
