@@ -34,6 +34,7 @@ libenigma_dvb_a_SOURCES = \
 	teletext.cpp \
 	tstools.cpp \
 	volume.cpp \
+	streamserver.cpp \
 	ca_connector.cpp \
 	decsa.cpp
 
@@ -70,5 +71,6 @@ dvbinclude_HEADERS = \
 	teletext.h \
 	tstools.h \
 	volume.h \
+	streamserver.h \
 	ca_connector.h \
 	decsa.h
