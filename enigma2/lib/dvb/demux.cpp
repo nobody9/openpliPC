@@ -468,7 +468,7 @@ RESULT eDVBPESReader::connectRead(const Slot2<void,const __u8*,int> &r, ePtr<eCo
 	return 0;
 }
 
-class eDVBRecordFileThread: public eFilePushThreadRecorder
+class eDVBRecordFileThread: public eFilePushThread
 {
 public:
 	eDVBRecordFileThread();
@@ -487,7 +487,7 @@ private:
 };
 
 eDVBRecordFileThread::eDVBRecordFileThread()
-	:eFilePushThreadRecorder(IOPRIO_CLASS_RT, 7, /*blocksize*/ 188, /*buffersize*/ 188 * 1024),
+	:eFilePushThread(IOPRIO_CLASS_RT, 7, /*blocksize*/ 188, /*buffersize*/ 188 * 1024),
 	 m_ts_parser(),
 	 m_current_offset(0)
 {
