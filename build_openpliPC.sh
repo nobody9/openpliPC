@@ -99,31 +99,13 @@ fi
 
 # Build and install enigma2:
 
-#echo "--------------------------------------"
-#echo "downloading OpenPli sources, please wait..."
-#echo "--------------------------------------"
-
 PKG="enigma2"
-
-#if [ -d $PKG ]; then
-# echo "Erasing older build dir"
-#	rm -Rf $PKG
-#	rm -f $PKG*
-#fi
-#git clone git://openpli.git.sourceforge.net/gitroot/openpli/enigma2
-
-#echo "--------------------------------------"
-#echo "downloading OpenPli sources, please wait..."
-#echo "--------------------------------------"
 
 echo "--------------------------------------"
 echo "configuring OpenPliPC $PKG"
 echo "--------------------------------------"
 
 cd $PKG
-
-#git checkout $REF
-#patch -p1 < ../patches/$PATCH
 
 autoreconf -i
 ./configure --prefix=$INSTALL_E2DIR --with-xlib --with-debug
