@@ -3,8 +3,8 @@
 
 #include <lib/gdi/gpixmap.h>
 #include <xine.h>
-#include <xine/xineutils.h>
 #include <xine/xine_internal.h>
+#include <xine/xineutils.h>
 #include <lib/dvb/idvb.h>
 #include <lib/base/message.h>
 
