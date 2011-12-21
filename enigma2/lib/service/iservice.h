@@ -643,7 +643,6 @@ class iSubtitleOutput: public iObject
 {
 public:
 	virtual RESULT enableSubtitles(eWidget *parent, SWIG_PYOBJECT(ePyObject) entry)=0;
-	virtual RESULT disableSubtitles(eWidget *parent)=0;
 	virtual PyObject *getSubtitleList()=0;
 	virtual PyObject *getCachedSubtitle()=0;
 };
@@ -761,8 +760,6 @@ class iStreamedService: public iObject
 	~iStreamedService();
 #endif
 public:
-	virtual PyObject *getBufferCharge()=0;
-	virtual int setBufferSize(int size)=0;
 };
 SWIG_TEMPLATE_TYPEDEF(ePtr<iStreamedService>, iStreamedServicePtr);
 

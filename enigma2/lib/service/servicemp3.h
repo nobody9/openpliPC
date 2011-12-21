@@ -6,7 +6,7 @@
 #include <lib/dvb/pmt.h>
 #include <lib/dvb/subtitle.h>
 #include <lib/dvb/teletext.h>
-#include <gst/gst.h>
+
 /* for subtitles */
 #include <lib/gui/esubtitle.h>
 
@@ -43,8 +43,6 @@ public:
 	int getInfo(const eServiceReference &ref, int w);
 	PyObject* getInfoObject(const eServiceReference &ref, int w);
 };
-
-typedef struct _GstElement GstElement;
 
 typedef enum { atUnknown, atMPEG, atMP3, atAC3, atDTS, atAAC, atPCM, atOGG, atFLAC } audiotype_t;
 typedef enum { stUnknown, stPlainText, stSSA, stASS, stSRT, stVOB, stPGS } subtype_t;
@@ -116,14 +114,12 @@ public:
 
 		// iSubtitleOutput
 	RESULT enableSubtitles(eWidget *parent, SWIG_PYOBJECT(ePyObject) entry);
-	RESULT disableSubtitles(eWidget *parent);
 	PyObject *getSubtitleList();
 	PyObject *getCachedSubtitle();
 
 		// iStreamedService
 	RESULT streamed(ePtr<iStreamedService> &ptr);
 	PyObject *getBufferCharge();
-	int setBufferSize(int size);
 
 		// iAudioDelay
 	int getAC3Delay();
@@ -131,27 +127,6 @@ public:
 	void setAC3Delay(int);
 	void setPCMDelay(int);
 
-	struct audioStream
-	{
-		GstPad* pad;
-		audiotype_t type;
-		std::string language_code; /* iso-639, if available. */
-		std::string codec; /* clear text codec description */
-		audioStream()
-			:pad(0), type(atUnknown)
-		{
-		}
-	};
-	struct subtitleStream
-	{
-		GstPad* pad;
-		subtype_t type;
-		std::string language_code; /* iso-639, if available. */
-		subtitleStream()
-			:pad(0)
-		{
-		}
-	};
 	struct sourceStream
 	{
 		audiotype_t audiotype;
@@ -159,21 +134,11 @@ public:
 		bool is_video;
 		bool is_streaming;
 		sourceStream()
-			:audiotype(atUnknown), containertype(ctNone), is_video(FALSE), is_streaming(FALSE)
+			:audiotype(atUnknown), containertype(ctNone), is_video(0), is_streaming(0)
 		{
 		}
 	};
-	struct bufferInfo
-	{
-		gint bufferPercent;
-		gint avgInRate;
-		gint avgOutRate;
-		gint64 bufferingLeft;
-		bufferInfo()
-			:bufferPercent(0), avgInRate(0), avgOutRate(0), bufferingLeft(-1)
-		{
-		}
-	};
+
 	struct errorInfo
 	{
 		std::string error_message;
@@ -186,14 +151,10 @@ private:
 	int m_currentAudioStream;
 	int m_currentSubtitleStream;
 	int selectAudioStream(int i);
-	std::vector<audioStream> m_audioStreams;
-	std::vector<subtitleStream> m_subtitleStreams;
 	eSubtitleWidget *m_subtitle_widget;
-	gdouble m_currentTrickRatio;
 	friend class eServiceFactoryMP3;
 	eServiceReference m_ref;
 	int m_buffer_size;
-	bufferInfo m_bufferInfo;
 	errorInfo m_errorInfo;
 	eServiceMP3(eServiceReference ref);
 	Signal2<void,iPlayableService*,int> m_event;
@@ -202,49 +163,8 @@ private:
 		stIdle, stRunning, stStopped,
 	};
 	int m_state;
-	GstElement *m_gst_playbin;
-	GstTagList *m_stream_tags;
-
-	class GstMessageContainer: public iObject
-	{
-		DECLARE_REF(GstMessageContainer);
-		GstMessage *messagePointer;
-		GstPad *messagePad;
-		GstBuffer *messageBuffer;
-		int messageType;
-
-	public:
-		GstMessageContainer(int type, GstMessage *msg, GstPad *pad, GstBuffer *buffer)
-		{
-			messagePointer = msg;
-			messagePad = pad;
-			messageBuffer = buffer;
-			messageType = type;
-		}
-		~GstMessageContainer()
-		{
-			if (messagePointer) gst_message_unref(messagePointer);
-			if (messagePad) gst_object_unref(messagePad);
-			if (messageBuffer) gst_buffer_unref(messageBuffer);
-		}
-		int getType() { return messageType; }
-		operator GstMessage *() { return messagePointer; }
-		operator GstPad *() { return messagePad; }
-		operator GstBuffer *() { return messageBuffer; }
-	};
-	eFixedMessagePump<ePtr<GstMessageContainer> > m_pump;
-
-	audiotype_t gstCheckAudioPad(GstStructure* structure);
-	void gstBusCall(GstMessage *msg);
-	void handleMessage(GstMessage *msg);
-	static GstBusSyncReply gstBusSyncHandler(GstBus *bus, GstMessage *message, gpointer user_data);
-	static void gstTextpadHasCAPS(GstPad *pad, GParamSpec * unused, gpointer user_data);
-	void gstTextpadHasCAPS_synced(GstPad *pad);
-	static void gstCBsubtitleAvail(GstElement *element, GstBuffer *buffer, gpointer user_data);
-	GstPad* gstCreateSubtitleSink(eServiceMP3* _this, subtype_t type);
-	void gstPoll(ePtr<GstMessageContainer> const &);
-	static void gstHTTPSourceSetAgent(GObject *source, GParamSpec *unused, gpointer user_data);
-
+	
+	
 	struct SubtitlePage
 	{
 		enum { Unknown, Pango, Vob } type;
@@ -260,14 +180,11 @@ private:
 	int m_decoder_time_valid_state;
 
 	void pushSubtitles();
-	void pullSubtitle(GstBuffer *buffer);
 	void sourceTimeout();
 	sourceStream m_sourceinfo;
-	gulong m_subs_to_pull_handler_id;
 
 	RESULT seekToImpl(pts_t to);
 
-	gint m_aspect, m_width, m_height, m_framerate, m_progressive;
 	std::string m_useragent;
 	RESULT trickSeek(int ratio);
 };
