@@ -8,8 +8,8 @@ DEFINE_REF(cXineLib);
 
 cXineLib::cXineLib(x11_visual_t *vis) : m_pump(eApp, 1) {
 	char        configfile[150];
-	char        vo_driver[] = "auto";
-	char        ao_driver[] = "alsa";
+	char        *vo_driver = "auto";
+	char        *ao_driver = "alsa";
 
 	instance = this;
 	osd = NULL;
@@ -24,8 +24,21 @@ cXineLib::cXineLib(x11_visual_t *vis) : m_pump(eApp, 1) {
 	printf("configfile  %s\n", configfile);
 	xine_config_load(xine, configfile);
 	xine_init(xine);
+  
+  cfg_entry_t *entry;
+	config_values_t *cfg;
+// read Video Driver from config
+	cfg = this->xine->config;
+	entry = cfg->lookup_entry(cfg, "video.driver");
+	vo_driver = strdup(entry->unknown_value);
+// read Audio Driver from config
+	entry = cfg->lookup_entry(cfg, "audio.driver");
+	ao_driver = strdup(entry->unknown_value);
+	printf("use vo_driver: %s \n", vo_driver);
+	printf("use ao_driver: %s \n", ao_driver);
 
-	if((vo_port = xine_open_video_driver(xine, vo_driver, XINE_VISUAL_TYPE_X11, (void *) vis)) == NULL)
+	
+	if((vo_port = xine_open_video_driver(xine, vo_driver , XINE_VISUAL_TYPE_X11, (void *) vis)) == NULL)
 	{
 		printf("I'm unable to initialize '%s' video driver. Giving up.\n", vo_driver);
 		return;
