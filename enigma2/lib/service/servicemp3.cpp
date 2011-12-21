@@ -14,22 +14,11 @@
 #include <lib/gdi/gpixmap.h>
 
 #include <string>
-
-//#include <gst/gst.h>
-//#include <gst/pbutils/missing-plugins.h>
-//#include <sys/stat.h>
+#include <sys/stat.h>
 
 #define HTTP_TIMEOUT 10
 
 // eServiceFactoryMP3
-
-/*
- * gstreamer suffers from a bug causing sparse streams to loose sync, after pause/resume / skip
- * see: https://bugzilla.gnome.org/show_bug.cgi?id=619434
- * As a workaround, we run the subsink in sync=false mode
- */
-#define GSTREAMER_SUBTITLE_SYNC_MODE_BUG
-/**/
 
 eServiceFactoryMP3::eServiceFactoryMP3()
 {
@@ -238,7 +227,7 @@ int eServiceMP3::ac3_delay,
     eServiceMP3::pcm_delay;
 
 eServiceMP3::eServiceMP3(eServiceReference ref)
-	:m_ref(ref), m_pump(eApp, 1)
+	:m_ref(ref)
 {
 	cXineLib *xineLib = cXineLib::getInstance();
 //xineLib->stopVideo();
@@ -272,7 +261,6 @@ eServiceMP3::~eServiceMP3()
 
 DEFINE_REF(eServiceMP3);
 
-DEFINE_REF(eServiceMP3::GstMessageContainer);
 
 RESULT eServiceMP3::connectEvent(const Slot2<void,iPlayableService*,int> &event, ePtr<eConnection> &connection)
 {
@@ -324,8 +312,7 @@ RESULT eServiceMP3::setSlowMotion(int ratio)
 {
 	if (!ratio)
 		return 0;
-	eDebug("eServiceMP3::setSlowMotion ratio=%f",1.0/(gdouble)ratio);
-	return trickSeek(1.0/(gdouble)ratio);
+return 0;
 }
 
 RESULT eServiceMP3::setFastForward(int ratio)
@@ -455,13 +442,10 @@ RESULT eServiceMP3::getName(std::string &name)
 int eServiceMP3::getInfo(int w)
 {
 	cXineLib *xineLib = cXineLib::getInstance();
- 	const gchar *tag = 0;
  
  	switch (w)
  	{
  	case sServiceref: return m_ref;
- 	case sProgressive: return m_progressive;
- 	case sAspect: return m_aspect;
 	case sVideoHeight:
 		return xineLib->getVideoHeight();
 		break;
@@ -512,15 +496,10 @@ int eServiceMP3::getInfo(int w)
  	case sTagPreviewImage:
  	case sTagAttachment:
 		return resIsPyObject;
-	case sTagCRC:
-		tag = "has-crc";
 		break;
 	default:
 		return resNA;
 	}
-
-	if (!m_stream_tags || !tag)
-		return 0;
 
 	return 0;
 }
@@ -562,7 +541,6 @@ RESULT eServiceMP3::audioDelay(ePtr<iAudioDelay> &ptr)
 
 int eServiceMP3::getNumberOfTracks()
 {
- 	return m_audioStreams.size();
 }
 
 int eServiceMP3::getCurrentTrack()
@@ -603,88 +581,10 @@ RESULT eServiceMP3::selectChannel(int i)
 
 RESULT eServiceMP3::getTrackInfo(struct iAudioTrackInfo &info, unsigned int i)
 {
- 	if (i >= m_audioStreams.size())
-		return -2;
-		info.m_description = m_audioStreams[i].codec;
-/*	if (m_audioStreams[i].type == atMPEG)
-		info.m_description = "MPEG";
-	else if (m_audioStreams[i].type == atMP3)
-		info.m_description = "MP3";
-	else if (m_audioStreams[i].type == atAC3)
-		info.m_description = "AC3";
-	else if (m_audioStreams[i].type == atAAC)
-		info.m_description = "AAC";
-	else if (m_audioStreams[i].type == atDTS)
-		info.m_description = "DTS";
-	else if (m_audioStreams[i].type == atPCM)
-		info.m_description = "PCM";
-	else if (m_audioStreams[i].type == atOGG)
-		info.m_description = "OGG";
-	else if (m_audioStreams[i].type == atFLAC)
-		info.m_description = "FLAC";
-	else
-		info.m_description = "???";*/
-	if (info.m_language.empty())
-		info.m_language = m_audioStreams[i].language_code;
 	return 0;
 }
 
-subtype_t getSubtitleType(GstPad* pad, gchar *g_codec=NULL)
-{
-}
-
-void eServiceMP3::gstBusCall(GstMessage *msg)
-{
-}
-
-void eServiceMP3::handleMessage(GstMessage *msg)
-{
-	if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_STATE_CHANGED && GST_MESSAGE_SRC(msg) != GST_OBJECT(m_gst_playbin))
-	{
-		/*
-		 * ignore verbose state change messages for all active elements;
-		 * we only need to handle state-change events for the playbin
-		 */
-		gst_message_unref(msg);
-		return;
-	}
-	m_pump.send(new GstMessageContainer(1, msg, NULL, NULL));
-}
-
-GstBusSyncReply eServiceMP3::gstBusSyncHandler(GstBus *bus, GstMessage *message, gpointer user_data)
-{
-}
-
-void eServiceMP3::gstHTTPSourceSetAgent(GObject *object, GParamSpec *unused, gpointer user_data)
-{
-}
-
-audiotype_t eServiceMP3::gstCheckAudioPad(GstStructure* structure)
-{
-}
-
-
-void eServiceMP3::gstPoll(ePtr<GstMessageContainer> const &msg)
-{
-}
-
 eAutoInitPtr<eServiceFactoryMP3> init_eServiceFactoryMP3(eAutoInitNumbers::service+1, "eServiceFactoryMP3");
-
-void eServiceMP3::gstCBsubtitleAvail(GstElement *subsink, GstBuffer *buffer, gpointer user_data)
-{
-}
-
-void eServiceMP3::gstTextpadHasCAPS(GstPad *pad, GParamSpec * unused, gpointer user_data)
-{
-}
-
-void eServiceMP3::gstTextpadHasCAPS_synced(GstPad *pad)
-{
-}
-
-void eServiceMP3::pullSubtitle(GstBuffer *buffer)
-{
-}
 
 void eServiceMP3::pushSubtitles()
 {
@@ -692,19 +592,6 @@ void eServiceMP3::pushSubtitles()
 
 RESULT eServiceMP3::enableSubtitles(eWidget *parent, ePyObject tuple)
 {
-}
-
-RESULT eServiceMP3::disableSubtitles(eWidget *parent)
-{
-	eDebug("eServiceMP3::disableSubtitles");
-	m_currentSubtitleStream = -1;
-	g_object_set (G_OBJECT (m_gst_playbin), "current-text", m_currentSubtitleStream, NULL);
-	m_subtitle_pages.clear();
-	m_prev_decoder_time = -1;
-	m_decoder_time_valid_state = 0;
-	delete m_subtitle_widget;
-	m_subtitle_widget = 0;
-	return 0;
 }
 
 PyObject *eServiceMP3::getCachedSubtitle()
@@ -718,31 +605,6 @@ PyObject *eServiceMP3::getSubtitleList()
 // 	eDebug("eServiceMP3::getSubtitleList");
 	ePyObject l = PyList_New(0);
 	int stream_idx = 0;
-	
-	for (std::vector<subtitleStream>::iterator IterSubtitleStream(m_subtitleStreams.begin()); IterSubtitleStream != m_subtitleStreams.end(); ++IterSubtitleStream)
-	{
-		subtype_t type = IterSubtitleStream->type;
-		switch(type)
-		{
-		case stUnknown:
-		case stVOB:
-		case stPGS:
-			break;
-		default:
-		{
-			ePyObject tuple = PyTuple_New(5);
-//			eDebug("eServiceMP3::getSubtitleList idx=%i type=%i, code=%s", stream_idx, int(type), (IterSubtitleStream->language_code).c_str());
-			PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(2));
-			PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(stream_idx));
-			PyTuple_SET_ITEM(tuple, 2, PyInt_FromLong(int(type)));
-			PyTuple_SET_ITEM(tuple, 3, PyInt_FromLong(0));
-			PyTuple_SET_ITEM(tuple, 4, PyString_FromString((IterSubtitleStream->language_code).c_str()));
-			PyList_Append(l, tuple);
-			Py_DECREF(tuple);
-		}
-		}
-		stream_idx++;
-	}
 	eDebug("eServiceMP3::getSubtitleList finished");
 	return l;
 }
@@ -750,24 +612,6 @@ PyObject *eServiceMP3::getSubtitleList()
 RESULT eServiceMP3::streamed(ePtr<iStreamedService> &ptr)
 {
 	ptr = this;
-	return 0;
-}
-
-PyObject *eServiceMP3::getBufferCharge()
-{
-	ePyObject tuple = PyTuple_New(5);
-	PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(m_bufferInfo.bufferPercent));
-	PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(m_bufferInfo.avgInRate));
-	PyTuple_SET_ITEM(tuple, 2, PyInt_FromLong(m_bufferInfo.avgOutRate));
-	PyTuple_SET_ITEM(tuple, 3, PyInt_FromLong(m_bufferInfo.bufferingLeft));
-	PyTuple_SET_ITEM(tuple, 4, PyInt_FromLong(m_buffer_size));
-	return tuple;
-}
-
-int eServiceMP3::setBufferSize(int size)
-{
-	m_buffer_size = size;
-	g_object_set (G_OBJECT (m_gst_playbin), "buffer-size", m_buffer_size, NULL);
 	return 0;
 }
 
