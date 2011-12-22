@@ -96,6 +96,26 @@ make
 sudo make install
 cd ..
 
+#Build and install libbluray:
+PKG="libbluray"
+LIB_BLURAY_REF="6d88105783fa3a83963178d31f624717334ca9e0"
+echo "-----------------------------------------"
+echo "Build and install $PKG"
+echo "-----------------------------------------"
+if [ -d $PKG ]; then
+	echo "Erasing older build dir"
+	rm -Rf $PKG
+	rm -f $PKG*
+fi
+git://git.videolan.org/libbluray.git
+cd $PKG
+git checkout $LIB_BLURAY_REF
+autoreconf -vif
+./configure --prefix=/usr
+make
+sudo make install
+cd ..
+
 #Build and install pythonwifi:
 PKG="pythonwifi"
 echo "-----------------------------------------"
