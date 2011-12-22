@@ -242,11 +242,19 @@
 		<device name="dreambox front panel">
 			<key id="KEY_POWER" mapto="deepstandby" flags="l" />
 		</device>
+		<device name="Xlib">
+			<key id="KEY_VOLUMEUP" mapto="volumeUp" flags="mr" />
+			<key id="KEY_VOLUMEDOWN" mapto="volumeDown" flags="mr" />
+			<key id="KEY_POWER" mapto="discrete_off" flags="m" />
+		</device>
 	</map>
 	
 	<map context="PowerKeyActions">
 		<key id="KEY_POWER" mapto="powerdown" flags="m" />
 		<key id="KEY_POWER" mapto="powerup" flags="b" />
+		<device name="Xlib">
+			<key id="KEY_POWER" mapto="discrete_off" flags="m" />
+		</device>
 	</map>
 	
 	<map context="NumberActions">

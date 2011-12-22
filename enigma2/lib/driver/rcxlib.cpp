@@ -146,7 +146,7 @@ int eXlibInputDevice::translateKey(int key)
 	case 58: // M
 		return KEY_MUTE;
 
-	case 65:
+	case 65: // SPACE
 		return KEY_MENU;
 
 
@@ -159,17 +159,25 @@ int eXlibInputDevice::translateKey(int key)
 	case 70:
 		return KEY_BLUE;
 
+	case	71: //F5
+		return KEY_INFO;
+	
+	case	72: //F6
+		return KEY_EPG;
 
-	case 82: // -
+	case 61: // -
 		return KEY_VOLUMEDOWN;
-	case 86: // +
+	case 35: // +
 		return KEY_VOLUMEUP;
 
 	case 112: // Page Up
 		return KEY_CHANNELUP;
 	case 117: // Page Down
 		return KEY_CHANNELDOWN;
-
+	
+	case	76: //F10
+		return KEY_POWER;
+	
 	default:
 		eDebug("unhandled KEYBOARD keycode: %d", key);
 		return KEY_RESERVED;
