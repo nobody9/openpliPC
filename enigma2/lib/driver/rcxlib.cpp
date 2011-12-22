@@ -165,8 +165,11 @@ int eXlibInputDevice::translateKey(int key)
 	case	72: //F6
 		return KEY_EPG;
 
+	case 82:
 	case 61: // -
 		return KEY_VOLUMEDOWN;
+
+	case 86:
 	case 35: // +
 		return KEY_VOLUMEUP;
 
