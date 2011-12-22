@@ -92,11 +92,16 @@ class ServiceInfo(Screen):
 			self["green"] = Label(_("PIDs"))
 			self["yellow"] = Label(_("Multiplex"))
 			self["blue"] = Label(_("Tuner status"))
-			service = session.nav.getCurrentService()
+
+			try:
+				service = session.nav.getCurrentService()
+			except:
+				service = None
+
 			if service is not None:
 				self.info = service.info()
 				self.feinfo = service.frontendInfo()
-				print self.info.getInfoObject(iServiceInformation.sCAIDs);
+				# print self.info.getInfoObject(iServiceInformation.sCAIDs);
 			else:
 				self.info = None
 				self.feinfo = None
