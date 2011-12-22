@@ -104,8 +104,8 @@ GREEN   ->  F2
 YELLOW  ->  F3
 BLUE    ->  F4
 
-VOL UP    ->  +  (numeric pad)
-VOL DOWN  ->  -  (numeric pad)
+VOL UP    ->  +  (numeric pad) or +
+VOL DOWN  ->  -  (numeric pad) or -
 
 NEXT CHANN. -> ARROW DOWN
 PREV CHANN. -> ARROW UP
