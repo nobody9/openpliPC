@@ -79,7 +79,9 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
   if ((buf->type & BUF_MAJOR_MASK) != BUF_CONTROL_BASE) {
 
     if (this->enabled) {
-
+      if (this->dvbspeed)
+        dvbspeed_put (this, fifo, buf);
+      else {
       nbc_compute_fifo_length(this, fifo, buf, FIFO_PUT);
 
       if (this->buffering) {
@@ -153,7 +155,8 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
       //  display_stats(this);
 
       //report_stats(this, 0);
-    }
+      }
+  	}
   } else {
 
     switch (buf->type) {
@@ -170,10 +173,10 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
           this->audio_last_pts    = 0;
           this->video_fifo_length = 0;
           this->audio_fifo_length = 0;
-         // nbc_set_speed_pause(this);
-          this->progress = 0;
-		 // this->progress = 100;
-          //report_progress (this->stream, progress);
+          dvbspeed_init (this);
+          if (!this->dvbspeed) nbc_set_speed_pause(this);
+/*          this->progress = 0;
+          report_progress (this->stream, progress);*/
         }
         break;
       case BUF_CONTROL_NOP:
@@ -185,6 +188,7 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
       case BUF_CONTROL_END:
       case BUF_CONTROL_QUIT:
         lprintf("BUF_CONTROL_END\n");
+        dvbspeed_close (this);
         if (this->enabled) {
           /* end of stream :
            *   - disable the nbc

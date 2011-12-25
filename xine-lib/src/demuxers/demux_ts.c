@@ -1266,6 +1266,9 @@ static void demux_ts_buffer_pes(demux_ts_t*this, unsigned char *ts,
 
     /* allocate the buffer here, as pes_header needs a valid buf for dvbsubs */
     m->buf = m->fifo->buffer_pool_alloc(m->fifo);
+    /* dont let decoder crash on incomplete frames.
+       Also needed by net_buf_ctrl/dvbspeed. */
+    m->buf->decoder_flags |= BUF_FLAG_FRAME_START;
 
     int pes_header_len = demux_ts_parse_pes_header(this->stream->xine, m, ts, len);
 
