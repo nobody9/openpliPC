@@ -78,17 +78,50 @@ void nbc_set_speed_normal (nbc_t *this) {
   stream->xine->clock->set_option (stream->xine->clock, CLOCK_SCR_ADJUSTABLE, 1);
 }
 
-void dvbspeed_init (nbc_t *this) {
-	printf ("MAO: dvbspeed mode\n");
- this->dvbs_center = 2 * 90000;
- this->dvbs_width = 90000;
- this->dvbs_audio_in = this->dvbs_audio_out = this->dvbs_audio_fill = 0;
- this->dvbs_video_in = this->dvbs_video_out = this->dvbs_video_fill = 0;
- this->dvbspeed = 7;
+void dvbspeed_init (nbc_t *this, int force) {
+  const char *mrl;
+  if (this->stream && this->stream->input_plugin || force == 1) {
+    mrl = this->stream->input_plugin->get_mrl (this->stream->input_plugin);
+    if (mrl || force == 1) {
+      /* detect Kaffeine: fifo://~/.kde4/share/apps/kaffeine/dvbpipe.m2t */
+      if (force == 1 || (strcasestr (mrl, "/dvbpipe.")) ||
+        ((!strncasecmp (mrl, "dvb", 3)) &&
+        ((mrl[3] == ':') || (mrl[3] && (mrl[4] == ':'))))) {
+        this->dvbs_center = 2 * 90000;
+        this->dvbs_width = 90000;
+        this->dvbs_audio_in = this->dvbs_audio_out = this->dvbs_audio_fill = 0;
+        this->dvbs_video_in = this->dvbs_video_out = this->dvbs_video_fill = 0;
+        this->dvbspeed = 7;
 #ifdef LOG_DVBSPEED
         /* I'm using plain printf because kaffeine sets verbosity to 0 */
         printf ("net_buf_ctrl: dvbspeed mode\n");
 #endif
+#if 1
+        /* somewhat rude but saves user a lot of frustration */
+        if (this->stream) {
+          xine_t *xine = this->stream->xine;
+          config_values_t *config = xine->config;
+          xine_cfg_entry_t entry;
+          if (xine_config_lookup_entry (xine, "audio.synchronization.slow_fast_audio",
+            &entry) && (entry.num_value == 0)) {
+            config->update_num (config, "audio.synchronization.slow_fast_audio", 1);
+#ifdef LOG_DVBSPEED
+            printf ("net_buf_ctrl: slow/fast audio playback enabled\n");
+#endif
+          }
+          if (xine_config_lookup_entry (xine, "engine.buffers.video_num_buffers",
+            &entry) && (entry.num_value < 1800)) {
+            config->update_num (config, "engine.buffers.video_num_buffers", 1800);
+#ifdef LOG_DVBSPEED
+            printf ("net_buf_ctrl: enlarged video fifo to 1800 buffers\n");
+#endif
+          }
+        }
+#endif
+      }
+    }
+  }
+
 }
 
 void dvbspeed_close (nbc_t *this) {
@@ -508,10 +541,10 @@ void nbc_put_cb (fifo_buffer_t *fifo,
           this->audio_last_pts    = 0;
           this->video_fifo_length = 0;
           this->audio_fifo_length = 0;
-          dvbspeed_init (this);
+          dvbspeed_init (this,0);
           if (!this->dvbspeed) nbc_set_speed_pause(this);
           this->progress = 0;
-/*          report_progress (this->stream, progress);*/
+          report_progress (this->stream, progress);
         }
         break;
       case BUF_CONTROL_NOP:

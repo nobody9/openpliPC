@@ -173,7 +173,7 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
           this->audio_last_pts    = 0;
           this->video_fifo_length = 0;
           this->audio_fifo_length = 0;
-          dvbspeed_init (this);
+          dvbspeed_init (this, 1);
           if (!this->dvbspeed) nbc_set_speed_pause(this);
 /*          this->progress = 0;
           report_progress (this->stream, progress);*/

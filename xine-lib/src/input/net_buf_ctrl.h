@@ -81,7 +81,7 @@ nbc_t *nbc_init (xine_stream_t *xine) XINE_MALLOC;
 void nbc_close (nbc_t *this);
 void nbc_set_speed_pause (nbc_t *this);
 void nbc_set_speed_normal (nbc_t *this);
-void dvbspeed_init (nbc_t *this);
+void dvbspeed_init (nbc_t *this, int force);
 void dvbspeed_close (nbc_t *this);
 void dvbspeed_put (nbc_t *this, fifo_buffer_t * fifo, buf_element_t *b);
 void dvbspeed_get (nbc_t *this, fifo_buffer_t * fifo, buf_element_t *b);
