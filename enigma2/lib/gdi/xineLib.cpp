@@ -52,8 +52,7 @@ cXineLib::cXineLib(x11_visual_t *vis) : m_pump(eApp, 1) {
 		return;
 	}
 
-	//setPrebuffer(150000);
-	xine_engine_set_param(xine, XINE_ENGINE_PARAM_VERBOSITY, XINE_VERBOSITY_DEBUG);
+	xine_engine_set_param(xine, XINE_ENGINE_PARAM_VERBOSITY, XINE_VERBOSITY_LOG);
 
 	xine_queue = xine_event_new_queue (stream);
 	xine_event_create_listener_thread(xine_queue, xine_event_handler, this);
