@@ -123,6 +123,7 @@ RECORD  ->  R
 TV      ->  T
 VIDEO   ->  V
 AUDIO   ->  A
+RADIO   ->  D
 MUTE    ->  M
 TIMESHIFT ->  P
 
