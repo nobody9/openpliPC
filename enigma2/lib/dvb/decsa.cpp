@@ -127,7 +127,7 @@ bool cDeCSA::SetCaPid(ca_pid_t *ca_pid)
 bool cDeCSA::Decrypt(unsigned char *data, int len, int& packetsCount)
 {
   cMutexLock lock(&mutex);
-
+//  printf("Begin Decrypting %d\n", len);
   int currIdx=-1;
   len-=(TS_SIZE-1);
   int l;
@@ -191,11 +191,13 @@ bool cDeCSA::Decrypt(unsigned char *data, int len, int& packetsCount)
   }
 
   if (cryptedPackets>0) {
+//  	printf("Begin Decrypting cryptedPackets %d\n",cryptedPackets);
     for (int i=cryptedPackets;i<=cs;i++) {
       pcks[i].data = NULL;
     }
 
     if (GetKeyStruct(currIdx)) {
+//    	printf("Begin Decrypting GetKeyStruct %d\n",currIdx);
       if (even_odd[currIdx]&0x40) {
         dvbcsa_bs_decrypt(csa_bs_key_odd[currIdx], pcks, 184);
       } else {

@@ -265,8 +265,8 @@ off_t eRawFile::length()
 
 eDecryptRawFile::eDecryptRawFile()
 {
-	ringBuffer = new cRingBufferLinear(MEGABYTE(2),TS_SIZE,true,"IN-TS");
-	ringBuffer->SetTimeouts(100,100);
+	ringBuffer = new cRingBufferLinear(KILOBYTE(1024),TS_SIZE,true,"IN-TS");
+	ringBuffer->SetTimeouts(200,200);
 	bs_size = dvbcsa_bs_batch_size();
 	delivered=false;
 	lastPacketsCount = 0;
@@ -324,7 +324,7 @@ uint8_t* eDecryptRawFile::getPackets(int &packetsCount) {
 ssize_t eDecryptRawFile::read(off_t offset, void *buf, size_t count)
 {
 	eSingleLocker l(m_lock);
-	int ret;
+	int ret = 0;
 
 	while (ringBuffer->Available()<KILOBYTE(128)) {
 		ret = ringBuffer->Read(m_fd, KILOBYTE(64));
