@@ -1454,7 +1454,7 @@ static void decode_render( vdpau_h264_alter_decoder_t *vd, int bad_frame )
     event.data_length = sizeof(data);
     data.width = seq->coded_width;
     data.height = seq->coded_height;
-    data.aspect = seq->ratio;
+    data.aspect = seq->ratio>1.77?3:2;
     xine_event_send( vd->stream, &event );
   }
 
