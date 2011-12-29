@@ -38,11 +38,11 @@ class Timezones:
 		
 		environ['TZ'] = self.timezones[index][1]
 		try:
-			unlink("/etc/localtime")
+			unlink("/usr/local/e2/etc/localtime")
 		except OSError:
 			pass
 		try:
-			symlink("/usr/share/zoneinfo/%s" %(self.timezones[index][1]), "/etc/localtime")
+			symlink("/usr/local/e2/share/zoneinfo/%s" %(self.timezones[index][1]), "/usr/local/e2/etc/localtime")
 		except OSError:
 			pass
 		try:

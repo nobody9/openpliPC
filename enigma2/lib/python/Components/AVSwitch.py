@@ -161,7 +161,7 @@ def InitAVSwitch():
 	SystemInfo["CanDownmixDTS"] = can_downmix
 	if can_downmix:
 		def setDTSDownmix(configElement):
-			open("/var/run/dts_mode", "w").write(configElement.value and "downmix" or "passthrough")
+			open("/usr/local/e2/etc/stb/dts_mode", "w").write(configElement.value and "downmix" or "passthrough")
 			try:
 				os.unlink('/home/root/.gstreamer-0.10/registry.mipsel.bin')
 			except:
