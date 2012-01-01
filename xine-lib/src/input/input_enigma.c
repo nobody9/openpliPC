@@ -74,14 +74,15 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
   int64_t audio_p = 0;
   int force_dvbspeed = 0;
   int has_video, has_audio;
-  
+  force_dvbspeed = 0;
   xine_t *xine = this->stream->xine;
-  config_values_t *config = xine->config;
-  xine_cfg_entry_t entry;
-  if (xine_config_lookup_entry (xine, "stream.buffer.dynamic",&entry) && (entry.num_value == 1))
-  {
-  	force_dvbspeed = 1;
-  }
+
+  cfg_entry_t *entry;
+	config_values_t *cfg;
+	cfg = xine->config;
+	entry = cfg->lookup_entry(cfg, "input.buffer.dynamic");
+  if  (strdup(entry->unknown_value) == "1");
+  			force_dvbspeed = 1;
 
   lprintf("enter enigma_nbc_put_cb\n");
   pthread_mutex_lock(&this->mutex);

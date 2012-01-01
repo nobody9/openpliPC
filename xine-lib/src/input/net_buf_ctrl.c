@@ -449,6 +449,8 @@ void nbc_put_cb (fifo_buffer_t *fifo,
   int64_t video_p = 0;
   int64_t audio_p = 0;
   int has_video, has_audio;
+	int force_dvbspeed = 1;
+	
 
   lprintf("enter nbc_put_cb\n");
   pthread_mutex_lock(&this->mutex);
@@ -541,7 +543,7 @@ void nbc_put_cb (fifo_buffer_t *fifo,
           this->audio_last_pts    = 0;
           this->video_fifo_length = 0;
           this->audio_fifo_length = 0;
-          dvbspeed_init (this,0);
+          dvbspeed_init (this, force_dvbspeed);
           if (!this->dvbspeed) nbc_set_speed_pause(this);
           this->progress = 0;
           report_progress (this->stream, progress);
