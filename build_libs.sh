@@ -6,7 +6,7 @@
 echo "-----------------------------------------"
 echo "*** INSTALL REQUIRED PACKAGES ***"
 echo "-----------------------------------------"
-REQPKG="autoconf automake build-essential gettext subversion mercurial git autopoint \
+REQPKG="autoconf automake build-essential debhelper gettext subversion mercurial git autopoint \
 	libdvdnav-dev libfreetype6-dev libfribidi-dev \
 	libgif-dev libjpeg62-dev libpng12-dev \
 	libsdl1.2-dev libsigc++-1.2-dev \
