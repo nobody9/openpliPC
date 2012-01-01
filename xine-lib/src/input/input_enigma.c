@@ -36,6 +36,7 @@
 #define LOG
 */
 
+#include <xine/xine_internal.h>
 #include <xine/input_plugin.h>
 #include "net_buf_ctrl.h"
 
@@ -71,7 +72,16 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
   int64_t progress = 0;
   int64_t video_p = 0;
   int64_t audio_p = 0;
+  int force_dvbspeed = 0;
   int has_video, has_audio;
+  
+  xine_t *xine = this->stream->xine;
+  config_values_t *config = xine->config;
+  xine_cfg_entry_t entry;
+  if (xine_config_lookup_entry (xine, "stream.buffer.dynamic",&entry) && (entry.num_value == 1))
+  {
+  	force_dvbspeed = 1;
+  }
 
   lprintf("enter enigma_nbc_put_cb\n");
   pthread_mutex_lock(&this->mutex);
@@ -173,7 +183,7 @@ static void enigma_nbc_put_cb (fifo_buffer_t *fifo, buf_element_t *buf, void *th
           this->audio_last_pts    = 0;
           this->video_fifo_length = 0;
           this->audio_fifo_length = 0;
-          dvbspeed_init (this, 1);
+          dvbspeed_init (this, force_dvbspeed);
           if (!this->dvbspeed) nbc_set_speed_pause(this);
 /*          this->progress = 0;
           report_progress (this->stream, progress);*/
