@@ -3,13 +3,14 @@
 # where install Enigma2 tree
 INSTALL_E2DIR="/usr/local/e2"
 
-BACKUP_E2="etc/enigma2 etc/tuxbox/*.xml etc/tuxbox/nim_sockets"
+BACKUP_E2="etc/enigma2 etc/tuxbox/*.xml etc/tuxbox/nim_sockets share/enigma2/xine.conf"
 
 # ----------------------------------------------------------------------
 
 DO_BACKUP=0
 DO_RESTORE=0
 DO_XINE=1
+DO_CONFIGURE=1
 
 function e2_backup {
         echo "-----------------------------"
@@ -34,6 +35,7 @@ function usage {
 	echo " -b : backup E2 conf file before re-compile"
 	echo " -r : restore E2 conf file after re-compile"
 	echo " -x : don't compile xine-lib (compile only enigma2)"
+	echo " -nc: don't start configure/autoconf"
 	echo " -h : this help"
 	echo ""
 	echo "common usage:"
@@ -52,6 +54,9 @@ while [ "$1" != "" ]; do
 	-x )	DO_XINE=0
 		shift
 		;;
+	-nc )	DO_CONFIGURE=0
+		shift
+		;;	
 	-h )  	usage
 	      	exit
 	      	;;
@@ -72,13 +77,16 @@ if [ "$DO_XINE" -eq "1" ]; then
 
 	# Build and install xine-lib:
 	PKG="xine-lib"
+
+	cd $PKG
+	
+  if [ "$DO_CONFIGURE" -eq "1" ]; then	
 	echo "-----------------------------------------"
 	echo "configuring OpenPliPC $PKG"
 	echo "-----------------------------------------"
 
-	cd $PKG
-
 	./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
+  fi	
 
 	echo "-----------------------------------------"
 	echo "build OpenPliPC $PKG, please wait..."
@@ -101,14 +109,17 @@ fi
 
 PKG="enigma2"
 
-echo "--------------------------------------"
-echo "configuring OpenPliPC $PKG"
-echo "--------------------------------------"
-
 cd $PKG
 
-autoreconf -i
-./configure --prefix=$INSTALL_E2DIR --with-xlib --with-debug
+if [ "$DO_CONFIGURE" -eq "1" ]; then
+
+  echo "--------------------------------------"
+  echo "configuring OpenPliPC $PKG"
+  echo "--------------------------------------"
+
+  autoreconf -i
+  ./configure --prefix=$INSTALL_E2DIR --with-xlib --with-debug
+fi  
  
 echo "--------------------------------------"
 echo "build OpenPliPC $PKG, please wait..."
