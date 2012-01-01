@@ -24,6 +24,7 @@ cXineLib::cXineLib(x11_visual_t *vis) : m_pump(eApp, 1) {
 	printf("configfile  %s\n", configfile);
 	xine_config_load(xine, configfile);
 	xine_init(xine);
+	xine_engine_set_param(xine, XINE_ENGINE_PARAM_VERBOSITY, XINE_VERBOSITY_LOG);
   
   cfg_entry_t *entry;
 	config_values_t *cfg;
@@ -51,8 +52,6 @@ cXineLib::cXineLib(x11_visual_t *vis) : m_pump(eApp, 1) {
 			|| (!xine_play(stream, 0, 0)) ) {
 		return;
 	}
-
-	xine_engine_set_param(xine, XINE_ENGINE_PARAM_VERBOSITY, XINE_VERBOSITY_LOG);
 
 	xine_queue = xine_event_new_queue (stream);
 	xine_event_create_listener_thread(xine_queue, xine_event_handler, this);
