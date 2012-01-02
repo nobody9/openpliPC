@@ -860,7 +860,7 @@ static int xv_gui_data_exchange (vo_driver_t *this_gen,
   return 0;
 }
 
-static void xv_store_port_attribute(xv_driver_t *this, char *name) {
+static void xv_store_port_attribute(xv_driver_t *this, const char * const name) {
   xcb_intern_atom_cookie_t atom_cookie;
   xcb_intern_atom_reply_t *atom_reply;
 

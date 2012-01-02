@@ -552,7 +552,7 @@ static int is_cjk_encoding(const char *enc) {
 static void draw_subtitle(sputext_decoder_t *this, int64_t sub_start, int64_t sub_end ) {
 
   int y;
-  int sub_x, sub_y, max_width;
+  int sub_x, sub_y, max_width = this->width;
   int alignment;
 
   _x_assert(this->renderer != NULL);

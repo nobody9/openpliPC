@@ -1114,7 +1114,7 @@ static void yv12_to_yuy2_mmxext
       p_v = v_src + v_src_pitch;
       p_ut = p_u;
       p_vt = p_v;
-
+ 
       for( i_y = height / 4 ; i_y-- ; )
       {
           p_line1 = p_line2;

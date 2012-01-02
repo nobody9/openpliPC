@@ -218,6 +218,8 @@ typedef struct {
   Display             *display;
   config_values_t     *config;
   XvPortID             xv_port;
+  XvAdaptorInfo       *adaptor_info;
+  unsigned int         adaptor_num;
 
   int                  surface_type_id;
   unsigned int         max_surface_width;
@@ -1309,8 +1311,8 @@ static vo_driver_t *open_plugin (video_driver_class_t *class_gen, const void *vi
   int                   nattr;
   x11_visual_t         *visual  = (x11_visual_t *) visual_gen;
   XColor                dummy;
-  XvAdaptorInfo        *adaptor_info;
-  unsigned int          adaptor_num;
+  XvAdaptorInfo        *adaptor_info = class->adaptor_info;
+  unsigned int          adaptor_num  = class->adaptor_num;
   /* XvImage              *myimage; */
 
   lprintf ("open_plugin\n");
@@ -1521,6 +1523,10 @@ static vo_driver_t *open_plugin (video_driver_class_t *class_gen, const void *vi
 static void dispose_class (video_driver_class_t *this_gen) {
   xvmc_class_t        *this = (xvmc_class_t *) this_gen;
 
+  XLockDisplay(this->display);
+  XvFreeAdaptorInfo (this->adaptor_info);
+  XUnlockDisplay(this->display);
+  
   free (this);
 }
 
@@ -1693,6 +1699,8 @@ static void *init_class (xine_t *xine, void *visual_gen) {
   this->display                      = display;
   this->config                       = xine->config;
   this->xv_port                      = xv_port;
+  this->adaptor_info                 = adaptor_info;
+  this->adaptor_num                  = adaptor_num;
   this->surface_type_id              = surface_type;
   this->max_surface_width            = max_width;
   this->max_surface_height           = max_height;

@@ -169,7 +169,7 @@ void free_decoded_picture(struct decoded_picture *pic)
  * ----------------------------------------------------------------------------
  */
 
-struct dpb* create_dpb()
+struct dpb* create_dpb(void)
 {
     struct dpb *dpb = calloc(1, sizeof(struct dpb));
 

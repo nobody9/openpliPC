@@ -49,16 +49,6 @@
 #include "combined_vdr.h"
 
 
-#ifdef HAVE_XINE_GRAB_VIDEO_FRAME
-#ifdef HAVE_JPEGLIB
-#ifdef boolean
-# define HAVE_BOOLEAN
-#endif
-#include <jpeglib.h>
-#undef boolean 
-#endif /*HAVE_JPEGLIB*/
-#endif /*HAVE_XINE_GRAB_VIDEO_FRAME*/
-
 
 #define VDR_MAX_NUM_WINDOWS 16
 #define VDR_ABS_FIFO_DIR "/tmp/vdr-xine"
@@ -191,55 +181,6 @@ typedef struct
 }
 vdr_input_class_t;
 
-
-#ifdef HAVE_XINE_GRAB_VIDEO_FRAME
-#ifdef HAVE_JPEGLIB
-#define JPEGCOMPRESSMEM 500000
-
-typedef struct tJpegCompressData_s {
-  int size;
-  unsigned char *mem;
-} tJpegCompressData;
-
-static void JpegCompressInitDestination(const j_compress_ptr cinfo)
-{
-  tJpegCompressData *jcd = (tJpegCompressData *)cinfo->client_data;
-  if (jcd) {
-     cinfo->dest->free_in_buffer = jcd->size = JPEGCOMPRESSMEM;
-     cinfo->dest->next_output_byte = jcd->mem = 
-       (unsigned char *)malloc(jcd->size);
-     }
-}
-
-static boolean JpegCompressEmptyOutputBuffer(const j_compress_ptr cinfo)
-{
-  tJpegCompressData *jcd = (tJpegCompressData *)cinfo->client_data;
-  if (jcd) {
-     int Used = jcd->size;
-     jcd->size += JPEGCOMPRESSMEM;
-     jcd->mem = (unsigned char *)realloc(jcd->mem, jcd->size);
-     if (jcd->mem) {
-        cinfo->dest->next_output_byte = jcd->mem + Used;
-        cinfo->dest->free_in_buffer = jcd->size - Used;
-        return TRUE;
-        }
-     }
-  return FALSE;
-}
-
-static void JpegCompressTermDestination(const j_compress_ptr cinfo)
-{
-  tJpegCompressData *jcd = (tJpegCompressData *)cinfo->client_data;
-  if (jcd) {
-     int Used = cinfo->dest->next_output_byte - jcd->mem;
-     if (Used < jcd->size) {
-        jcd->size = Used;
-        jcd->mem = (unsigned char *)realloc(jcd->mem, jcd->size);
-        }
-     }
-}
-#endif /*HAVE_JPEGLIB */
-#endif /*HAVE_XINE_GRAB_VIDEO_FRAME*/
 
 
 static int vdr_write(int f, void *b, int n)
@@ -488,12 +429,6 @@ static off_t vdr_execute_rpc_command(vdr_input_plugin_t *this)
 
       if (this->osd_supports_custom_extent && data->w_ref > 0 && data->h_ref > 0)
         xine_osd_set_extent(this->osd[ data->window ].window, data->w_ref, data->h_ref);
- 
-      /*
-       * We use a new object type id for osd objects coming from this input plugin so that
-       * post plugins like autocrop can do special handling
-       */
-      this->osd[ data->window ].window->osd.renderer->event.object.object_type = 2;
     }
     break;
 
@@ -1176,109 +1111,7 @@ t3 = _now();
   case func_grab_image:
     {
       READ_DATA_OR_FAIL(grab_image, lprintf("got GRABIMAGE\n"));
-#ifdef HAVE_XINE_GRAB_VIDEO_FRAME
-      {
-        int size = 0;
-        char *img = NULL;
 
-        result_grab_image_t result_grab_image;
-        memset(&result_grab_image, 0, sizeof(result_grab_image));
-        result_grab_image.header.func = data->header.func;
-        result_grab_image.header.len  = sizeof (result_grab_image);
-
-        xine_grab_video_frame_t *grab_frame = xine_new_grab_video_frame(this->stream);
-        if (grab_frame)
-        {
-          grab_frame->width = data->width;
-          grab_frame->height = data->height;
-          if (!grab_frame->grab(grab_frame))
-          {
-            if (!data->jpeg) /* convert to PNM */
-            {
-              /* allocate memory for result */
-              size_t bytes = grab_frame->width * grab_frame->height * 3;
-              img = malloc(bytes + 64);
-              if (img)
-              {
-                /* PNM header */
-                sprintf(img, "P6\n%d\n%d\n255\n", grab_frame->width, grab_frame->height);
-                int hdrlen = strlen(img);
-
-                /* copy image */
-                xine_fast_memcpy(img + hdrlen, grab_frame->img, bytes);
-
-                size = bytes + hdrlen;
-              }
-            }
-            else /* JPEG */
-            {
-#ifdef HAVE_JPEGLIB
-              /* Compress JPEG */
-              struct jpeg_destination_mgr jdm;
-              struct jpeg_compress_struct cinfo;
-              struct jpeg_error_mgr jerr;
-              tJpegCompressData jcd;
-
-              jdm.init_destination = JpegCompressInitDestination;
-              jdm.empty_output_buffer = JpegCompressEmptyOutputBuffer;
-              jdm.term_destination = JpegCompressTermDestination;
-              cinfo.err = jpeg_std_error(&jerr);
-              jpeg_create_compress(&cinfo);
-              cinfo.dest = &jdm;
-              cinfo.client_data = &jcd;
-              cinfo.image_width = grab_frame->width;
-              cinfo.image_height = grab_frame->height;
-              cinfo.input_components = 3;
-              cinfo.in_color_space = JCS_RGB;
-
-              jpeg_set_defaults(&cinfo);
-              jpeg_set_quality(&cinfo, data->quality, TRUE);
-              jpeg_start_compress(&cinfo, TRUE);
-
-              JSAMPROW rp[grab_frame->height];
-              int rs = grab_frame->width * 3;
-              int k;
-              for (k = 0; k < grab_frame->height; k++)
-                rp[k] = grab_frame->img + k * rs;
-              jpeg_write_scanlines(&cinfo, rp, grab_frame->height);
-
-              jpeg_finish_compress(&cinfo);
-              jpeg_destroy_compress(&cinfo);
-
-              size = jcd.size;
-              img = (char*)jcd.mem;
-#else
-              lprintf("no JPEG support present!\n");
-#endif
-            }
-          }
-
-          if (img && size > 0)
-          {
-            result_grab_image.width       = grab_frame->width;
-            result_grab_image.height      = grab_frame->height;
-          }
-          else
-            size = 0;
-
-          grab_frame->dispose(grab_frame);
-        }
-
-        result_grab_image.header.len  += size;
-
-        int ok = 0;
-        if (sizeof (result_grab_image) == vdr_write(this->fh_result, &result_grab_image, sizeof (result_grab_image)))
-        {
-            if (!size || (size == vdr_write(this->fh_result, img, size)))
-              ok = 1;
-        }
-
-        free(img);
-
-        if (!ok)
-          return -1;
-      }
-#else
       {
         off_t ret_val   = -1;
 
@@ -1327,7 +1160,6 @@ t3 = _now();
         if (ret_val != 0)
           return ret_val;
       }
-#endif /*HAVE_XINE_GRAB_VIDEO_FRAME*/
     }
     break;
 

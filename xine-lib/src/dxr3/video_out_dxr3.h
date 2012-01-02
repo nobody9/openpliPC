@@ -131,7 +131,7 @@ typedef struct dxr3_frame_s {
   vo_frame_t       vo_frame;
   uint32_t         oheight;
   int              aspect, pan_scan;
-  uint8_t         *mem;           /* allocated for YV12 or YUY2 buffers */
+  void            *mem;           /* allocated for YV12 or YUY2 buffers */
   uint8_t         *real_base[3];  /* yuv/yuy2 buffers in mem aligned on 16 */
   int              swap_fields;   /* shifts Y buffer one line to exchange odd/even lines */
 } dxr3_frame_t;

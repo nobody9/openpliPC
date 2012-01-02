@@ -401,7 +401,7 @@ static void process_sequence_mpeg12_dependent_data( vdpau_mpeg12_decoder_t *this
     event.data_length = sizeof(data);
     data.width = sequence->coded_width;
     data.height = sequence->coded_height;
-    data.aspect = sequence->aspect_ratio_information;
+    data.aspect = sequence->ratio;
     xine_event_send( this_gen->stream, &event );
   }
   else if ( sequence->have_header == 2 && sequence->reported_video_step != sequence->video_step ) {
