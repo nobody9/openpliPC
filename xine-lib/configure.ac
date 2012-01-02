@@ -304,30 +304,6 @@ test x"$have_zlib" != x"yes" && AC_MSG_ERROR(zlib needed)
 AC_SUBST(ZLIB_CPPFLAGS)
 AC_SUBST(ZLIB_LIBS)
 
-dnl libjpeg (optional; enabled by default)
-AC_ARG_WITH([jpeglib-prefix], 
-            [AS_HELP_STRING([--with-jpeglib-prefix=PREFIX], [path to jpeg compression library])],
-            [if test x"$withval" != x"no"; then
-                 JPEGLIB_CPPFLAGS="-I$withval/include"
-                 JPEGLIB_LIBS="-L$withval/lib"
-             else
-                 have_jpeglib=no
-             fi])
-if test x"$have_jpeglib" != x"no" ; then
-		AC_CHECK_LIB([jpeg], [jpeg_start_compress],
-		             [JPEGLIB_LIBS="$JPEGLIB_LIBS -ljpeg"
-		              ac_save_CPPFLAGS="$CPPFLAGS" CPPFLAGS="$CPPFLAGS $JPEGLIB_CPPFLAGS"
-		              AC_CHECK_HEADER([jpeglib.h], [have_jpeglib=yes], [have_jpeglib=no])
-		              CPPFLAGS="$ac_save_CPPFLAGS"],
-		             [have_jpeglib=no],
-		             ["$JPEGLIB_LIBS"])
-    if test x"$have_jpeglib" = x"yes"; then
-        AC_DEFINE([HAVE_JPEGLIB], 1, [Define this if you have jpeg library])
-				AC_SUBST(JPEGLIB_CPPFLAGS)
-				AC_SUBST(JPEGLIB_LIBS)
-		fi
-fi
-
 dnl FreeType2 (optional; disabled by default)
 AC_ARG_WITH([freetype],
 	    [AS_HELP_STRING([--with-freetype], [Build with FreeType2 library])],

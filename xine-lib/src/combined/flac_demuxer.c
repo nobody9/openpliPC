@@ -101,13 +101,17 @@ typedef struct demux_flac_class_s {
 static
 #ifdef LEGACY_FLAC
 FLAC__SeekableStreamDecoderReadStatus
-#else
-FLAC__StreamDecoderReadStatus
-#endif
 flac_read_callback (const FLAC__SeekableStreamDecoder *decoder,
                     FLAC__byte buffer[],
                     unsigned *bytes,
                     void *client_data)
+#else
+FLAC__StreamDecoderReadStatus
+flac_read_callback (const FLAC__SeekableStreamDecoder *decoder,
+                    FLAC__byte buffer[],
+                    size_t *bytes,
+                    void *client_data)
+#endif
 {
     demux_flac_t *this    = (demux_flac_t *)client_data;
     input_plugin_t *input = this->input;

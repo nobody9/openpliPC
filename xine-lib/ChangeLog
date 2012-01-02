@@ -1,4 +1,4 @@
-xine-lib (1.1.90) (Unreleased)
+xine-lib (1.2.0) 2012-01-01
   * Add support for VDR.
   * Add support for VDPAU.
   * xine-config is deprecated in favour of pkg-config libxine.
@@ -75,12 +75,12 @@ xine-lib (1.1.21) 2011-??-??
   * Improved syncing of DVB subtitles
   * BluRay support (requires libbluray)
 
-xine-lib (1.1.20.1) 2011-??-??
+xine-lib (1.1.20.1) 2012-01-01
   * Various bug fixes.
   * Use the current ImageMagick API (if using ImageMagick).
   * Fix PVR plugin input building (needs V4L2).
   * Fixes related to unknown audio & subtitle languages.
-  * Memory leak fixes
+  * Memory leak fixes.
 
 xine-lib (1.1.20) 2011-11-13
   * Imagine that there's a large poppy here.

@@ -1808,7 +1808,6 @@ xine_video_port_t *xine_new_framegrab_video_port (xine_t *this) {
   plugin_node_t      *node;
   vo_driver_t        *driver;
   xine_video_port_t  *port;
-  vo_info_t          *vo_info;
   plugin_catalog_t   *catalog = this->plugin_catalog;
   const char         *id;
   int                 list_id, list_size;
@@ -1823,7 +1822,6 @@ xine_video_port_t *xine_new_framegrab_video_port (xine_t *this) {
 
     node = xine_sarray_get (catalog->plugin_lists[PLUGIN_VIDEO_OUT - 1], list_id);
 
-    vo_info = (vo_info_t *)node->info->special_info;
     if (!strcasecmp (node->info->id, id)) {
       driver = _load_video_driver (this, node, NULL);
       break;
@@ -1918,7 +1916,6 @@ ao_driver_t *_x_load_audio_output_plugin (xine_t *this, const char *id)
 {
   plugin_node_t      *node;
   ao_driver_t        *driver = NULL;
-  ao_info_t          *ao_info;
   plugin_catalog_t   *catalog = this->plugin_catalog;
   int                 list_id, list_size;
 
@@ -1928,8 +1925,6 @@ ao_driver_t *_x_load_audio_output_plugin (xine_t *this, const char *id)
   for (list_id = 0; list_id < list_size; list_id++) {
 
     node = xine_sarray_get (this->plugin_catalog->plugin_lists[PLUGIN_AUDIO_OUT - 1], list_id);
-
-    ao_info = (ao_info_t *)node->info->special_info;
 
     if (!strcasecmp(node->info->id, id)) {
       driver = _load_audio_driver (this, node, NULL);

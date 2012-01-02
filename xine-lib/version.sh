@@ -29,8 +29,8 @@
 #   XINE_LT_AGE         the number of previous API versions still supported
 
 XINE_VERSION_MAJOR=1
-XINE_VERSION_MINOR=1
-XINE_VERSION_SUB=90
+XINE_VERSION_MINOR=2
+XINE_VERSION_SUB=0
 XINE_VERSION_PATCH=
 # Release series number (usually $XINE_MAJOR.$XINE_MINOR)
 XINE_VERSION_SERIES=1.2

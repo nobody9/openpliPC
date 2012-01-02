@@ -294,7 +294,7 @@ static void fill_vdpau_pictureinfo_h264(video_decoder_t *this_gen, uint32_t slic
 
 }
 
-int check_progressive(video_decoder_t *this_gen, struct decoded_picture *dpic)
+static int check_progressive(video_decoder_t *this_gen, struct decoded_picture *dpic)
 {
   vdpau_h264_decoder_t *this = (vdpau_h264_decoder_t *)this_gen;
   int progressive = 0;
@@ -378,7 +378,7 @@ static int vdpau_decoder_init(video_decoder_t *this_gen)
   event.data_length = sizeof(data);
   data.width = this->width;
   data.height = this->height;
-  data.aspect = this->ratio>1.77?3:2;
+  data.aspect = this->ratio;
   xine_event_send( this->stream, &event );
 
   switch(this->completed_pic->sps_nal->sps.profile_idc) {

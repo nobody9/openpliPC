@@ -89,6 +89,7 @@ struct ff_video_decoder_s {
 
   xine_stream_t    *stream;
   int64_t           pts;
+  int64_t           last_pts;
   uint64_t          pts_tag_mask;
   uint64_t          pts_tag;
   int               pts_tag_counter;
@@ -329,13 +330,6 @@ static void init_video_codec (ff_video_decoder_t *this, unsigned int codec_type)
   if (this->class->choose_speed_over_accuracy)
     this->context->flags2 |= CODEC_FLAG2_FAST;
 
-#ifdef DEPRECATED_AVCODEC_THREAD_INIT
-  if (this->class->thread_count > 1) {
-    if (this->codec->id != CODEC_ID_SVQ3)
-      this->context->thread_count = this->class->thread_count;
-  }
-#endif 
-
   pthread_mutex_lock(&ffmpeg_lock);
   if (avcodec_open (this->context, this->codec) < 0) {
     pthread_mutex_unlock(&ffmpeg_lock);
@@ -363,13 +357,14 @@ static void init_video_codec (ff_video_decoder_t *this, unsigned int codec_type)
     }
   }
 
-#ifndef DEPRECATED_AVCODEC_THREAD_INIT 
   if (this->class->thread_count > 1) {
     if (this->codec->id != CODEC_ID_SVQ3
-    && avcodec_thread_init(this->context, this->class->thread_count) != -1) 
+#ifndef DEPRECATED_AVCODEC_THREAD_INIT
+	&& avcodec_thread_init(this->context, this->class->thread_count) != -1
+#endif
+	)
       this->context->thread_count = this->class->thread_count;
   }
-#endif 
 
   this->context->skip_loop_filter = skip_loop_filter_enum_values[this->class->skip_loop_filter_enum];
 
@@ -427,6 +422,9 @@ static void init_video_codec (ff_video_decoder_t *this, unsigned int codec_type)
       this->frame_flags |= VO_INTERLACED_FLAG;
       break;
   }
+
+  /* dont want initial AV_NOPTS_VALUE here */
+  this->context->reordered_opaque = 0;
 
 }
 
@@ -1076,6 +1074,52 @@ static void ff_handle_special_buffer (ff_video_decoder_t *this, buf_element_t *b
   }
 }
 
+static uint64_t ff_tag_pts(ff_video_decoder_t *this, uint64_t pts)
+{
+  return pts | this->pts_tag;
+}
+
+static uint64_t ff_untag_pts(ff_video_decoder_t *this, uint64_t pts)
+{
+  if (this->pts_tag_mask == 0)
+    return pts; /* pts tagging inactive */
+
+  if (this->pts_tag != 0 && (pts & this->pts_tag_mask) != this->pts_tag)
+    return 0; /* reset pts if outdated while waiting for first pass (see below) */
+
+  return pts & ~this->pts_tag_mask;
+}
+
+static void ff_check_pts_tagging(ff_video_decoder_t *this, uint64_t pts)
+{
+  if (this->pts_tag_mask == 0)
+    return; /* pts tagging inactive */
+  if ((pts & this->pts_tag_mask) != this->pts_tag) {
+    this->pts_tag_stable_counter = 0;
+    return; /* pts still outdated */
+  }
+
+  /* the tag should be stable for 100 frames */
+  this->pts_tag_stable_counter++;
+
+  if (this->pts_tag != 0) {
+    if (this->pts_tag_stable_counter >= 100) {
+      /* first pass: reset pts_tag */
+      this->pts_tag = 0;
+      this->pts_tag_stable_counter = 0;
+    }
+  } else if (pts == 0)
+    return; /* cannot detect second pass */
+  else {
+    if (this->pts_tag_stable_counter >= 100) {
+      /* second pass: reset pts_tag_mask and pts_tag_counter */
+      this->pts_tag_mask = 0;
+      this->pts_tag_counter = 0;
+      this->pts_tag_stable_counter = 0;
+    }
+  }
+}
+
 static void ff_handle_mpeg12_buffer (ff_video_decoder_t *this, buf_element_t *buf) {
 
   vo_frame_t *img;
@@ -1096,6 +1140,13 @@ static void ff_handle_mpeg12_buffer (ff_video_decoder_t *this, buf_element_t *bu
 
     uint8_t *current;
     int next_flush;
+
+    /* apply valid pts to first frame _starting_ thereafter only */
+    if (this->pts && !this->context->reordered_opaque) {
+      this->context->reordered_opaque = 
+      this->av_frame->reordered_opaque = ff_tag_pts (this, this->pts);
+      this->pts = 0;
+    }
 
     got_picture = 0;
     if (!flush) {
@@ -1178,8 +1229,11 @@ static void ff_handle_mpeg12_buffer (ff_video_decoder_t *this, buf_element_t *bu
         free_img = 0;
       }
 
-      img->pts  = this->pts;
-      this->pts = 0;
+      /* get back reordered pts */
+      img->pts = ff_untag_pts (this, this->av_frame->reordered_opaque);
+      ff_check_pts_tagging (this, this->av_frame->reordered_opaque);
+      this->av_frame->reordered_opaque = 0;
+      this->context->reordered_opaque = 0;
 
       if (this->av_frame->repeat_pict)
         img->duration = this->video_step * 3 / 2;
@@ -1216,52 +1270,6 @@ static void ff_handle_mpeg12_buffer (ff_video_decoder_t *this, buf_element_t *bu
         this->skipframes = img->draw(img, this->stream);
         img->free(img);
       }
-    }
-  }
-}
-
-static uint64_t ff_tag_pts(ff_video_decoder_t *this, uint64_t pts)
-{
-  return pts | this->pts_tag;
-}
-
-static uint64_t ff_untag_pts(ff_video_decoder_t *this, uint64_t pts)
-{
-  if (this->pts_tag_mask == 0)
-    return pts; /* pts tagging inactive */
-
-  if (this->pts_tag != 0 && (pts & this->pts_tag_mask) != this->pts_tag)
-    return 0; /* reset pts if outdated while waiting for first pass (see below) */
-
-  return pts & ~this->pts_tag_mask;
-}
-
-static void ff_check_pts_tagging(ff_video_decoder_t *this, uint64_t pts)
-{
-  if (this->pts_tag_mask == 0)
-    return; /* pts tagging inactive */
-  if ((pts & this->pts_tag_mask) != this->pts_tag) {
-    this->pts_tag_stable_counter = 0;
-    return; /* pts still outdated */
-  }
-
-  /* the tag should be stable for 100 frames */
-  this->pts_tag_stable_counter++;
-
-  if (this->pts_tag != 0) {
-    if (this->pts_tag_stable_counter >= 100) {
-      /* first pass: reset pts_tag */
-      this->pts_tag = 0;
-      this->pts_tag_stable_counter = 0;
-    }
-  } else if (pts == 0)
-    return; /* cannot detect second pass */
-  else {
-    if (this->pts_tag_stable_counter >= 100) {
-      /* second pass: reset pts_tag_mask and pts_tag_counter */
-      this->pts_tag_mask = 0;
-      this->pts_tag_counter = 0;
-      this->pts_tag_stable_counter = 0;
     }
   }
 }
@@ -1591,8 +1599,9 @@ static void ff_decode_data (video_decoder_t *this_gen, buf_element_t *buf) {
         ff_handle_preview_buffer(this, buf);
 
       /* decode */
-      if (buf->pts)
-	this->pts = buf->pts;
+      /* PES: each valid pts shall be used only once */
+      if (buf->pts && (buf->pts != this->last_pts))
+	this->last_pts = this->pts = buf->pts;
 
       if ((buf->type & 0xFFFF0000) == BUF_VIDEO_MPEG) {
 	ff_handle_mpeg12_buffer(this, buf);
