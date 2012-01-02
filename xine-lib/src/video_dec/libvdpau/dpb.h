@@ -81,7 +81,7 @@ struct dpb {
   int max_dpb_frames;
 };
 
-struct dpb* create_dpb(void);
+struct dpb* create_dpb();
 void release_dpb(struct dpb *dpb);
 
 /**

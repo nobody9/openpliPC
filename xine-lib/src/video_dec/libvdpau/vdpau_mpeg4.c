@@ -322,7 +322,7 @@ static void update_metadata( vdpau_mpeg4_decoder_t *this_gen )
   event.data_length = sizeof(data);
   data.width = sequence->coded_width;
   data.height = sequence->coded_height;
-  data.aspect = sequence->ratio;
+  data.aspect = sequence->ratio>1.77?3:2;
   xine_event_send( this_gen->stream, &event );
 }
 
@@ -481,7 +481,7 @@ static void video_object_layer( vdpau_mpeg4_decoder_t *this_gen, uint8_t *buf, i
       sequence->picture.vdp_infos.non_intra_quantizer_matrix[mpeg_scan_norm[j]] = default_non_intra_quantizer_matrix[j];
     }
     if ( picture->vdp_infos.quant_type ) {
-      int val, last = 0;
+      int val, last;
       if ( read_bits( &sequence->br, 1 ) ) { /* load_intra_quant_matrix */
         lprintf("load_intra_quant_matrix\n");
         for ( j=0; j<64; ++j ) {

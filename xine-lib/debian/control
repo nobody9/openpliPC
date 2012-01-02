@@ -25,13 +25,13 @@ Build-Depends: debhelper (>= 5.0.1), binutils (>= 2.12.90.0.9), pkg-config,
 	libsmbclient-dev, libspeex-dev, libmng-dev,
 	libmad0-dev, libmpcdec-dev, libcdio-dev, libvcdinfo-dev,
 	libdvdnav-dev, libdvdread-dev,
-	zlib1g-dev, w3m, xmlto, librsvg2-bin
+	zlib1g-dev, w3m, xmlto, librsvg2-bin, libjpeg62-dev
 Standards-Version: 3.7.2
 
 Package: libxine-dev
 Architecture: any
 Section: libdevel
-Depends: libxine2 (= ${Source-Version}), libc6-dev, zlib1g-dev | libz-dev, libslang2-dev | slang1-dev, libfreetype6-dev, pkg-config
+Depends: libxine2 (= ${Source-Version}), libc6-dev, zlib1g-dev | libz-dev, libjpeg62-dev, libslang2-dev | slang1-dev, libfreetype6-dev, pkg-config
 Conflicts: xine-ui (<< 0.9.10), libxine-dev
 Description: the xine video player library, development packages
  This contains development files (headers, documentation and the like)
