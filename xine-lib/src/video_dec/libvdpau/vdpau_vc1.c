@@ -238,7 +238,7 @@ static void update_metadata( vdpau_vc1_decoder_t *this_gen )
     event.data_length = sizeof(data);
     data.width = sequence->coded_width;
     data.height = sequence->coded_height;
-    data.aspect = sequence->ratio;
+    data.aspect = sequence->ratio>1.77?3:2;
     xine_event_send( this_gen->stream, &event );
   }
 }

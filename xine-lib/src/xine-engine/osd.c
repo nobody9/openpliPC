@@ -558,7 +558,7 @@ static int osd_hide (osd_object_t *osd, int64_t vpts) {
 
   this->stream->xine->port_ticket->release(this->stream->xine->port_ticket, 1);
 
-  return ret;
+  return 1;
 }
 
 

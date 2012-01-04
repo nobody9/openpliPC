@@ -22,7 +22,7 @@
 #define __VDR_H
 
 
-#define XINE_VDR_VERSION 901
+#define XINE_VDR_VERSION 1901
 
 
 enum funcs
@@ -416,6 +416,11 @@ data_set_video_window_t;
 typedef struct __attribute__((packed)) data_grab_image_s
 {
   data_header_t header;
+
+  uint16_t width;
+  uint16_t height;
+  uint16_t jpeg;
+  uint16_t quality;
 }
 data_grab_image_t;
 

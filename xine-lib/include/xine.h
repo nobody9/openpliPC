@@ -1838,7 +1838,6 @@ void xine_config_reset (xine_t *self) XINE_PROTECTED;
 #define XINE_EVENT_SET_VIDEO_STREAMTYPE 501
 #define XINE_EVENT_SET_AUDIO_STREAMTYPE 502
 
-
 /*
  * xine event struct
  */
@@ -1871,6 +1870,7 @@ typedef struct {
   int                 str_len;
   char                str[256]; /* might be longer */
 } xine_ui_data_t;
+
 
 typedef struct {
   int                 pid;
@@ -1954,6 +1954,7 @@ typedef struct {
   int                 enabled;      /* buffer disabled by engine */
   int                 type;         /* 0=buffer put, 1=buffer get */
 } xine_nbc_stats_data_t;
+
 
 typedef struct {
   int64_t             framerate;
@@ -2210,7 +2211,7 @@ void xine_event_send (xine_stream_t *stream, const xine_event_t *event) XINE_PRO
 #define XINE_OSD_CAP_FREETYPE2     0x0001 /* freetype2 support compiled in     */
 #define XINE_OSD_CAP_UNSCALED      0x0002 /* unscaled overlays supp. by vo drv */
 #define XINE_OSD_CAP_CUSTOM_EXTENT 0x0004 /* hardware scaled to match video output window */
-#define XINE_OSD_CAP_ARGB_LAYER    0x0008 /* supports separate true color layer */
+#define XINE_OSD_CAP_ARGB_LAYER    0x0008 /* supports ARGB true color pixmaps */
 #define XINE_OSD_CAP_VIDEO_WINDOW  0x0010 /* can scale video to an area within osd extent */
 
 typedef struct xine_osd_s xine_osd_t;
@@ -2279,13 +2280,12 @@ void        xine_osd_set_palette   (xine_osd_t *self,
 				    const uint8_t *const trans ) XINE_PROTECTED;
 
 /*
- * set an argb buffer to be blended into video
- * the buffer must exactly match the osd dimensions
- * and stay valid while the osd is on screen. pass
- * a NULL pointer to safely remove the buffer from
- * the osd layer. only the dirty area  will be
- * updated on screen. for convinience the whole
- * osd object will be considered dirty when setting
+ * Set an ARGB buffer to be blended into video.
+ * The buffer must stay valid while the OSD is on screen.
+ * Pass a NULL pointer to safely remove the buffer from
+ * the OSD layer. Only the dirty area  will be
+ * updated on screen. For convenience the whole
+ * OSD object will be considered dirty when setting
  * a different buffer pointer.
  * see also XINE_OSD_CAP_ARGB_LAYER
  */
