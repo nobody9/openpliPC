@@ -139,6 +139,13 @@
 #define MY_PI                3.1415926
 #define MY_2PI               6.2831853
 
+typedef struct opengl_argb_layer_s {
+  pthread_mutex_t  mutex;
+  uint32_t        *buffer;
+  /* dirty area */
+  int width;
+  int height;
+} opengl_argb_layer_t;
 
 typedef struct {
   vo_frame_t         vo_frame;
@@ -213,6 +220,7 @@ typedef struct {
   /* Frame state */
   opengl_frame_t    *frame[NUM_FRAMES_BACKLOG];
   x11osd            *xoverlay;
+  opengl_argb_layer_t argb_layer;
   int                ovl_changed;
 
   config_values_t   *config;
@@ -243,6 +251,10 @@ typedef struct {
     enum render_e defaction;
     /* Fallback: change to following render backend if this one doesn't work */
     int fallback;
+    /* Upload new overlay image; Returns 0 if failed */
+    int (*ovl_image)(opengl_driver_t *, opengl_frame_t *);
+    /* Display current overlay */
+    void (*ovl_display)(opengl_driver_t *, opengl_frame_t *);
 } opengl_render_t;
 
 
@@ -269,6 +281,50 @@ static void render_tex2d (opengl_driver_t *this, opengl_frame_t *frame) {
   glTexCoord2f (0,  0);    glVertex2i (x1, y1);
   glTexCoord2f (tx, 0);    glVertex2i (x2, y1);
   glEnd ();
+}
+
+/* Static Overlay display */
+static void render_overlay (opengl_driver_t *this, opengl_frame_t *frame) {
+  int             x1, x2, y1, y2;
+  float           tx, ty;
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+  if (this->tex_width == 0 && this->tex_height == 0) // Image_Pipeline renderer is active (no texture support)
+  {
+    glPixelZoom   (((float)this->sc.output_width)    / this->argb_layer.width,
+	       	 - ((float)this->sc.output_height)   / this->argb_layer.height);
+    glRasterPos2i (this->sc.output_xoffset, this->sc.output_yoffset);
+    glDrawPixels  (this->argb_layer.width, this->argb_layer.height, GL_BGRA,
+		             GL_UNSIGNED_BYTE, this->argb_layer.buffer);
+  }
+  else
+  {
+    if (this->fprog != -1)  // 2D_Tex_Fragprog is active which uses a pixelshader to make yuv2rgb conversion
+	                    // -> disable it because texture is already argb
+      glDisable(MYGL_FRAGMENT_PROGRAM_ARB);
+		    
+    /* Calc texture/rectangle coords */
+    x1 = this->sc.output_xoffset;
+    y1 = this->sc.output_yoffset;
+    x2 = x1 + this->sc.output_width;
+    y2 = y1 + this->sc.output_height;
+    tx = (float) this->argb_layer.width  / this->tex_width;
+    ty = (float) this->argb_layer.height / this->tex_height;
+
+    /* Draw quad */
+    glBegin (GL_QUADS);
+    glTexCoord2f (tx, ty);   glVertex2i (x2, y2);
+    glTexCoord2f (0,  ty);   glVertex2i (x1, y2);
+    glTexCoord2f (0,  0);    glVertex2i (x1, y1);
+    glTexCoord2f (tx, 0);    glVertex2i (x2, y1);
+    glEnd ();
+
+    if (this->fprog != -1)  // enable pixelshader for next normal video frame
+      glEnable(MYGL_FRAGMENT_PROGRAM_ARB);
+  }
+  glDisable(GL_BLEND);
 }
 
 /* Static 2d texture tiled based display */
@@ -552,6 +608,21 @@ static int render_image_tex (opengl_driver_t *this, opengl_frame_t *frame) {
   glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, frame->width, frame->height,
 		   RGB_TEXTURE_FORMAT, GL_UNSIGNED_BYTE,
 		   frame->rgb);
+  return 1;
+}
+
+static int render_overlay_image_tex (opengl_driver_t *this, opengl_frame_t *frame) {
+  int ret;
+
+  ret = render_help_image_tex (this, this->argb_layer.width, this->argb_layer.height,
+                                 4, GL_BGRA);
+
+  if (! ret)
+    return 0;
+
+  glTexSubImage2D (GL_TEXTURE_2D, 0, 4, 0, this->argb_layer.width, this->argb_layer.height,
+                   GL_BGRA, GL_UNSIGNED_BYTE,
+                   this->argb_layer.buffer);
   return 1;
 }
 
@@ -971,20 +1042,20 @@ static int render_setup_fp_yuv (opengl_driver_t *this) {
 /*
  * List of render backends
  */
-/* name, display, image,  setup, needsrgb, defaction, fallback */
+/* name, display, image,  setup, needsrgb, defaction, fallback, ovl_image, ovl_display */
 static const opengl_render_t opengl_rb[] = {
     {   "2D_Tex_Fragprog",  render_tex2d, render_image_fp_yuv,
-	render_setup_fp_yuv, 0, RENDER_NONE, 1 },
+	render_setup_fp_yuv, 0, RENDER_NONE, 1, render_overlay_image_tex, render_overlay },
     {   "2D_Tex",           render_tex2d, render_image_tex,
-	render_setup_tex2d,  1, RENDER_NONE, 2 },
+	render_setup_tex2d,  1, RENDER_NONE, 2, render_overlay_image_tex, render_overlay },
     {   "2D_Tex_Tiled",     render_tex2dtiled, render_image_tiledtex,
-	render_setup_tex2d,  1, RENDER_NONE, 3 },
+	render_setup_tex2d,  1, RENDER_NONE, 3, render_overlay_image_tex, render_overlay },
     {   "Image_Pipeline",   render_draw, render_image_nop,
-	render_setup_2d,     1, RENDER_NONE, -1 },
+	render_setup_2d,     1, RENDER_NONE, -1, render_image_nop, render_overlay },
     {   "Cylinder",         render_cyl, render_image_tex,
-	render_setup_cyl,    1, RENDER_DRAW, 1 },
+	render_setup_cyl,    1, RENDER_DRAW, 1, render_image_nop, render_image_nop },
     {   "Env_Mapped_Torus", render_env_tor, render_image_envtex,
-	render_setup_torus,  1, RENDER_DRAW, 1 }
+	render_setup_torus,  1, RENDER_DRAW, 1, render_image_nop, render_image_nop }
 } ;
 
 
@@ -1064,6 +1135,14 @@ static void *render_run (opengl_driver_t *this) {
 	if (changed)
 	  ret = (render->image) (this, frame);
 	(render->display) (this, frame);
+	// display overlay
+	pthread_mutex_lock (&this->argb_layer.mutex);
+        if (this->argb_layer.buffer)
+        {
+	  ret = (render->ovl_image) (this, frame);
+	  (render->ovl_display) (this, frame);
+	}
+	pthread_mutex_unlock (&this->argb_layer.mutex);
 	if (this->render_double_buffer)
 	  glXSwapBuffers(this->display, this->drawable);
 	else
@@ -1473,6 +1552,9 @@ static void opengl_overlay_blend (vo_driver_t *this_gen,
   opengl_driver_t  *this  = (opengl_driver_t *) this_gen;
   opengl_frame_t   *frame = (opengl_frame_t *) frame_gen;
 
+  if (overlay->width <= 0 || overlay->height <= 0 || (!overlay->rle && (!overlay->argb_layer || !overlay->argb_layer->buffer)))
+    return;
+
   /* Alpha Blend here */
   if (overlay->rle) {
     if (overlay->unscaled) {
@@ -1499,6 +1581,18 @@ static void opengl_overlay_blend (vo_driver_t *this_gen,
 #       error "bad BYTES_PER_PIXEL"
 #     endif
     }
+  }
+  else if (overlay && overlay->argb_layer && overlay->argb_layer->buffer && this->ovl_changed)
+  { 
+	  // copy argb_buffer because it gets invalid after overlay_end and rendering is after overlay_end
+	  pthread_mutex_lock (&this->argb_layer.mutex);
+	  if (this->argb_layer.buffer)
+		free(this->argb_layer.buffer);
+	  this->argb_layer.buffer = calloc(overlay->extent_width * overlay->extent_height, sizeof(uint32_t));
+	  this->argb_layer.width  = overlay->extent_width;
+	  this->argb_layer.height = overlay->extent_height;
+	  xine_fast_memcpy(this->argb_layer.buffer, overlay->argb_layer->buffer, overlay->extent_width * overlay->extent_height * sizeof(uint32_t));
+	  pthread_mutex_unlock (&this->argb_layer.mutex);
   }
 }
 
@@ -1848,6 +1942,9 @@ static vo_driver_t *opengl_open_plugin (video_driver_class_t *class_gen, const v
   this->fprog = -1;
 
   this->xoverlay                = NULL;
+  this->argb_layer.buffer       = NULL;
+  this->argb_layer.width        = 0;
+  this->argb_layer.height       = 0;
   this->ovl_changed             = 0;
   this->xine                    = class->xine;
   this->config                  = config;
