@@ -11,7 +11,7 @@
 
 #include <lib/gdi/xineLib.h>
 
-#define INPUT_MOTION (ExposureMask | KeyPressMask | KeyReleaseMask)
+#define INPUT_MOTION (ExposureMask | KeyPressMask | KeyReleaseMask | StructureNotifyMask)
 
 enum
 {
@@ -59,6 +59,7 @@ public:
 	static double         pixel_aspect;
 	static Display       *display;
 	static Window         window;
+	static int            xpos, ypos;
 
 	gXlibDC();
 	virtual ~gXlibDC();
