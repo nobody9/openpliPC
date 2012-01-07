@@ -12,6 +12,7 @@ Display   *gXlibDC::display;
 Window    gXlibDC::window;
 int       gXlibDC::width, gXlibDC::height;
 double    gXlibDC::pixel_aspect;
+int       gXlibDC::xpos, gXlibDC::ypos;
 
 static const std::string getConfigString(const std::string &key, const std::string &defaultValue)
 {
@@ -61,6 +62,8 @@ gXlibDC::gXlibDC() : m_pump(eApp, 1)
 	fullscreen = getConfigBool("config.pc.default_fullscreen", false);
 	windowWidth  = 720;
 	windowHeight = 576;
+	xpos = 0;
+	ypos = 0;
 
 	ASSERT(instance == 0);
 	instance = this;
@@ -87,7 +90,7 @@ gXlibDC::gXlibDC() : m_pump(eApp, 1)
 	}
 
 	XLockDisplay(display);
- 	window = XCreateSimpleWindow(display, XDefaultRootWindow(display), 0, 0, windowWidth, windowHeight, 0, 0, 0);
+ 	window = XCreateSimpleWindow(display, XDefaultRootWindow(display), xpos, ypos, windowWidth, windowHeight, 0, 0, 0);
 	XSelectInput (display, window, INPUT_MOTION);
 	XMapRaised(display, window);
 	res_h = (DisplayWidth(display, screen) * 1000 / DisplayWidthMM(display, screen));
@@ -266,7 +269,6 @@ void gXlibDC::updateWindowState() {
 		XResizeWindow(display, window, windowWidth, windowHeight);
 
 	XFlush(display);
-
 	xineLib->updateWindowSize(width, height);
 	xineLib->showOsd();
 }
@@ -325,9 +327,33 @@ void gXlibDC::thread()
 				}
 				break;
 			case Expose:
-				xineLib->showOsd();
+			    if(event.xexpose.count != 0)
 				break;
-			}
+			    xineLib->showOsd();
+			    break;
+			case ConfigureNotify:
+			    {
+				   XConfigureEvent& cne = (XConfigureEvent&)event;
+				   Window           tmp_win;
+				   
+				   if((cne.x == 0) && (cne.y == 0)) {
+			                 XLockDisplay(display);
+	        		         XTranslateCoordinates(display, cne.window, DefaultRootWindow(cne.display),
+						                           0, 0, &xpos, &ypos, &tmp_win);
+			                 XUnlockDisplay(display);
+	        	           }
+				   else {
+					xpos = cne.x;
+					ypos = cne.y;
+				   }
+		                   if (!fullscreen){
+					windowWidth  = cne.width;
+					windowHeight = cne.height;
+				   }
+ 				   updateWindowState();	
+			     }
+			     break;				
+			}				
 		}
 	}
 }
@@ -338,8 +364,8 @@ void gXlibDC::frame_output_cb(void *data, int video_width, int video_height, dou
 {
 	*dest_x            = 0;
 	*dest_y            = 0;
-	*win_x             = 0;
-	*win_y             = 0;
+	*win_x             = xpos;
+	*win_y             = ypos;
 	*dest_width        = gXlibDC::width;
 	*dest_height       = gXlibDC::height;
 	*dest_pixel_aspect = gXlibDC::pixel_aspect;
