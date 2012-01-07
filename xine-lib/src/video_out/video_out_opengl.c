@@ -219,9 +219,13 @@ typedef struct {
 
   /* Frame state */
   opengl_frame_t    *frame[NUM_FRAMES_BACKLOG];
+  
+  /* Overlay */
   x11osd            *xoverlay;
   opengl_argb_layer_t argb_layer;
   int                ovl_changed;
+  int                last_ovl_width, last_ovl_height;
+  int                tex_ovl_width, tex_ovl_height; /* independend of frame */
 
   config_values_t   *config;
   xine_t            *xine;
@@ -291,7 +295,7 @@ static void render_overlay (opengl_driver_t *this, opengl_frame_t *frame) {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
-  if (this->tex_width == 0 && this->tex_height == 0) // Image_Pipeline renderer is active (no texture support)
+  if (this->tex_ovl_width == 0 && this->tex_ovl_height == 0) // Image_Pipeline renderer is active (no texture support)
   {
     glPixelZoom   (((float)this->sc.output_width)    / this->argb_layer.width,
 	       	 - ((float)this->sc.output_height)   / this->argb_layer.height);
@@ -301,6 +305,9 @@ static void render_overlay (opengl_driver_t *this, opengl_frame_t *frame) {
   }
   else
   {
+    if (this->glBindTextureEXT) // bind overlay texture
+      this->glBindTextureEXT (GL_TEXTURE_2D, 1000);
+
     if (this->fprog != -1)  // 2D_Tex_Fragprog is active which uses a pixelshader to make yuv2rgb conversion
 	                    // -> disable it because texture is already argb
       glDisable(MYGL_FRAGMENT_PROGRAM_ARB);
@@ -310,8 +317,8 @@ static void render_overlay (opengl_driver_t *this, opengl_frame_t *frame) {
     y1 = this->sc.output_yoffset;
     x2 = x1 + this->sc.output_width;
     y2 = y1 + this->sc.output_height;
-    tx = (float) this->argb_layer.width  / this->tex_width;
-    ty = (float) this->argb_layer.height / this->tex_height;
+    tx = (float) this->argb_layer.width  / this->tex_ovl_width;
+    ty = (float) this->argb_layer.height / this->tex_ovl_height;
 
     /* Draw quad */
     glBegin (GL_QUADS);
@@ -323,6 +330,9 @@ static void render_overlay (opengl_driver_t *this, opengl_frame_t *frame) {
 
     if (this->fprog != -1)  // enable pixelshader for next normal video frame
       glEnable(MYGL_FRAGMENT_PROGRAM_ARB);
+
+    if (this->glBindTextureEXT) // unbind overlay texture  
+      this->glBindTextureEXT (GL_TEXTURE_2D, 0);
   }
   glDisable(GL_BLEND);
 }
@@ -527,6 +537,45 @@ static int render_help_image_tex (opengl_driver_t *this, int new_w, int new_h,
   return 2;
 }
 
+/* holds/allocates extra texture for overlay */
+/* returns 0: allocation failure  1: texture updated  2: texture kept */
+static int render_help_overlay_image_tex(opengl_driver_t *this, int new_w, int new_h,
+				                         GLint glformat, GLint texformat) {
+  int tex_w, tex_h, err;
+
+  /* check necessary texture size and allocate */
+  if (new_w != this->last_ovl_width ||
+      new_h != this->last_ovl_height ||
+      ! this->tex_ovl_width || ! this->tex_ovl_height) {
+    tex_w = tex_h = 16;
+    while (tex_w < new_w)
+      tex_w <<= 1;
+    while (tex_h < new_h)
+      tex_h <<= 1;
+
+    if (tex_w != this->tex_ovl_width || tex_h != this->tex_ovl_height) {
+      char *tmp = calloc (tex_w * tex_h, 4); /* 4 enough until RGBA */
+      if (this->glBindTextureEXT)  // xine code binds without call glGenTextures -> seems to me not correct
+        this->glBindTextureEXT (GL_TEXTURE_2D, 1000);  // bind 1000 to avoid collision with tiledtex textures / don't want to rewrite everything ...
+      glTexParameteri (GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri (GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexImage2D (GL_TEXTURE_2D, 0, glformat, tex_w, tex_h,
+		      0, texformat, GL_UNSIGNED_BYTE, tmp);
+      err = glGetError ();
+      free (tmp);
+      if (err)
+	    return 0;
+      this->tex_ovl_width  = tex_w;
+      this->tex_ovl_height = tex_h;
+      lprintf ("* new texsize: %dx%d\n", tex_w, tex_h);
+    }
+    this->last_ovl_width  = new_w;
+    this->last_ovl_height = new_h;
+    return 1;
+  }
+  return 2;										 
+}
+
 /* returns 0: allocation failure  1: textures updated  2: textures kept */
 static int render_help_image_tiledtex (opengl_driver_t *this,
 				       int new_w, int new_h,
@@ -613,13 +662,16 @@ static int render_image_tex (opengl_driver_t *this, opengl_frame_t *frame) {
 
 static int render_overlay_image_tex (opengl_driver_t *this, opengl_frame_t *frame) {
   int ret;
-
-  ret = render_help_image_tex (this, this->argb_layer.width, this->argb_layer.height,
-                                 4, GL_BGRA);
+  
+  // use own texture
+  ret = render_help_overlay_image_tex (this, this->argb_layer.width, this->argb_layer.height,
+                                       4, GL_BGRA);
 
   if (! ret)
     return 0;
 
+  if (this->glBindTextureEXT)
+    this->glBindTextureEXT (GL_TEXTURE_2D, 1000); 
   glTexSubImage2D (GL_TEXTURE_2D, 0, 4, 0, this->argb_layer.width, this->argb_layer.height,
                    GL_BGRA, GL_UNSIGNED_BYTE,
                    this->argb_layer.buffer);
@@ -1208,6 +1260,7 @@ static void *render_run (opengl_driver_t *this) {
 	}
 	XUnlockDisplay (this->display);
 	this->tex_width = this->tex_height = 0;
+	this->tex_ovl_width = this->tex_ovl_height = 0;
       }
       break;
 
@@ -1946,6 +1999,8 @@ static vo_driver_t *opengl_open_plugin (video_driver_class_t *class_gen, const v
   this->argb_layer.width        = 0;
   this->argb_layer.height       = 0;
   this->ovl_changed             = 0;
+  this->last_ovl_width = this->last_ovl_height = -1;
+  
   this->xine                    = class->xine;
   this->config                  = config;
 
