@@ -225,6 +225,8 @@ void gXlibDC::setResolution(int xres, int yres)
 	if (argb_buffer)
 		delete [] argb_buffer;
 	argb_buffer = new uint32_t[windowWidth*windowHeight];
+	int i;
+	for (i=0; i<windowWidth*windowHeight;i++) argb_buffer[i]= 0xFFFFFF;
 
 	xineLib->newOsd(windowWidth, windowHeight, argb_buffer);
 
@@ -346,11 +348,14 @@ void gXlibDC::thread()
 					xpos = cne.x;
 					ypos = cne.y;
 				   }
-		                   if (!fullscreen){
-					windowWidth  = cne.width;
-					windowHeight = cne.height;
+		           	   if (!fullscreen){
+					 if (cne.width != windowWidth || cne.height != windowHeight)
+					 {
+					   windowWidth  = cne.width;
+					   windowHeight = cne.height;
+					   updateWindowState();
+					 }  
 				   }
- 				   updateWindowState();	
 			     }
 			     break;				
 			}				
