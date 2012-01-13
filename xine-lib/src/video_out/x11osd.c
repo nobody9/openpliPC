@@ -78,6 +78,7 @@ struct x11osd
   Pixmap bitmap;
   Visual *visual;
   Colormap cmap;
+  XImage *argb_img;
 
   GC gc;
 
@@ -96,6 +97,12 @@ x11osd_expose (x11osd * osd)
   assert (osd);
 
   lprintf("expose (state:%d)\n", osd->clean );
+  
+  // copy argb data to bitmap
+  if (osd->argb_img && osd->argb_img->data)
+  {
+     XPutImage(osd->display, osd->bitmap, osd->gc, osd->argb_img, 0, 0, 0, 0, osd->width, osd->height);
+  }
 
   switch (osd->mode) {
     case X11OSD_SHAPED:
@@ -153,6 +160,11 @@ x11osd_resize (x11osd * osd, int width, int height)
 		       osd->width, osd->height, osd->depth);
       break;
   }
+  
+  // resize argb_img data
+  XDestroyImage(osd->argb_img);
+  osd->argb_img = XCreateImage(osd->display, osd->visual, 24, ZPixmap, 0, NULL, osd->width, osd->height, 32, 0);
+  osd->argb_img->data = calloc(osd->width * osd->height, sizeof(uint32_t));
 
   osd->clean = UNDEFINED;
   x11osd_clear(osd);
@@ -224,6 +236,11 @@ x11osd_drawable_changed (x11osd * osd, Window window)
       break;
   }
 
+  // resize argb_img data
+  XDestroyImage(osd->argb_img);
+  osd->argb_img = XCreateImage(osd->display, osd->visual, 24, ZPixmap, 0, NULL, osd->width, osd->height, 32, 0);
+  osd->argb_img->data = calloc(osd->width * osd->height, sizeof(uint32_t));
+
   osd->clean = UNDEFINED;
   /* do not x11osd_clear() here: osd->u.colorkey.sc has not being updated yet */
 }
@@ -267,6 +284,10 @@ x11osd_create (xine_t *xine, Display *display, int screen, Window window, enum x
 
   assert(osd->width);
   assert(osd->height);
+
+  // create image for argb overlay
+  osd->argb_img = XCreateImage(osd->display, osd->visual, 24, ZPixmap, 0, NULL, osd->width, osd->height, 32, 0);
+  osd->argb_img->data = calloc(osd->width * osd->height, sizeof(uint32_t));
 
   switch (mode) {
     case X11OSD_SHAPED:
@@ -395,7 +416,7 @@ x11osd_destroy (x11osd * osd)
     XFreePixmap (osd->display, osd->u.shaped.mask_bitmap);
     XDestroyWindow (osd->display, osd->u.shaped.window);
   }
-
+  XDestroyImage(osd->argb_img);
   free (osd);
 }
 
@@ -546,5 +567,137 @@ void x11osd_blend(x11osd *osd, vo_overlay_t *overlay)
     }
     osd->clean = DRAWN;
   }
+  else if (overlay->argb_layer && overlay->argb_layer->buffer)
+  {
+    osd->argb_img->data = realloc(osd->argb_img->data, osd->width * osd->height * sizeof(uint32_t));
+    
+    x11osd_scale_argb32_image((uint32_t*)overlay->argb_layer->buffer, (uint32_t*)osd->argb_img->data, overlay->extent_width, overlay->extent_height, osd->width, osd->height);
+    
+	  
+	uint32_t bx, by;
+	uint32_t w, h;
+	if(osd->mode==X11OSD_SHAPED) // fill bitmask / if bit is set, the corresponding pixel is drawn to screen
+	{
+	  w= osd->width - overlay->x;
+	  h= osd->height - overlay->y;
+	  for (by= 0; by < h; by++)
+		for (bx= 0; bx < w; bx++)
+		  if (((uint32_t*)osd->argb_img->data)[bx+by*w] != 0xFFFFFF )
+		    XDrawPoint(osd->display, osd->u.shaped.mask_bitmap, osd->u.shaped.mask_gc, bx, by);
+	}    
+
+	osd->clean = DRAWN;
+  }
 }
+
+// adapted algorithm from yuv2rgb.c to scale rgb images
+void x11osd_scale_argb32_image(uint32_t* src, uint32_t* dst, int src_width, int src_height, int dst_width, int dst_height)
+{
+	int step_dx = src_width * 32768 / dst_width;
+	int step_dy = src_height * 32768 / dst_height;
+	int height, dy= 0;
+		
+	if (src_width == dst_width && src_height == dst_height)
+	{
+	  xine_fast_memcpy (dst, src, dst_width*dst_height*4);
+	  return;
+	}
+	
+	for (height = 0;; ) 
+	{
+      x11osd_scale_line (src, dst, dst_width, step_dx);  //scale_line
+      
+      dy += step_dy;
+      dst += dst_width;
+
+      while (--dst_height > 0 && dy < 32768)    // copy scaled line (only enlarging)
+      {
+        xine_fast_memcpy (dst, dst-(dst_width), dst_width*4); // copy last line
+
+	    dy += step_dy;
+	    dst += dst_width;
+      }
+      if (dst_height <= 0)
+	    break;
+
+      do 
+      { // skip at least one line (possibly more if scale factor < 1)
+        dy -= 32768;
+        src += src_width;  
+
+        height++;
+      } while( dy>=32768);
+    }	
+}
+
+// adapted algorithm from yuv2rgb.c to scale single argb line
+void x11osd_scale_line(uint32_t* src, uint32_t* dst, int width, int step)
+{
+  uint32_t p1;
+  uint32_t p2;
+  int dx;
+  
+  p1 = *src++;
+  p2 = *src++;
+  dx = 0;
+  
+  if (step < 32768) {
+    while (width) {
+      *dst = ((((p1 >> 24) * (32768-dx)) + ((p2 >> 24) * dx))>>15) << 24
+           | (((((p1 >> 16) & 0xFF) * (32768-dx)) + (((p2 >> 16) & 0xFF) * dx))>>15) << 16
+           | (((((p1 >>  8) & 0xFF) * (32768-dx)) + (((p2 >>  8) & 0xFF) * dx))>>15) <<  8
+           | (((p1 & 0xFF) * (32768-dx)) + ((p2 & 0xFF) * dx))>>15;
+       
+      dx += step;
+      if (dx > 32768) {
+	dx -= 32768;
+	p1 = p2;
+	p2 = *src++;
+      }
+
+      dst ++;
+      width --;
+    }
+  } else if (step <= 65536) {
+    while (width) {
+      *dst = ((((p1 >> 24) * (32768-dx)) + ((p2 >> 24) * dx))>>15) << 24
+           | (((((p1 >> 16) & 0xFF) * (32768-dx)) + (((p2 >> 16) & 0xFF) * dx))>>15) << 16
+           | (((((p1 >>  8) & 0xFF) * (32768-dx)) + (((p2 >>  8) & 0xFF) * dx))>>15) <<  8
+           | (((p1 & 0xFF) * (32768-dx)) + ((p2 & 0xFF) * dx))>>15;
+
+      dx += step;
+      if (dx > 65536) {
+	dx -= 65536;
+	p1 = *src++;
+	p2 = *src++;
+      } else {
+	dx -= 32768;
+	p1 = p2;
+	p2 = *src++;
+      }
+
+      dst ++;
+      width --;
+    }
+  } else {
+    while (width) {
+      int offs;
+
+      *dst = ((((p1 >> 24) * (32768-dx)) + ((p2 >> 24) * dx))>>15) << 24
+           | (((((p1 >> 16) & 0xFF) * (32768-dx)) + (((p2 >> 16) & 0xFF) * dx))>>15) << 16
+           | (((((p1 >>  8) & 0xFF) * (32768-dx)) + (((p2 >>  8) & 0xFF) * dx))>>15) <<  8
+           | (((p1 & 0xFF) * (32768-dx)) + ((p2 & 0xFF) * dx))>>15;
+
+      dx += step;
+      offs=((dx-1)>>15);
+      dx-=offs<<15;
+      src+=offs-2;
+      p1=*src++;
+      p2=*src++;
+      dst ++;
+      width --;
+    }
+  }
+  
+};
 

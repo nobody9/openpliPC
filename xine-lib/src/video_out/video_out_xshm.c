@@ -689,6 +689,14 @@ static void xshm_overlay_blend (vo_driver_t *this_gen,
       }
     }
   }
+  else if (overlay && overlay->argb_layer && overlay->argb_layer->buffer && this->ovl_changed)
+  {
+	  pthread_mutex_lock (&overlay->argb_layer->mutex); 
+	  LOCK_DISPLAY(this);
+	  x11osd_blend(this->xoverlay, overlay);
+	  UNLOCK_DISPLAY(this);
+	  pthread_mutex_unlock (&overlay->argb_layer->mutex);
+  }
 }
 
 static void clean_output_area (xshm_driver_t *this, xshm_frame_t *frame) {

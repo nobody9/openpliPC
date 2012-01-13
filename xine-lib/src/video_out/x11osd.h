@@ -49,4 +49,8 @@ void x11osd_clear(x11osd *osd);
 
 void x11osd_blend(x11osd *osd, vo_overlay_t *overlay);
 
+void x11osd_scale_argb32_image(uint32_t* src, uint32_t* dst, int src_width, int src_height, int dst_width, int dst_height);
+
+void x11osd_scale_line(uint32_t* src, uint32_t* dst, int width, int step);
+
 #endif
