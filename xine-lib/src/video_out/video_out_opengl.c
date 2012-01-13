@@ -1642,6 +1642,11 @@ static void opengl_overlay_blend (vo_driver_t *this_gen,
 	  if (this->argb_layer.buffer)
 		free(this->argb_layer.buffer);
 	  this->argb_layer.buffer = calloc(overlay->extent_width * overlay->extent_height, sizeof(uint32_t));
+	  if (this->argb_layer.buffer == NULL)
+	  {
+	    printf("Fatal error(opengl_overlay_blend): No memory\n");
+	    return;
+	  }  
 	  this->argb_layer.width  = overlay->extent_width;
 	  this->argb_layer.height = overlay->extent_height;
 	  xine_fast_memcpy(this->argb_layer.buffer, overlay->argb_layer->buffer, overlay->extent_width * overlay->extent_height * sizeof(uint32_t));
@@ -1943,6 +1948,11 @@ static void opengl_dispose (vo_driver_t *this_gen) {
     x11osd_destroy (this->xoverlay);
     XUnlockDisplay (this->display);
   }
+
+  pthread_mutex_lock (&this->argb_layer.mutex);
+  if (this->argb_layer.buffer)
+	free(this->argb_layer.buffer);
+  pthread_mutex_unlock (&this->argb_layer.mutex);
 
   _x_alphablend_free(&this->alphablend_extra_data);
 
