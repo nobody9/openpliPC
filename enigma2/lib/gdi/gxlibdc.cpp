@@ -347,7 +347,7 @@ void gXlibDC::thread()
 					ypos = cne.y;
 				   }
 		                   if (!fullscreen){
-				     if (cne.width != windowWidth && cne.height != windowHeight)
+				     if (cne.width != windowWidth || cne.height != windowHeight)
 				     {
 					windowWidth  = cne.width;
 					windowHeight = cne.height;
