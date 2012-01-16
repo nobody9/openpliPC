@@ -107,7 +107,7 @@ if [ -d $PKG ]; then
 	rm -Rf $PKG
 	rm -f $PKG*
 fi
-git://git.videolan.org/libbluray.git
+git clone git://git.videolan.org/libbluray.git
 cd $PKG
 git checkout $LIB_BLURAY_REF
 autoreconf -vif
