@@ -225,8 +225,7 @@ void gXlibDC::setResolution(int xres, int yres)
 	if (argb_buffer)
 		delete [] argb_buffer;
 	argb_buffer = new uint32_t[windowWidth*windowHeight];
-	int i;
-	for (i=0; i<windowWidth*windowHeight;i++) argb_buffer[i]= 0xFFFFFF;
+	memset(argb_buffer, 0, windowWidth * windowHeight * sizeof(uint32_t));
 
 	xineLib->newOsd(windowWidth, windowHeight, argb_buffer);
 

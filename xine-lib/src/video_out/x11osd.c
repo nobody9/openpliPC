@@ -602,7 +602,7 @@ void x11osd_blend(x11osd *osd, vo_overlay_t *overlay)
 	  h= osd->height - overlay->y;
 	  for (by= 0; by < h; by++)
 		for (bx= 0; bx < w; bx++)
-		  if (((uint32_t*)osd->argb_img->data)[bx+by*w] != 0xFFFFFF )
+		  if ((((uint32_t*)osd->argb_img->data)[bx+by*w] >> 24) != 0 )
 		    XDrawPoint(osd->display, osd->u.shaped.mask_bitmap, osd->u.shaped.mask_gc, bx, by);
 	}    
 
