@@ -53,7 +53,7 @@ enigma2_LDADD = \
 	@PYTHON_LDFLAGS@ \
 	@X11_LIBS@ \
 	@LIBDDVD_LIBS@ \
-	-lcrypt -lnl -lnl-genl -ldvbcsa
+	-lcrypt -lnl -lnl-genl -ldvbcsa -lrt
 
 enigma2_LDFLAGS = -Wl,--export-dynamic
 
