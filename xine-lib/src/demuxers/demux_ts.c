@@ -2229,30 +2229,8 @@ static void demux_ts_parse_packet (demux_ts_t*this) {
   }
 
   /* PAT */
-  if (pid == 0) {
-    demux_ts_parse_pat(this, originalPkt, originalPkt+data_offset-4,
-		       payload_unit_start_indicator);
-    return;
-  }
-
   /* PMT */
-  program_count=0;
-  while ((this->program_number[program_count] != INVALID_PROGRAM) &&
-         (program_count < MAX_PMTS)) {
-    if (pid == this->pmt_pid[program_count]) {
-
-#ifdef TS_LOG
-      printf ("demux_ts: PMT prog: 0x%.4x pid: 0x%.4x\n",
-              this->program_number[program_count],
-              this->pmt_pid[program_count]);
-#endif
-      demux_ts_parse_pmt (this, originalPkt, originalPkt+data_offset-4,
-                          payload_unit_start_indicator,
-                          program_count);
-      return;
-    }
-    program_count++;
-  }
+  // PAT and PMT are not processed for openpliPC. PIDs are recognized in E2
 
   data_len = PKT_SIZE - data_offset;
 
@@ -2314,6 +2292,7 @@ static void demux_ts_parse_packet (demux_ts_t*this) {
 static void demux_ts_event_handler (demux_ts_t *this) {
 
   xine_event_t *event;
+  int           mi;
 
   while ((event = xine_event_get (this->event_queue))) {
 
@@ -2324,13 +2303,37 @@ static void demux_ts_event_handler (demux_ts_t *this) {
       /* flush all streams */
       demux_ts_flush(this);
       /* fall thru */
-
+      break;
+      
     case XINE_EVENT_PIDS_CHANGE:
-
-      demux_ts_dynamic_pmt_clear(this);
+      demux_ts_dynamic_pmt_clear(this); 
       this->send_newpts = 1;
       _x_demux_control_start (this->stream);
       break;
+      
+    case XINE_EVENT_SET_VIDEO_STREAMTYPE:
+      printf("RECEIVED XINE_EVENT_SET_VIDEO_STREAMTYPE\n");
+ 
+      if (event->data) {
+        xine_streamtype_data_t* data = (xine_streamtype_data_t*)event->data;
+
+        mi = demux_ts_dynamic_pmt_find (this, data->pid, BUF_VIDEO_BASE, data->streamtype);
+        if (mi >= 0) {
+          this->videoPid = data->pid;
+          this->videoMedia = mi;
+        }
+      }
+      break;
+
+    case XINE_EVENT_SET_AUDIO_STREAMTYPE:
+      printf("RECEIVED XINE_EVENT_SET_AUDIO_STREAMTYPE\n");
+
+      if (event->data) {
+        xine_streamtype_data_t* data = (xine_streamtype_data_t*)event->data;
+
+        mi = demux_ts_dynamic_pmt_find (this, data->pid, BUF_AUDIO_BASE, data->streamtype);
+      }
+      break;  
 
     }
 
