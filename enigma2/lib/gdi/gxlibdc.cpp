@@ -225,6 +225,7 @@ void gXlibDC::setResolution(int xres, int yres)
 	if (argb_buffer)
 		delete [] argb_buffer;
 	argb_buffer = new uint32_t[windowWidth*windowHeight];
+	memset(argb_buffer, 0, windowWidth * windowHeight * sizeof(uint32_t));
 
 	xineLib->newOsd(windowWidth, windowHeight, argb_buffer);
 
@@ -238,7 +239,8 @@ void gXlibDC::setResolution(int xres, int yres)
 	m_surface.offset = 0;
 
 	m_pixmap = new gPixmap(&m_surface);
-
+    
+	XResizeWindow(display, window, windowWidth, windowHeight);
 	updateWindowState();
 }
 
@@ -251,6 +253,15 @@ void gXlibDC::updateWindowState() {
 		height = windowHeight;
 	}
 
+	XFlush(display);
+	xineLib->updateWindowSize(width, height);
+	xineLib->showOsd();
+}
+
+void gXlibDC::fullscreen_switch() {
+	printf("FULLSCREEN EVENT\n");
+	fullscreen ^= 1;
+	
 	XEvent xev;
 	Atom wm_state = XInternAtom(display, "_NET_WM_STATE", False);
 	Atom fullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
@@ -264,18 +275,7 @@ void gXlibDC::updateWindowState() {
 	xev.xclient.data.l[1] = fullscreenAtom;
 	xev.xclient.data.l[2] = 0;
 	XSendEvent(display, XDefaultRootWindow(display), False, SubstructureNotifyMask, &xev);
-
-	if (!fullscreen)
-		XResizeWindow(display, window, windowWidth, windowHeight);
-
-	XFlush(display);
-	xineLib->updateWindowSize(width, height);
-	xineLib->showOsd();
-}
-
-void gXlibDC::fullscreen_switch() {
-	printf("FULLSCREEN EVENT\n");
-	fullscreen ^= 1;
+	
 	updateWindowState();
 }
 
@@ -346,13 +346,13 @@ void gXlibDC::thread()
 					xpos = cne.x;
 					ypos = cne.y;
 				   }
-		                   if (!fullscreen){
-				     if (cne.width != windowWidth || cne.height != windowHeight)
-				     {
-					windowWidth  = cne.width;
-					windowHeight = cne.height;
-					updateWindowState();
-				     }
+		           	   if (!fullscreen){
+					 if (cne.width != windowWidth || cne.height != windowHeight)
+					 {
+					   windowWidth  = cne.width;
+					   windowHeight = cne.height;
+					   updateWindowState();
+					 }  
 				   }
 			     }
 			     break;				
