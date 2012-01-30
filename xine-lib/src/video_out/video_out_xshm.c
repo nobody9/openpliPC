@@ -116,6 +116,7 @@ typedef struct {
   xshm_frame_t      *cur_frame;
   x11osd            *xoverlay;
   int                ovl_changed;
+  int                video_window_width, video_window_height, video_window_x, video_window_y;
 
   int (*x11_old_error_handler)  (Display *, XErrorEvent *);
 
@@ -505,13 +506,28 @@ static void xshm_update_frame_format (vo_driver_t *this_gen,
 
   if ((frame->sc.gui_width != gui_width) ||
       (frame->sc.gui_height != gui_height) ||
+      (this->video_window_width && this->video_window_height) ||
       do_adapt) {
 
     do_adapt = 1;
-    frame->sc.gui_width  = gui_width;
-    frame->sc.gui_height = gui_height;
+    if (this->video_window_width && this->video_window_height)
+    {
+      frame->sc.gui_width  = this->video_window_width;
+      frame->sc.gui_height = this->video_window_height;
+    } 
+    else
+    {
+      frame->sc.gui_width  = gui_width;
+      frame->sc.gui_height = gui_height;
+    }
 
     xshm_compute_rgb_size (this, frame);
+    
+    if (this->video_window_width && this->video_window_height)
+    {
+      frame->sc.output_xoffset+= this->video_window_x;
+      frame->sc.output_yoffset+= this->video_window_y;
+    }  
 
     lprintf ("gui_size has changed => adapt\n");
   }
@@ -691,11 +707,15 @@ static void xshm_overlay_blend (vo_driver_t *this_gen,
   }
   else if (overlay && overlay->argb_layer && overlay->argb_layer->buffer && this->ovl_changed)
   {
-	  pthread_mutex_lock (&overlay->argb_layer->mutex); 
-	  LOCK_DISPLAY(this);
-	  x11osd_blend(this->xoverlay, overlay);
-	  UNLOCK_DISPLAY(this);
-	  pthread_mutex_unlock (&overlay->argb_layer->mutex);
+    pthread_mutex_lock (&overlay->argb_layer->mutex); 
+    LOCK_DISPLAY(this);
+    x11osd_blend(this->xoverlay, overlay);
+    UNLOCK_DISPLAY(this);
+    pthread_mutex_unlock (&overlay->argb_layer->mutex);
+    this->video_window_width  = overlay->video_window_width;
+    this->video_window_height = overlay->video_window_height;
+    this->video_window_x      = overlay->video_window_x;
+    this->video_window_y      = overlay->video_window_y;
   }
 }
 
@@ -710,7 +730,7 @@ static void clean_output_area (xshm_driver_t *this, xshm_frame_t *frame) {
   for( i = 0; i < 4; i++ ) {
     if( this->sc.border[i].w && this->sc.border[i].h )
       XFillRectangle(this->display, this->drawable, this->gc,
-                     this->sc.border[i].x, this->sc.border[i].y,
+                     this->sc.border[i].x + this->video_window_x, this->sc.border[i].y + this->video_window_y,
                      this->sc.border[i].w, this->sc.border[i].h);
   }
   if (this->xoverlay) {
@@ -1115,6 +1135,10 @@ static vo_driver_t *xshm_open_plugin_2 (video_driver_class_t *class_gen, const v
   UNLOCK_DISPLAY(this);
   this->xoverlay                = NULL;
   this->ovl_changed             = 0;
+  this->video_window_width      = 0;
+  this->video_window_height     = 0;
+  this->video_window_x          = 0;
+  this->video_window_y          = 0;
 
   this->x11_old_error_handler = NULL;
   this->xine                  = class->xine;

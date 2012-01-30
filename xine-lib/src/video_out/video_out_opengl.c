@@ -145,6 +145,7 @@ typedef struct opengl_argb_layer_s {
   /* dirty area */
   int width;
   int height;
+  int changed;
 } opengl_argb_layer_t;
 
 typedef struct {
@@ -226,6 +227,7 @@ typedef struct {
   int                ovl_changed;
   int                last_ovl_width, last_ovl_height;
   int                tex_ovl_width, tex_ovl_height; /* independend of frame */
+  int                video_window_width, video_window_height, video_window_x, video_window_y;
 
   config_values_t   *config;
   xine_t            *xine;
@@ -272,10 +274,21 @@ static void render_tex2d (opengl_driver_t *this, opengl_frame_t *frame) {
   float           tx, ty;
 
   /* Calc texture/rectangle coords */
-  x1 = this->sc.output_xoffset;
-  y1 = this->sc.output_yoffset;
-  x2 = x1 + this->sc.output_width;
-  y2 = y1 + this->sc.output_height;
+  if (this->video_window_width && this->video_window_height) // video is displayed in a small window
+  {
+    x1 = this->video_window_x;
+    y1 = this->video_window_y;
+    x2 = x1 + this->video_window_width;
+    y2 = y1 + this->video_window_height;
+  }
+  else
+  {
+    x1 = this->sc.output_xoffset;
+    y1 = this->sc.output_yoffset;
+    x2 = x1 + this->sc.output_width;
+    y2 = y1 + this->sc.output_height;
+  }
+  
   tx = (float) frame->width  / this->tex_width;
   ty = (float) frame->height / this->tex_height;
   /* Draw quad */
@@ -297,9 +310,9 @@ static void render_overlay (opengl_driver_t *this, opengl_frame_t *frame) {
   
   if (this->tex_ovl_width == 0 && this->tex_ovl_height == 0) // Image_Pipeline renderer is active (no texture support)
   {
-    glPixelZoom   (((float)this->sc.output_width)    / this->argb_layer.width,
-	       	 - ((float)this->sc.output_height)   / this->argb_layer.height);
-    glRasterPos2i (this->sc.output_xoffset, this->sc.output_yoffset);
+    glPixelZoom   (((float)this->gui_width)    / this->argb_layer.width,
+	       	 - ((float)this->gui_height)   / this->argb_layer.height);
+    glRasterPos2i (0, 0);
     glDrawPixels  (this->argb_layer.width, this->argb_layer.height, GL_BGRA,
 		             GL_UNSIGNED_BYTE, this->argb_layer.buffer);
   }
@@ -313,10 +326,10 @@ static void render_overlay (opengl_driver_t *this, opengl_frame_t *frame) {
       glDisable(MYGL_FRAGMENT_PROGRAM_ARB);
 		    
     /* Calc texture/rectangle coords */
-    x1 = this->sc.output_xoffset;
-    y1 = this->sc.output_yoffset;
-    x2 = x1 + this->sc.output_width;
-    y2 = y1 + this->sc.output_height;
+    x1 = 0;
+    y1 = 0;
+    x2 = this->gui_width;
+    y2 = this->gui_height;
     tx = (float) this->argb_layer.width  / this->tex_ovl_width;
     ty = (float) this->argb_layer.height / this->tex_ovl_height;
 
@@ -348,10 +361,20 @@ static void render_tex2dtiled (opengl_driver_t *this, opengl_frame_t *frame) {
   frame_w = frame->width;
   frame_h = frame->height;
   /* Calc texture/rectangle coords */
-  x1 = this->sc.output_xoffset;
-  y1 = this->sc.output_yoffset;
-  x2 = x1 + this->sc.output_width;
-  y2 = y1 + this->sc.output_height;
+  if (this->video_window_width && this->video_window_height) // video is displayed in a small window
+  {
+    x1 = this->video_window_x;
+    y1 = this->video_window_y;
+    x2 = x1 + this->video_window_width;
+    y2 = y1 + this->video_window_height;
+  }
+  else
+  {
+    x1 = this->sc.output_xoffset;
+    y1 = this->sc.output_yoffset;
+    x2 = x1 + this->sc.output_width;
+    y2 = y1 + this->sc.output_height;
+  }
   txa = 1.0 / tex_w;
   tya = 1.0 / tex_h;
   txb = (float) frame_w / (tex_w-2);	/* temporary: total */
@@ -382,11 +405,23 @@ static void render_tex2dtiled (opengl_driver_t *this, opengl_frame_t *frame) {
 
 /* Static image pipline based display */
 static void render_draw (opengl_driver_t *this, opengl_frame_t *frame) {
-  glPixelZoom   (((float)this->sc.output_width)    / frame->width,
-		 - ((float)this->sc.output_height) / frame->height);
-  glRasterPos2i (this->sc.output_xoffset, this->sc.output_yoffset);
-  glDrawPixels  (frame->width, frame->height, RGB_TEXTURE_FORMAT,
-		 GL_UNSIGNED_BYTE, frame->rgb);
+	
+  if (this->video_window_width && this->video_window_height) // video is displayed in a small window
+  {
+    glPixelZoom(((float)this->video_window_width)  / frame->width,
+              - ((float)this->video_window_height) / frame->height);
+    glRasterPos2i(this->video_window_x, this->video_window_y);
+    glDrawPixels (frame->width, frame->height, RGB_TEXTURE_FORMAT,
+                  GL_UNSIGNED_BYTE, frame->rgb);
+  }
+  else
+  {
+    glPixelZoom(((float)this->sc.output_width)  / frame->width,
+              - ((float)this->sc.output_height) / frame->height);
+    glRasterPos2i(this->sc.output_xoffset, this->sc.output_yoffset);
+    glDrawPixels (frame->width, frame->height, RGB_TEXTURE_FORMAT,
+                  GL_UNSIGNED_BYTE, frame->rgb);
+  }
 }
 
 /* Animated spinning cylinder */
@@ -1185,20 +1220,27 @@ static void *render_run (opengl_driver_t *this) {
 	CHECKERR ("pre-render");
 	ret = 1;
 	if (changed)
+	  if (this->argb_layer.changed) // clean window after every overlay change - do it twice because of double buffering
+	  {
+      glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+      if (this->argb_layer.changed == 1) 
+        this->argb_layer.changed++;
+      else this->argb_layer.changed = 0;
+    }
 	  ret = (render->image) (this, frame);
-	(render->display) (this, frame);
-	// display overlay
-	pthread_mutex_lock (&this->argb_layer.mutex);
-        if (this->argb_layer.buffer)
-        {
-	  ret = (render->ovl_image) (this, frame);
-	  (render->ovl_display) (this, frame);
-	}
-	pthread_mutex_unlock (&this->argb_layer.mutex);
-	if (this->render_double_buffer)
-	  glXSwapBuffers(this->display, this->drawable);
-	else
-	  glFlush ();
+    (render->display) (this, frame);
+    // display overlay
+    pthread_mutex_lock (&this->argb_layer.mutex);
+    if (this->argb_layer.buffer)
+    {
+      ret = (render->ovl_image) (this, frame);
+      (render->ovl_display) (this, frame);
+    }
+    pthread_mutex_unlock (&this->argb_layer.mutex);
+    if (this->render_double_buffer)
+      glXSwapBuffers(this->display, this->drawable);
+    else
+      glFlush ();
 	/* Note: no glFinish() - work concurrently to the graphics pipe */
 	CHECKERR ("post-render");
 	XUnlockDisplay (this->display);
@@ -1637,20 +1679,25 @@ static void opengl_overlay_blend (vo_driver_t *this_gen,
   }
   else if (overlay && overlay->argb_layer && overlay->argb_layer->buffer && this->ovl_changed)
   { 
-	  // copy argb_buffer because it gets invalid after overlay_end and rendering is after overlay_end
-	  pthread_mutex_lock (&this->argb_layer.mutex);
-	  if (this->argb_layer.buffer)
-		free(this->argb_layer.buffer);
-	  this->argb_layer.buffer = calloc(overlay->extent_width * overlay->extent_height, sizeof(uint32_t));
-	  if (this->argb_layer.buffer == NULL)
-	  {
-	    printf("Fatal error(opengl_overlay_blend): No memory\n");
-	    return;
-	  }  
-	  this->argb_layer.width  = overlay->extent_width;
-	  this->argb_layer.height = overlay->extent_height;
-	  xine_fast_memcpy(this->argb_layer.buffer, overlay->argb_layer->buffer, overlay->extent_width * overlay->extent_height * sizeof(uint32_t));
-	  pthread_mutex_unlock (&this->argb_layer.mutex);
+    // copy argb_buffer because it gets invalid after overlay_end and rendering is after overlay_end
+    pthread_mutex_lock (&this->argb_layer.mutex);
+    if (this->argb_layer.buffer)
+      free(this->argb_layer.buffer);
+    this->argb_layer.buffer = calloc(overlay->extent_width * overlay->extent_height, sizeof(uint32_t));
+    if (this->argb_layer.buffer == NULL)
+    {
+      printf("Fatal error(opengl_overlay_blend): No memory\n");
+      return;
+    }
+    this->argb_layer.width  = overlay->extent_width;
+    this->argb_layer.height = overlay->extent_height;
+    this->argb_layer.changed= 1;
+    xine_fast_memcpy(this->argb_layer.buffer, overlay->argb_layer->buffer, overlay->extent_width * overlay->extent_height * sizeof(uint32_t));
+    pthread_mutex_unlock (&this->argb_layer.mutex);
+    this->video_window_width  = overlay->video_window_width;
+    this->video_window_height = overlay->video_window_height;
+    this->video_window_x      = overlay->video_window_x;
+    this->video_window_y      = overlay->video_window_y;
   }
 }
 
@@ -2008,8 +2055,13 @@ static vo_driver_t *opengl_open_plugin (video_driver_class_t *class_gen, const v
   this->argb_layer.buffer       = NULL;
   this->argb_layer.width        = 0;
   this->argb_layer.height       = 0;
+  this->argb_layer.changed      = 0;
   this->ovl_changed             = 0;
   this->last_ovl_width = this->last_ovl_height = -1;
+  this->video_window_width      = 0;
+  this->video_window_height     = 0;
+  this->video_window_x          = 0;
+  this->video_window_y          = 0;
   
   this->xine                    = class->xine;
   this->config                  = config;
