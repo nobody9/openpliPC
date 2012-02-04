@@ -1,6 +1,6 @@
 from config import config, ConfigSlider, ConfigSelection, ConfigYesNo, \
 	ConfigEnableDisable, ConfigSubsection, ConfigBoolean, ConfigSelectionNumber, ConfigNothing, NoSave
-from enigma import eAVSwitch, getDesktop
+from enigma import eAVSwitch, getDesktop, eEnv
 from SystemInfo import SystemInfo
 import os
 
@@ -24,7 +24,7 @@ class AVSwitch:
 			return (4,3)
 		elif valstr == "16_9": # auto ... 4:3 or 16:9
 			try:
-				aspect_str = open("/usr/local/e2/etc/stb/vmpeg/0/aspect", "r").read()
+				aspect_str = open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/aspect"), "r").read()
 				if aspect_str == "1": # 4:3
 					return (4,3)
 			except IOError:
@@ -146,14 +146,14 @@ def InitAVSwitch():
 	SystemInfo["ScartSwitch"] = eAVSwitch.getInstance().haveScartSwitch()
 
 	try:
-		can_downmix = open("/usr/local/e2/etc/stb/audio/ac3_choices", "r").read()[:-1].find("downmix") != -1
+		can_downmix = open(eEnv.resolve("${sysconfdir}/stb/audio/ac3_choices"), "r").read()[:-1].find("downmix") != -1
 	except:
 		can_downmix = False
 
 	SystemInfo["CanDownmixAC3"] = can_downmix
 	if can_downmix:
 		def setAC3Downmix(configElement):
-			open("/usr/local/e2/etc/stb/audio/ac3", "w").write(configElement.value and "downmix" or "passthrough")
+			open(eEnv.resolve("${sysconfdir}/stb/audio/ac3"), "w").write(configElement.value and "downmix" or "passthrough")
 		config.av.downmix_ac3 = ConfigYesNo(default = True)
 		config.av.downmix_ac3.addNotifier(setAC3Downmix)
 
@@ -161,7 +161,7 @@ def InitAVSwitch():
 	SystemInfo["CanDownmixDTS"] = can_downmix
 	if can_downmix:
 		def setDTSDownmix(configElement):
-			open("/usr/local/e2/etc/stb/dts_mode", "w").write(configElement.value and "downmix" or "passthrough")
+			open(eEnv.resolve("${sysconfdir}/stb/dts_mode"), "w").write(configElement.value and "downmix" or "passthrough")
 			try:
 				os.unlink('/home/root/.gstreamer-0.10/registry.mipsel.bin')
 			except:
@@ -170,26 +170,26 @@ def InitAVSwitch():
 		config.av.downmix_dts.addNotifier(setDTSDownmix)
 
 	try:
-		can_osd_alpha = open("/usr/local/e2/etc/stb/video/alpha", "r") and True or False
+		can_osd_alpha = open(eEnv.resolve("${sysconfdir}/stb/video/alpha"), "r") and True or False
 	except:
 		can_osd_alpha = False
 
 	SystemInfo["CanChangeOsdAlpha"] = can_osd_alpha
 
 	def setAlpha(config):
-		open("/usr/local/e2/etc/stb/video/alpha", "w").write(str(config.value))
+		open(eEnv.resolve("${sysconfdir}/stb/video/alpha"), "w").write(str(config.value))
 
 	if can_osd_alpha:
 		config.av.osd_alpha = ConfigSlider(default=255, limits=(0,255))
 		config.av.osd_alpha.addNotifier(setAlpha)
 
-	if os.path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness"):
+	if os.path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_scaler_sharpness")):
 		def setScaler_sharpness(config):
 			myval = int(config.value)
 			try:
 				print "--> setting scaler_sharpness to: %0.8X" % myval
-				open("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
-				open("/usr/local/e2/etc/stb/vmpeg/0/pep_apply", "w").write("1")
+				open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_scaler_sharpness"), "w").write("%0.8X" % myval)
+				open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_apply"), "w").write("1")
 			except IOError:
 				print "couldn't write pep_scaler_sharpness"
 

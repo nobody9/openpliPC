@@ -75,8 +75,8 @@ eDBoxLCD::eDBoxLCD()
 	lcdfd = open("/dev/dbox/oled0", O_RDWR);
 	if (lcdfd < 0)
 	{
-		if (!access("/usr/local/e2/etc/stb/lcd/oled_brightness", W_OK) ||
-		    !access("/usr/local/e2/etc/stb/fp/oled_brightness", W_OK) )
+		if (!access(eEnv::resolve("${sysconfdir}/stb/lcd/oled_brightness").c_str(), W_OK) ||
+		    !access(eEnv::resolve("${sysconfdir}/stb/fp/oled_brightness").c_str(), W_OK) )
 			is_oled = 2;
 		lcdfd = open("/dev/dbox/lcd0", O_RDWR);
 	} else
@@ -92,20 +92,20 @@ eDBoxLCD::eDBoxLCD()
 		int i=LCD_MODE_BIN;
 		ioctl(lcdfd, LCD_IOCTL_ASC_MODE, &i);
 		inverted=0;
-		FILE *f = fopen("/usr/local/e2/etc/stb/lcd/xres", "r");
+		FILE *f = fopen(eEnv::resolve("${sysconfdir}/stb/lcd/xres").c_str(), "r");
 		if (f)
 		{
 			int tmp;
 			if (fscanf(f, "%x", &tmp) == 1)
 				xres = tmp;
 			fclose(f);
-			f = fopen("/usr/local/e2/etc/stb/lcd/yres", "r");
+			f = fopen(eEnv::resolve("${sysconfdir}/stb/lcd/yres").c_str(), "r");
 			if (f)
 			{
 				if (fscanf(f, "%x", &tmp) == 1)
 					yres = tmp;
 				fclose(f);
-				f = fopen("/usr/local/e2/etc/stb/lcd/bpp", "r");
+				f = fopen(eEnv::resolve("${sysconfdir}/stb/lcd/bpp").c_str(), "r");
 				if (f)
 				{
 					if (fscanf(f, "%x", &tmp) == 1)
@@ -151,13 +151,16 @@ int eDBoxLCD::setLCDBrightness(int brightness)
 {
 #ifndef NO_LCD
 	eDebug("setLCDBrightness %d", brightness);
-	FILE *f=fopen("/usr/local/e2/etc/stb/lcd/oled_brightness", "w");
+	FILE *f=fopen(eEnv::resolve("${sysconfdir}/stb/lcd/oled_brightness").c_str(), "w");
 	if (!f)
-		f = fopen("/usr/local/e2/etc/stb/fp/oled_brightness", "w");
+		f = fopen(eEnv::resolve("${sysconfdir}/stb/fp/oled_brightness").c_str(), "w");
 	if (f)
 	{
 		if (fprintf(f, "%d", brightness) == 0)
-			eDebug("write /usr/local/e2/etc/stb/lcd/oled_brightness failed!! (%m)");
+		{
+			std::string err= "write " + eEnv::resolve("${sysconfdir}/stb/lcd/oled_brightness") + " failed!! (%m)";
+			eDebug(err.c_str());
+		}
 		fclose(f);
 	}
 	else

@@ -1,10 +1,11 @@
 from fcntl import ioctl
 from struct import pack, unpack
+from enigma import eEnv
 
 def getFPVersion():
 	ret = None
 	try:
-		ret = long(open("/usr/local/e2/etc/stb/fp/version", "r").read())
+		ret = long(open(eEnv.resolve("${sysconfdir}/stb/fp/version"), "r").read())
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
@@ -15,7 +16,7 @@ def getFPVersion():
 
 def setFPWakeuptime(wutime):
 	try:
-		open("/usr/local/e2/etc/stb/fp/wakeup_time", "w").write(str(wutime))
+		open(eEnv.resolve("${sysconfdir}/stb/fp/wakeup_time"), "w").write(str(wutime))
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
@@ -25,7 +26,7 @@ def setFPWakeuptime(wutime):
 
 def setRTCtime(wutime):
 	try:
-		open("/usr/local/e2/etc/stb/fp/rtc", "w").write(str(wutime))
+		open(eEnv.resolve("${sysconfdir}/stb/fp/rtc"), "w").write(str(wutime))
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
@@ -36,7 +37,7 @@ def setRTCtime(wutime):
 def getFPWakeuptime():
 	ret = 0
 	try:
-		ret = long(open("/usr/local/e2/etc/stb/fp/wakeup_time", "r").read())
+		ret = long(open(eEnv.resolve("${sysconfdir}/stb/fp/wakeup_time"), "r").read())
 	except IOError:
 		try:
 			fp = open("/dev/dbox/fp0")
@@ -53,7 +54,7 @@ def getFPWasTimerWakeup():
 		return wasTimerWakeup
 	wasTimerWakeup = False
 	try:
-		wasTimerWakeup = int(open("/usr/local/e2/etc/stb/fp/was_timer_wakeup", "r").read()) and True or False
+		wasTimerWakeup = int(open(eEnv.resolve("${sysconfdir}/stb/fp/was_timer_wakeup"), "r").read()) and True or False
 	except:
 		try:
 			fp = open("/dev/dbox/fp0")
@@ -67,7 +68,7 @@ def getFPWasTimerWakeup():
 
 def clearFPWasTimerWakeup():
 	try:
-		open("/usr/local/e2/etc/stb/fp/was_timer_wakeup", "w").write('0')
+		open(eEnv.resolve("${sysconfdir}/stb/fp/was_timer_wakeup"), "w").write('0')
 	except:
 		try:
 			fp = open("/dev/dbox/fp0")

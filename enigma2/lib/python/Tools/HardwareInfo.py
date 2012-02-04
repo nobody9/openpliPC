@@ -1,3 +1,5 @@
+from enigma import eEnv
+
 class HardwareInfo:
 	device_name = None
 	device_version = None
@@ -9,7 +11,7 @@ class HardwareInfo:
 
 		HardwareInfo.device_name = "unknown"
 		try:
-			file = open("/usr/local/e2/etc/stb/info/model", "r")
+			file = open(eEnv.resolve("${sysconfdir}/stb/info/model"), "r")
 			HardwareInfo.device_name = file.readline().strip()
 			file.close()
 			try:

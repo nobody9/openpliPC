@@ -1,6 +1,7 @@
 from Components.config import config, ConfigSubsection, ConfigSlider, ConfigSelection, ConfigNothing, NoSave
 from Tools.CList import CList
 from os import path as os_path
+from enigma import eEnv
 # The "VideoEnhancement" is the interface to /usr/local/e2/etc/stb/vmpeg/0.
 
 class VideoEnhancement:
@@ -14,12 +15,12 @@ class VideoEnhancement:
 		config.pep = ConfigSubsection()
 		config.pep.configsteps = NoSave(ConfigSelection(choices=[1, 5, 10, 25], default = 1))
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_contrast"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_contrast")):
 			def setContrast(config):
 				myval = int(config.value*256)
 				try:
 					print "--> setting contrast to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_contrast", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_contrast"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_contrast."
 
@@ -31,12 +32,12 @@ class VideoEnhancement:
 		else:
 			config.pep.contrast = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_saturation"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_saturation")):
 			def setSaturation(config):
 				myval = int(config.value*256)
 				try:
 					print "--> setting saturation to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_saturation", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_saturation"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_saturaion."
 
@@ -48,12 +49,12 @@ class VideoEnhancement:
 		else:
 			config.pep.saturation = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_hue"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_hue")):
 			def setHue(config):
 				myval = int(config.value*256)
 				try:
 					print "--> setting hue to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_hue", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_hue"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_hue."
 
@@ -65,12 +66,12 @@ class VideoEnhancement:
 		else:
 			config.pep.hue = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_brightness"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_brightness")):
 			def setBrightness(config):
 				myval = int(config.value*256)
 				try:
 					print "--> setting brightness to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_brightness", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_brightness"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_brightness."
 
@@ -82,12 +83,12 @@ class VideoEnhancement:
 		else:
 			config.pep.brightness = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_block_noise_reduction"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_block_noise_reduction")):
 			def setBlock_noise_reduction(config):
 				myval = int(config.value)
 				try:
 					print "--> setting block_noise_reduction to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_block_noise_reduction", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_block_noise_reduction"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_block_noise_reduction."
 
@@ -99,12 +100,12 @@ class VideoEnhancement:
 		else:
 			config.pep.block_noise_reduction = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_mosquito_noise_reduction"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_mosquito_noise_reduction")):
 			def setMosquito_noise_reduction(config):
 				myval = int(config.value)
 				try:
 					print "--> setting mosquito_noise_reduction to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_mosquito_noise_reduction", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_mosquito_noise_reduction"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_mosquito_noise_reduction."
 
@@ -116,12 +117,12 @@ class VideoEnhancement:
 		else:
 			config.pep.mosquito_noise_reduction = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_digital_contour_removal"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_digital_contour_removal")):
 			def setDigital_contour_removal(config):
 				myval = int(config.value)
 				try:
 					print "--> setting digital_contour_removal to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_digital_contour_removal", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_digital_contour_removal"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_digital_contour_removal."
 
@@ -133,11 +134,11 @@ class VideoEnhancement:
 		else:
 			config.pep.digital_contour_removal = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_split"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_split")):
 			def setSplitMode(config):
 				try:
 					print "--> setting splitmode to:",str(config.value)
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_split", "w").write(str(config.value))
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_split"), "w").write(str(config.value))
 				except IOError:
 					print "couldn't write pep_split."
 
@@ -153,12 +154,12 @@ class VideoEnhancement:
 		else:
 			config.pep.split = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_sharpness"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_sharpness")):
 			def setSharpness(config):
 				myval = int(config.value*256)
 				try:
 					print "--> setting sharpness to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_sharpness", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_sharpness"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_sharpness."
 
@@ -170,12 +171,12 @@ class VideoEnhancement:
 		else:
 			config.pep.sharpness = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_auto_flesh"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_auto_flesh")):
 			def setAutoflesh(config):
 				myval = int(config.value)
 				try:
 					print "--> setting auto_flesh to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_auto_flesh", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_auto_flesh"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_auto_flesh."
 
@@ -187,12 +188,12 @@ class VideoEnhancement:
 		else:
 			config.pep.auto_flesh = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_green_boost"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_green_boost")):
 			def setGreenboost(config):
 				myval = int(config.value)
 				try:
 					print "--> setting green_boost to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_green_boost", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_green_boost"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_green_boost."
 
@@ -204,12 +205,12 @@ class VideoEnhancement:
 		else:
 			config.pep.green_boost = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_blue_boost"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_blue_boost")):
 			def setBlueboost(config):
 				myval = int(config.value)
 				try:
 					print "--> setting blue_boost to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_blue_boost", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_blue_boost"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_blue_boost."
 
@@ -221,12 +222,12 @@ class VideoEnhancement:
 		else:
 			config.pep.blue_boost = NoSave(ConfigNothing())
 
-		if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_dynamic_contrast"):
+		if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_dynamic_contrast")):
 			def setDynamic_contrast(config):
 				myval = int(config.value)
 				try:
 					print "--> setting dynamic_contrast to: %0.8X" % myval
-					open("/usr/local/e2/etc/stb/vmpeg/0/pep_dynamic_contrast", "w").write("%0.8X" % myval)
+					open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_dynamic_contrast"), "w").write("%0.8X" % myval)
 				except IOError:
 					print "couldn't write pep_dynamic_contrast."
 
@@ -241,12 +242,12 @@ class VideoEnhancement:
 		try:
 			x = config.av.scaler_sharpness.value
 		except KeyError:
-			if os_path.exists("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness"):
+			if os_path.exists(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_scaler_sharpness")):
 				def setScaler_sharpness(config):
 					myval = int(config.value)
 					try:
 						print "--> setting scaler_sharpness to: %0.8X" % myval
-						open("/usr/local/e2/etc/stb/vmpeg/0/pep_scaler_sharpness", "w").write("%0.8X" % myval)
+						open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_scaler_sharpness"), "w").write("%0.8X" % myval)
 					except IOError:
 						print "couldn't write pep_scaler_sharpness."
 
@@ -266,7 +267,7 @@ class VideoEnhancement:
 	def setConfiguredValues(self):
 		try:
 			print "--> applying pep values"
-			open("/usr/local/e2/etc/stb/vmpeg/0/pep_apply", "w").write("1")
+			open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/pep_apply"), "w").write("1")
 		except IOError:
 			print "couldn't apply pep values."
 

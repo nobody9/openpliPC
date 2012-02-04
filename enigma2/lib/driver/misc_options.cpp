@@ -8,6 +8,7 @@
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
 #include <lib/base/eerror.h>
+#include <lib/base/eenv.h>
 
 Misc_Options *Misc_Options::instance = 0;
 
@@ -22,10 +23,11 @@ int Misc_Options::set_12V_output(int state)
 {
 	if (state == m_12V_output_state)
 		return 0;
-	int fd = open("/usr/local/e2/etc/stb/misc/12V_output", O_WRONLY);
+	int fd = open(eEnv::resolve("${sysconfdir}/stb/misc/12V_output").c_str(), O_WRONLY);
 	if (fd < 0)
 	{
-		eDebug("couldn't open /usr/local/e2/etc/stb/misc/12V_output");
+		std::string err= "couldn't open " + eEnv::resolve("${sysconfdir}/stb/misc/12V_output");
+		eDebug(err.c_str());
 		return -1;
 	}
 	const char *str=0;
@@ -42,10 +44,11 @@ int Misc_Options::set_12V_output(int state)
 
 bool Misc_Options::detected_12V_output()
 {
-	int fd = open("/usr/local/e2/etc/stb/misc/12V_output", O_WRONLY);
+	int fd = open(eEnv::resolve("${sysconfdir}/stb/misc/12V_output").c_str(), O_WRONLY);
 	if (fd < 0)
 	{
-		eDebug("couldn't open /usr/local/e2/etc/stb/misc/12V_output");
+		std::string err= "couldn't open " + eEnv::resolve("${sysconfdir}/stb/misc/12V_output");
+		eDebug(err.c_str());
 		return false;
 	}
 	close(fd);
