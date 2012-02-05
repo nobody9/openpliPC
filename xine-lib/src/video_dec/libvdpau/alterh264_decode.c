@@ -1827,7 +1827,18 @@ decode_render (vdpau_h264_alter_decoder_t * vd, int bad_frame)
     event.data_length = sizeof (data);
     data.width = seq->coded_width;
     data.height = seq->coded_height;
-    data.aspect = seq->ratio;
+
+    if (fabs(seq->ratio-1.0)<0.1)
+      data.aspect = XINE_VO_ASPECT_SQUARE;
+    else if (fabs(seq->ratio-1.33)<0.1)
+      data.aspect = XINE_VO_ASPECT_4_3;
+    else if (fabs(seq->ratio-1.77)<0.1)
+      data.aspect = XINE_VO_ASPECT_ANAMORPHIC;
+    else if (fabs(seq->ratio-2.11)<0.1)
+      data.aspect = XINE_VO_ASPECT_DVB;
+    else
+      data.aspect = XINE_VO_ASPECT_AUTO;
+
     xine_event_send (vd->stream, &event);
   }
 
