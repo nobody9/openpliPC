@@ -11,6 +11,8 @@ DO_BACKUP=0
 DO_RESTORE=0
 DO_XINE=1
 DO_CONFIGURE=1
+DO_PARALLEL=1
+DO_MAKEINSTALL=1
 
 function e2_backup {
         echo "-----------------------------"
@@ -36,6 +38,8 @@ function usage {
 	echo " -r : restore E2 conf file after re-compile"
 	echo " -x : don't compile xine-lib (compile only enigma2)"
 	echo " -nc: don't start configure/autoconf"
+	echo " -py: parallel compile (y threads) e.g. -p2"
+	echo " -ni: only execute make and no make install"
 	echo " -h : this help"
 	echo ""
 	echo "common usage:"
@@ -46,24 +50,37 @@ function usage {
 while [ "$1" != "" ]; do
     case $1 in
         -b ) 	DO_BACKUP=1
-		shift
-        	;;
-        -r )  	DO_RESTORE=1
-		shift
-              	;;
-	-x )	DO_XINE=0
-		shift
-		;;
-	-nc )	DO_CONFIGURE=0
-		shift
-		;;	
-	-h )  	usage
-	      	exit
-	      	;;
-	*  )  	echo "Unknown parameter"
-	      	usage
-	      	exit
-	      	;;
+              shift
+              ;;
+        -r ) 	DO_RESTORE=1
+		          shift
+              ;;
+	      -x )	DO_XINE=0
+		          shift
+		          ;;
+	      -nc )	DO_CONFIGURE=0
+		          shift
+		          ;;
+        -ni )	DO_MAKEINSTALL=0
+		          shift
+		          ;;
+        -p* ) if [ "`expr substr "$1" 3 3`" = "" ]
+              then
+                 echo "Number threads is missing"
+                 usage
+                 exit
+              else
+                 DO_PARALLEL=`expr substr "$1" 3 3`
+              fi     
+              shift
+		          ;;
+	      -h )  usage
+	      	    exit
+	      	    ;;
+	      * )  	echo "Unknown parameter $1"
+	      	    usage
+	      	    exit
+	      	    ;;
     esac
 done
 
@@ -81,24 +98,40 @@ if [ "$DO_XINE" -eq "1" ]; then
 	cd $PKG
 	
   if [ "$DO_CONFIGURE" -eq "1" ]; then	
-	echo "-----------------------------------------"
-	echo "configuring OpenPliPC $PKG"
-	echo "-----------------------------------------"
+	  echo "-----------------------------------------"
+	  echo "configuring OpenPliPC $PKG"
+	  echo "-----------------------------------------"
 
-	./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
+	  ./autogen.sh --disable-xinerama --disable-musepack --prefix=/usr
   fi	
 
-	echo "-----------------------------------------"
-	echo "build OpenPliPC $PKG, please wait..."
-	echo "-----------------------------------------"
+  if [ "$DO_MAKEINSTALL" -eq "0" ]; then
+	  echo "-----------------------------------------"
+	  echo "build OpenPliPC $PKG, please wait..."
+	  echo "-----------------------------------------"
 
-	make
+	  make -j"$DO_PARALLEL"
+    if [ ! $? -eq 0 ]
+    then
+      echo ""
+      echo "An error occured while building xine-lib"
+      exit
+    fi
+    
+  else
+	  echo "--------------------------------------"
+	  echo "installing OpenPliPC $PKG"
+	  echo "--------------------------------------"
 
-	echo "--------------------------------------"
-	echo "installing OpenPliPC $PKG"
-	echo "--------------------------------------"
-
-	sudo make install
+	  sudo make -j"$DO_PARALLEL" install
+    if [ ! $? -eq 0 ]
+    then
+      echo ""
+      echo "An error occured while building xine-lib"
+      exit
+    fi
+  fi
+    
 	cd ..
 
 fi
@@ -125,13 +158,28 @@ echo "--------------------------------------"
 echo "build OpenPliPC $PKG, please wait..."
 echo "--------------------------------------"
 
-make
- 
-echo "--------------------------------------"
-echo "installing OpenPliPC $PKG in $INSTALL_E2DIR"
-echo "--------------------------------------"
+if [ "$DO_MAKEINSTALL" -eq "0" ]; then
+  make -j"$DO_PARALLEL"
+  if [ ! $? -eq 0 ]
+  then
+    echo ""
+    echo "An error occured while building OpenPliPC"
+    exit
+  fi
+  
+else  
+  echo "--------------------------------------"
+  echo "installing OpenPliPC $PKG in $INSTALL_E2DIR"
+  echo "--------------------------------------"
 
-sudo make install
+  sudo make -j"$DO_PARALLEL" install
+  if [ ! $? -eq 0 ]
+  then
+    echo ""
+    echo "An error occured while building OpenPliPC"
+    exit
+  fi
+fi  
 cd ..
  
 echo "--------------------------------------"
