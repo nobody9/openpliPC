@@ -646,7 +646,7 @@ class iTSMPEGDecoder: public iObject
 public:
 	enum { pidDisabled = -1 };
 		/** Set Displayed Video PID and type */
-	virtual RESULT setVideoPID(int vpid, int type)=0;
+	virtual RESULT setVideoPID(int vpid, int type, int streamtype)=0;
 
 	enum { af_MPEG, af_AC3, af_DTS, af_AAC, af_DTSHD };
 		/** Set Displayed Audio PID and type */

@@ -130,36 +130,39 @@ eDVBVideo::eDVBVideo(int dev) : m_dev(dev), m_progressive(-1) {}
 #define VIDEO_STREAMTYPE_MPEG1       0x01
 
 
-int eDVBVideo::startPid(int pid, int type)
+int eDVBVideo::startPid(int pid, int type, bool is_pvr)
 {
 	cXineLib *xineLib = cXineLib::getInstance();
-	int streamtype = VIDEO_STREAMTYPE_MPEG2;
-
-	switch(type)
+	if (is_pvr)
 	{
-	default:
-	case MPEG2:
+	  int streamtype = VIDEO_STREAMTYPE_MPEG2;
+	  switch(type)
+	  {
+	    default:
+	    case MPEG2:
 		break;
-	case MPEG4_H264:
+	    case MPEG4_H264:
 		streamtype = VIDEO_STREAMTYPE_MPEG4_H264;
 		break;
-	case MPEG1:
+	    case MPEG1:
 		streamtype = VIDEO_STREAMTYPE_MPEG1;
 		break;
-	case MPEG4_Part2:
+	    case MPEG4_Part2:
 		streamtype = VIDEO_STREAMTYPE_MPEG4_Part2;
 		break;
-	case VC1:
+	    case VC1:
 		streamtype = VIDEO_STREAMTYPE_VC1;
 		break;
-	case VC1_SM:
+	    case VC1_SM:
 		streamtype = VIDEO_STREAMTYPE_VC1_SM;
 		break;
-	}
+	  }
+	  type = streamtype;
+	}  
 
-	eDebug("VIDEO_SET_STREAMTYPE %d", streamtype);
+	eDebug("VIDEO_SET_STREAMTYPE %x", type);
 
-	xineLib->setVideoType(pid, streamtype);
+	xineLib->setVideoType(pid, type);
 
 	freeze();  // why freeze here?!? this is a problem when only a pid change is requested... because of the unfreeze logic in 
 	eDebug("VIDEO_PLAY\n");
@@ -361,8 +364,16 @@ int eTSMPEGDecoder::setState()
 		if ((m_vpid >= 0) && (m_vpid < 0x1FFF))
 		{
 			m_video = new eDVBVideo(m_decoder);
-			if (m_video->startPid(m_vpid, m_vtype))
-				res = -1;
+			if (m_vstreamtype != 0)
+			{
+				if (m_video->startPid(m_vpid, m_vstreamtype, m_is_pvr))
+					res = -1;
+			}
+			else
+			{
+				if (m_video->startPid(m_vpid, m_vtype, m_is_pvr))
+					res = -1;
+			}		
 		}
 		m_changed &= ~changeVideo;
 	}
@@ -478,14 +489,20 @@ eTSMPEGDecoder::~eTSMPEGDecoder()
 	setState();
 }
 
-RESULT eTSMPEGDecoder::setVideoPID(int vpid, int type)
+RESULT eTSMPEGDecoder::setVideoPID(int vpid, int type, int streamtype)
 {
 printf("eTSMPEGDecoder setVideoPID %d\n", vpid);
-	if ((m_vpid != vpid) || (m_vtype != type))
+	if ((m_vpid != vpid) || (m_vtype != type) || (m_vstreamtype != streamtype))
 	{
 		m_changed |= changeVideo;
 		m_vpid = vpid;
 		m_vtype = type;
+		m_vstreamtype = streamtype;
+		
+		if (m_vstreamtype == 0)
+		  m_is_pvr = true;
+		else
+		  m_is_pvr = false;
 	}
 	return 0;
 }

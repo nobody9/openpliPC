@@ -121,6 +121,7 @@ public:
 		int component_tag;
 		enum { vtMPEG2, vtMPEG4_H264, vtMPEG1, vtMPEG4_Part2, vtVC1, vtVC1_SM };
 		int type;
+		int orig_streamtype;
 	};
 	
 	struct audioStream
