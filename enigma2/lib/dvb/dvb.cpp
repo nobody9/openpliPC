@@ -1,5 +1,6 @@
 #include <lib/base/eerror.h>
 #include <lib/base/filepush.h>
+#include <lib/base/eenv.h>
 #include <lib/dvb/cahandler.h>
 #include <lib/dvb/idvb.h>
 #include <lib/dvb/dvb.h>
@@ -82,7 +83,7 @@ eDVBResourceManager::eDVBResourceManager()
 		num_adapter++;
 	}
 
-	int fd = open("/usr/local/e2/etc/stb/info/model", O_RDONLY);
+	int fd = open(eEnv::resolve("${sysconfdir}/stb/info/model").c_str(), O_RDONLY);
 	char tmp[16];
 	int rd = fd >= 0 ? read(fd, tmp, sizeof(tmp)) : 0;
 	if (fd >= 0)
@@ -101,7 +102,8 @@ eDVBResourceManager::eDVBResourceManager()
 	else if (!strncmp(tmp, "dm7020hd\n", rd))
 		m_boxtype = DM7020HD;
 	else {
-		eDebug("boxtype detection via /usr/local/e2/etc/stb/info not possible... use fallback via demux count!\n");
+		std::string info= "boxtype detection via " + eEnv::resolve("${sysconfdir}/stb/info") + " not possible... use fallback via demux count!\n";
+		eDebug(info.c_str());
 		if (m_demux.size() == 3)
 			m_boxtype = DM800;
 		else if (m_demux.size() < 5)

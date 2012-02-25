@@ -1,6 +1,6 @@
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
-
+from enigma import eEnv
 from os import environ, unlink, symlink
 import time
 
@@ -25,7 +25,7 @@ class Timezones:
 		try:
 			timezonesHandler = self.parseTimezones(self.timezones)
 			parser.setContentHandler(timezonesHandler)
-			parser.parse('/usr/local/e2/etc/tuxbox/timezone.xml')
+			parser.parse(eEnv.resolve("${sysconfdir}/tuxbox/timezone.xml"))
 		except:
 			pass
 		
@@ -38,11 +38,11 @@ class Timezones:
 		
 		environ['TZ'] = self.timezones[index][1]
 		try:
-			unlink("/usr/local/e2/etc/localtime")
+			unlink(eEnv.resolve("${sysconfdir}/localtime"))
 		except OSError:
 			pass
 		try:
-			symlink("/usr/local/e2/share/zoneinfo/%s" %(self.timezones[index][1]), "/usr/local/e2/etc/localtime")
+			symlink(eEnv.resolve("${datarootdir}/zoneinfo/%s") %(self.timezones[index][1]), eEnv.resolve("${sysconfdir}/localtime"))
 		except OSError:
 			pass
 		try:

@@ -1,5 +1,6 @@
 #include <lib/dvb/dvbtime.h>
 #include <lib/dvb/dvb.h>
+#include <lib/base/eenv.h>
 
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -17,13 +18,16 @@ static time_t prev_time;
 
 void setRTC(time_t time)
 {
-	FILE *f = fopen("/usr/local/e2/etc/stb/fp/rtc", "w");
+	FILE *f = fopen(eEnv::resolve("${sysconfdir}/stb/fp/rtc").c_str(), "w");
 	if (f)
 	{
 		if (fprintf(f, "%u", (unsigned int)time))
 			prev_time = time;
 		else
-			eDebug("write /usr/local/e2/etc/stb/fp/rtc failed (%m)");
+    {
+			std::string err= "write " + eEnv::resolve("${sysconfdir}/stb/fp/rtc") + "failed (%m)";
+			eDebug(err.c_str());
+    }
 		fclose(f);
 	}
 	else
@@ -43,13 +47,16 @@ void setRTC(time_t time)
 time_t getRTC()
 {
 	time_t rtc_time=0;
-	FILE *f = fopen("/usr/local/e2/etc/stb/fp/rtc", "r");
+	FILE *f = fopen(eEnv::resolve("${sysconfdir}/stb/fp/rtc").c_str(), "r");
 	if (f)
 	{
 		// sanity check to detect corrupt atmel firmware
 		unsigned int tmp;
 		if (fscanf(f, "%u", &tmp) != 1)
-			eDebug("read /usr/local/e2/etc/stb/fp/rtc failed (%m)");
+    {
+			std::string err= "read " + eEnv::resolve("${sysconfdir}/stb/fp/rtc") + " failed (%m)";
+			eDebug(err.c_str());
+    }  
 		else
 			rtc_time=tmp;
 		fclose(f);

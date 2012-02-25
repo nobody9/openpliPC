@@ -1,5 +1,6 @@
 #include <lib/base/ebase.h>
 #include <lib/base/eerror.h>
+#include <lib/base/eenv.h>
 #include <lib/dvb/decoder.h>
 #include <lib/gdi/xineLib.h>
 
@@ -434,7 +435,7 @@ RESULT eTSMPEGDecoder::setHwPCMDelay(int delay)
 {
 	if (delay != m_pcm_delay )
 	{
-		FILE *fp = fopen("/usr/local/e2/etc/stb/audio/audio_delay_pcm", "w");
+		FILE *fp = fopen(eEnv::resolve("${sysconfdir}/stb/audio/audio_delay_pcm").c_str(), "w");
 		if (fp)
 		{
 			fprintf(fp, "%x", delay*90);
@@ -450,7 +451,7 @@ RESULT eTSMPEGDecoder::setHwAC3Delay(int delay)
 {
 	if ( delay != m_ac3_delay )
 	{
-		FILE *fp = fopen("/usr/local/e2/etc/stb/audio/audio_delay_bitstream", "w");
+		FILE *fp = fopen(eEnv::resolve("${sysconfdir}/stb/audio/audio_delay_bitstream").c_str(), "w");
 		if (fp)
 		{
 			fprintf(fp, "%x", delay*90);

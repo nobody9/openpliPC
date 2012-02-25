@@ -29,6 +29,7 @@
 #define X11OSD_H
 
 #include <xine/vo_scale.h>
+#include <sys/time.h>
 
 typedef struct x11osd x11osd;
 enum x11osd_mode {X11OSD_SHAPED, X11OSD_COLORKEY};
@@ -48,5 +49,11 @@ void x11osd_drawable_changed (x11osd * osd, Window window);
 void x11osd_clear(x11osd *osd);
 
 void x11osd_blend(x11osd *osd, vo_overlay_t *overlay);
+
+void x11osd_scale_argb32_image(x11osd *osd, uint32_t* src, uint32_t* dst, int src_width, int src_height, int dst_width, int dst_height);
+
+void x11osd_scale_line(uint32_t* src, uint32_t* dst, int width, int step);
+
+void x11osd_scale_line_mmx(uint32_t* src, uint32_t* dst, int width, int step);
 
 #endif

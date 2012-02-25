@@ -2,6 +2,7 @@
 #include <lib/dvb/frontendparms.h>
 #include <lib/base/eerror.h>
 #include <lib/base/nconfig.h> // access to python config
+#include <lib/base/eenv.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -1485,8 +1486,8 @@ int eDVBFrontend::readInputpower()
 	int power=m_slotid;  // this is needed for read inputpower from the correct tuner !
 	char proc_name[64];
 	char proc_name2[64];
-	sprintf(proc_name, "/usr/local/e2/etc/stb/frontend/%d/lnb_sense", m_slotid);
-	sprintf(proc_name2, "/usr/local/e2/etc/stb/fp/lnb_sense%d", m_slotid);
+	sprintf(proc_name, eEnv::resolve("${sysconfdir}/stb/frontend/%d/lnb_sense").c_str(), m_slotid);
+	sprintf(proc_name2, eEnv::resolve("${sysconfdir}/stb/fp/lnb_sense%d").c_str(), m_slotid);
 	FILE *f;
 	if ((f=fopen(proc_name, "r")) || (f=fopen(proc_name2, "r")))
 	{
@@ -1855,7 +1856,7 @@ int eDVBFrontend::tuneLoopInt()  // called by m_tuneTimer
 				if (!m_simulate)
 				{
 					char proc_name[64];
-					sprintf(proc_name, "/usr/local/e2/etc/stb/frontend/%d/static_current_limiting", sec_fe->m_dvbid);
+					sprintf(proc_name, eEnv::resolve("${sysconfdir}/stb/frontend/%d/static_current_limiting").c_str(), sec_fe->m_dvbid);
 					FILE *f=fopen(proc_name, "w");
 					if (f) // new interface exist?
 					{

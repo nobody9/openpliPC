@@ -49,6 +49,12 @@ static bool getConfigBool(const std::string &key, bool defaultValue)
 	return defaultValue;
 }
 
+static int getConfigInt(const std::string &key)
+{
+  std::string value = getConfigString(key, "0");
+	return atoi(value.c_str());
+}
+
 gXlibDC::gXlibDC() : m_pump(eApp, 1)
 {
 	double      res_h, res_v;
@@ -60,6 +66,8 @@ gXlibDC::gXlibDC() : m_pump(eApp, 1)
 
 	argb_buffer = NULL;
 	fullscreen = getConfigBool("config.pc.default_fullscreen", false);
+	initialWindowWidth  = getConfigInt("config.pc.initial_window_width");
+	initialWindowHeight = getConfigInt("config.pc.initial_window_height");
 	windowWidth  = 720;
 	windowHeight = 576;
 	xpos = 0;
@@ -90,7 +98,10 @@ gXlibDC::gXlibDC() : m_pump(eApp, 1)
 	}
 
 	XLockDisplay(display);
- 	window = XCreateSimpleWindow(display, XDefaultRootWindow(display), xpos, ypos, windowWidth, windowHeight, 0, 0, 0);
+	if (initialWindowWidth && initialWindowHeight)
+ 	  window = XCreateSimpleWindow(display, XDefaultRootWindow(display), xpos, ypos, initialWindowWidth, initialWindowHeight, 0, 0, 0);
+	else
+ 	  window = XCreateSimpleWindow(display, XDefaultRootWindow(display), xpos, ypos, windowWidth, windowHeight, 0, 0, 0);
 	XSelectInput (display, window, INPUT_MOTION);
 	XMapRaised(display, window);
 	res_h = (DisplayWidth(display, screen) * 1000 / DisplayWidthMM(display, screen));
@@ -239,8 +250,9 @@ void gXlibDC::setResolution(int xres, int yres)
 	m_surface.offset = 0;
 
 	m_pixmap = new gPixmap(&m_surface);
-    
-	XResizeWindow(display, window, windowWidth, windowHeight);
+
+	if (initialWindowWidth == 0 || initialWindowHeight == 0) 
+	  XResizeWindow(display, window, windowWidth, windowHeight);
 	updateWindowState();
 }
 
@@ -248,7 +260,12 @@ void gXlibDC::updateWindowState() {
 	if (fullscreen)	{
 		width  = DisplayWidth( display, screen );
 		height = DisplayHeight( display, screen );
-	} else {
+	} else if (initialWindowWidth && initialWindowHeight)
+	{
+		width  = initialWindowWidth;
+		height = initialWindowHeight;
+	} else
+	{
 		width  = windowWidth;
 		height = windowHeight;
 	}

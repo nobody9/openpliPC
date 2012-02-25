@@ -29,6 +29,7 @@ private:
 	x11_visual_t         vis;
 	int                  fullscreen;
 	int                  windowWidth, windowHeight;
+	int                  initialWindowWidth, initialWindowHeight;
 	cXineLib            *xineLib;
 	gSurface             m_surface;
 	uint32_t            *argb_buffer;

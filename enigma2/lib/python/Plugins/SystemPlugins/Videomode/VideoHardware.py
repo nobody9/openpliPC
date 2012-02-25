@@ -1,4 +1,4 @@
-from enigma import eTimer, eAVSwitch
+from enigma import eTimer, eAVSwitch, eEnv
 from Components.config import config, ConfigSelection, ConfigSubDict, ConfigYesNo
 
 from Tools.CList import CList
@@ -34,7 +34,7 @@ class VideoHardware:
 				ret = (16,10)
 		elif is_auto:
 			try:
-				aspect_str = open("/usr/local/e2/stb/vmpeg/0/aspect", "r").read()
+				aspect_str = open(eEnv.resolve("${sysconfdir}/stb/vmpeg/0/aspect"), "r").read()
 				if aspect_str == "1": # 4:3
 					ret = (4,3)
 			except IOError:

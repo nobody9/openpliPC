@@ -44,6 +44,9 @@
 #include <X11/extensions/shape.h>
 #include <X11/Xatom.h>
 
+#include <xine/xineutils.h>
+#include "xine_mmx.h"
+
 #define LOG_MODULE "x11osd"
 #define LOG_VERBOSE
 
@@ -78,6 +81,9 @@ struct x11osd
   Pixmap bitmap;
   Visual *visual;
   Colormap cmap;
+  XImage *argb_img;
+  void (*scale_func) (uint32_t* src, uint32_t* dst, int width, int step);
+  int scale_mmx;
 
   GC gc;
 
@@ -96,6 +102,12 @@ x11osd_expose (x11osd * osd)
   assert (osd);
 
   lprintf("expose (state:%d)\n", osd->clean );
+  
+  // copy argb data to bitmap
+  if (osd->argb_img && osd->argb_img->data)
+  {
+     XPutImage(osd->display, osd->bitmap, osd->gc, osd->argb_img, 0, 0, 0, 0, osd->width, osd->height);
+  }
 
   switch (osd->mode) {
     case X11OSD_SHAPED:
@@ -153,6 +165,11 @@ x11osd_resize (x11osd * osd, int width, int height)
 		       osd->width, osd->height, osd->depth);
       break;
   }
+  
+  // resize argb_img data
+  XDestroyImage(osd->argb_img);
+  osd->argb_img = XCreateImage(osd->display, osd->visual, 24, ZPixmap, 0, NULL, osd->width, osd->height, 32, 0);
+  osd->argb_img->data = calloc(osd->width * osd->height, sizeof(uint32_t));
 
   osd->clean = UNDEFINED;
   x11osd_clear(osd);
@@ -224,6 +241,11 @@ x11osd_drawable_changed (x11osd * osd, Window window)
       break;
   }
 
+  // resize argb_img data
+  XDestroyImage(osd->argb_img);
+  osd->argb_img = XCreateImage(osd->display, osd->visual, 24, ZPixmap, 0, NULL, osd->width, osd->height, 32, 0);
+  osd->argb_img->data = calloc(osd->width * osd->height, sizeof(uint32_t));
+
   osd->clean = UNDEFINED;
   /* do not x11osd_clear() here: osd->u.colorkey.sc has not being updated yet */
 }
@@ -267,6 +289,26 @@ x11osd_create (xine_t *xine, Display *display, int screen, Window window, enum x
 
   assert(osd->width);
   assert(osd->height);
+
+  // create image for argb overlay
+  osd->argb_img = XCreateImage(osd->display, osd->visual, 24, ZPixmap, 0, NULL, osd->width, osd->height, 32, 0);
+  osd->argb_img->data = calloc(osd->width * osd->height, sizeof(uint32_t));
+  
+  // scale function
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
+  uint32_t mm = xine_mm_accel();
+  if ((osd->scale_func == NULL) && ((mm & MM_ACCEL_X86_MMX) || (mm & MM_ACCEL_X86_MMXEXT)))
+  {
+    osd->scale_func= x11osd_scale_line_mmx;
+    osd->scale_mmx= 1;
+    printf("X11OSD: MMX OSD scaling active\n");
+  }
+#endif
+  if (osd->scale_func == NULL)
+  {
+    osd->scale_func= x11osd_scale_line;
+    osd->scale_mmx= 0;
+  }  
 
   switch (mode) {
     case X11OSD_SHAPED:
@@ -395,7 +437,7 @@ x11osd_destroy (x11osd * osd)
     XFreePixmap (osd->display, osd->u.shaped.mask_bitmap);
     XDestroyWindow (osd->display, osd->u.shaped.window);
   }
-
+  XDestroyImage(osd->argb_img);
   free (osd);
 }
 
@@ -546,5 +588,292 @@ void x11osd_blend(x11osd *osd, vo_overlay_t *overlay)
     }
     osd->clean = DRAWN;
   }
+  else if (overlay->argb_layer && overlay->argb_layer->buffer)
+  {
+    osd->argb_img->data = realloc(osd->argb_img->data, osd->width * osd->height * sizeof(uint32_t));
+    
+    x11osd_scale_argb32_image(osd, (uint32_t*)overlay->argb_layer->buffer, (uint32_t*)osd->argb_img->data, overlay->extent_width, overlay->extent_height, osd->width, osd->height);
+	  
+	uint32_t bx, by;
+	uint32_t w, h;
+	if(osd->mode==X11OSD_SHAPED) // fill bitmask / if bit is set, the corresponding pixel is drawn to screen
+	{
+	  w= osd->width - overlay->x;
+	  h= osd->height - overlay->y;
+	  for (by= 0; by < h; by++)
+		for (bx= 0; bx < w; bx++)
+		  if ((((uint32_t*)osd->argb_img->data)[bx+by*w] >> 24) != 0 )
+		    XDrawPoint(osd->display, osd->u.shaped.mask_bitmap, osd->u.shaped.mask_gc, bx, by);
+	}    
+
+	osd->clean = DRAWN;
+  }
 }
 
+// adapted algorithm from yuv2rgb.c to scale rgb images
+void x11osd_scale_argb32_image(x11osd *osd, uint32_t* src, uint32_t* dst, int src_width, int src_height, int dst_width, int dst_height)
+{
+	int step_dx = src_width * 32768 / dst_width;
+	int step_dy = src_height * 32768 / dst_height;
+	int height, dy= 0;
+		
+	if (src_width == dst_width && src_height == dst_height)
+	{
+	  xine_fast_memcpy (dst, src, dst_width*dst_height*4);
+	  return;
+	}
+	
+	for (height = 0;; ) 
+	{
+	  osd->scale_func(src, dst, dst_width, step_dx);  // scale_line with or without mmx
+	    
+      dy += step_dy;
+      dst += dst_width;
+
+      while (--dst_height > 0 && dy < 32768)    // copy scaled line (only enlarging)
+      {
+        xine_fast_memcpy (dst, dst-(dst_width), dst_width*4); // copy last line
+
+	    dy += step_dy;
+	    dst += dst_width;
+      }
+      if (dst_height <= 0)
+	    break;
+
+      do 
+      { // skip at least one line (possibly more if scale factor < 1)
+        dy -= 32768;
+        src += src_width;  
+
+        height++;
+      } while( dy>=32768);
+    }	
+    if (osd->scale_mmx) emms();   // empties the MMX state
+}
+
+// adapted algorithm from yuv2rgb.c to scale single argb line
+void x11osd_scale_line(uint32_t* src, uint32_t* dst, int width, int step)
+{
+  uint32_t p1;
+  uint32_t p2;
+  int dx;
+  
+  p1 = *src++;
+  p2 = *src++;
+  dx = 0;
+  
+  if (step < 32768) 
+  {
+    while (width) 
+    {
+      *dst = ((((p1 >> 24) * (32768-dx)) + ((p2 >> 24) * dx))>>15) << 24                   // interpolate A: (A1*(32768-dx)+A2*dx) / 32768
+           | (((((p1 >> 16) & 0xFF) * (32768-dx)) + (((p2 >> 16) & 0xFF) * dx))>>15) << 16 // interpolate R
+           | (((((p1 >>  8) & 0xFF) * (32768-dx)) + (((p2 >>  8) & 0xFF) * dx))>>15) <<  8 // interpolate G
+           | (((p1 & 0xFF) * (32768-dx)) + ((p2 & 0xFF) * dx))>>15;                        // interpolate B
+      
+      dx += step;
+      if (dx > 32768) 
+      {
+	    dx -= 32768;
+	    p1 = p2;
+	    p2 = *src++;
+      }
+
+      dst ++;
+      width --;
+    }
+  } else if (step <= 65536) 
+  {
+    while (width) 
+    {
+      *dst = ((((p1 >> 24) * (32768-dx)) + ((p2 >> 24) * dx))>>15) << 24
+           | (((((p1 >> 16) & 0xFF) * (32768-dx)) + (((p2 >> 16) & 0xFF) * dx))>>15) << 16
+           | (((((p1 >>  8) & 0xFF) * (32768-dx)) + (((p2 >>  8) & 0xFF) * dx))>>15) <<  8
+           | (((p1 & 0xFF) * (32768-dx)) + ((p2 & 0xFF) * dx))>>15;
+
+      dx += step;
+      if (dx > 65536) 
+      {
+	    dx -= 65536;
+	    p1 = *src++;
+	    p2 = *src++;
+      } else 
+      {
+	    dx -= 32768;
+	    p1 = p2;
+	    p2 = *src++;
+      }
+
+      dst ++;
+      width --;
+    }
+  } else 
+  {
+    while (width) 
+    {
+      int offs;
+
+      *dst = ((((p1 >> 24) * (32768-dx)) + ((p2 >> 24) * dx))>>15) << 24
+           | (((((p1 >> 16) & 0xFF) * (32768-dx)) + (((p2 >> 16) & 0xFF) * dx))>>15) << 16
+           | (((((p1 >>  8) & 0xFF) * (32768-dx)) + (((p2 >>  8) & 0xFF) * dx))>>15) <<  8
+           | (((p1 & 0xFF) * (32768-dx)) + ((p2 & 0xFF) * dx))>>15;
+
+      dx += step;
+      offs=((dx-1)>>15);
+      dx-=offs<<15;
+      src+=offs-2;
+      p1=*src++;
+      p2=*src++;
+      dst ++;
+      width --;
+    }
+  }
+};
+
+// adapted algorithm from yuv2rgb.c to scale single argb line
+void x11osd_scale_line_mmx(uint32_t* src, uint32_t* dst, int width, int step)
+{
+  uint32_t p1;
+  uint32_t p2;
+  int dx;
+  int dx2; 
+  
+  p1 = *src++;
+  p2 = *src++;
+  dx = 0;
+  
+  if (step < 32768) 
+  {
+    while (width) 
+    {
+	  dx2 = dx * 2;
+	  if (dx2==65536) 
+	    dx2-= 1;
+       
+      /*  
+       *  MMX ARGB interpolation between p1(a1,r1,g1,b1) and p2(a2,r2,g2,b2)
+       *  a= (a1* (32768-dx) + a2 * dx) / 32768 -> a = a1 - a1*dx/32768 + a2*dx/32768
+       *  r= (r1* (32768-dx) + r2 * dx) / 32768 -> r = r1 - r1*dx/32768 + r2*dx/32768
+       *  ...
+       *  Doing multiplication of a,r,g,b with dx in one step
+       *  Division by 32768 is not necessary in mmx because you can get only the high 16 bits of a multiplication
+      */
+      movd_m2r(p1,mm0);          // mm0 = p1;  
+      movq_r2r(mm0,mm1);         // mm1 = mm0;  copy because result of unpack overides mm1 and we need p1 later again
+      pxor_r2r(mm2,mm2);         // mm2 = 0;
+      punpcklbw_r2r(mm2,mm1);    // mm1 = unpacked p1 (00 AA 00 RR 00 GG 00 BB)
+      movd_m2r(dx2,mm3);         // mm3 = dx2;   from here i call dx2 = 0xd1d2
+      movd_m2r(dx2,mm4);         // mm4 = dx2;
+      punpcklwd_r2r(mm3,mm4);    // mm4 = 00 00 00 00 d1 d2 d1 d2;
+      movq_r2r(mm4,mm3);         // mm3 = mm4;
+      punpcklwd_r2r(mm3,mm4);    // mm4 = d1 d2 d1 d2 d1 d2 d1 d2;  4 times dx2
+      movq_r2r(mm4,mm5);         // mm5 = mm4; copy
+      pmulhuw_r2r(mm4,mm1);      // mm1 = mm4 * mm1 = dx2 * p1 = dx * p1 / 32768 // get from multiplication only high 16 bits
+      packuswb_r2r(mm2,mm1);     // mm1 = packed mm1
+      movd_m2r(p2,mm6);          // mm6 = p2;
+      punpcklbw_r2r(mm2,mm6);    // mm6 = unpacked p2 (00 AA 00 RR 00 GG 00 BB)
+      pmulhuw_r2r(mm5,mm6);      // mm6 = mm5 * mm6 = dx2 * p2 = dx * p2 / 32768 // get from multiplication only high 16 bits
+      packuswb_r2r(mm2,mm6);     // mm6 = packed mm6
+      psubusb_r2r(mm1,mm0);      // mm0 = mm0 - mm1 = p1 - (p1*dx/32768)
+      paddusb_r2r(mm0,mm6);      // mm5 = mm0 + mm5 = p1 - (p1*dx/32768) + (p2*dx/32768)
+      
+      movd_r2m(mm6, *dst);
+      
+      dx += step;
+      if (dx > 32768) 
+      {
+	    dx -= 32768;
+	    p1 = p2;
+	    p2 = *src++;
+      }
+
+      dst ++;
+      width --;
+    }
+  } else if (step <= 65536) 
+  {
+    while (width) 
+    {
+	  dx2 = dx * 2;
+	  if (dx2==65536) 
+	    dx2-= 1;
+	      
+      movd_m2r(p1,mm0);          // mm0 = p1;  
+      movq_r2r(mm0,mm1);         // mm1 = mm0;  copy because result of unpack overides mm1 and we need p1 later again
+      pxor_r2r(mm2,mm2);         // mm2 = 0;
+      punpcklbw_r2r(mm2,mm1);    // mm1 = unpacked p1 (00 AA 00 RR 00 GG 00 BB)
+      movd_m2r(dx2,mm3);         // mm3 = dx2;   from here i call dx2 = 0xd1d2
+      movd_m2r(dx2,mm4);         // mm4 = dx2;
+      punpcklwd_r2r(mm3,mm4);    // mm4 = 00 00 00 00 d1 d2 d1 d2;
+      movq_r2r(mm4,mm3);         // mm3 = mm4;
+      punpcklwd_r2r(mm3,mm4);    // mm4 = d1 d2 d1 d2 d1 d2 d1 d2;  4 times dx2
+      movq_r2r(mm4,mm5);         // mm5 = mm4; copy
+      pmulhuw_r2r(mm4,mm1);      // mm1 = mm4 * mm1 = dx2 * p1 = dx * p1 / 32768 // get from multiplication only high 16 bits
+      packuswb_r2r(mm2,mm1);     // mm1 = packed mm1
+      movd_m2r(p2,mm6);          // mm6 = p2;
+      punpcklbw_r2r(mm2,mm6);    // mm6 = unpacked p2 (00 AA 00 RR 00 GG 00 BB)
+      pmulhuw_r2r(mm5,mm6);      // mm6 = mm5 * mm6 = dx2 * p2 = dx * p2 / 32768 // get from multiplication only high 16 bits
+      packuswb_r2r(mm2,mm6);     // mm6 = packed mm6
+      psubusb_r2r(mm1,mm0);      // mm0 = mm0 - mm1 = p1 - (p1*dx/32768)
+      paddusb_r2r(mm0,mm6);      // mm5 = mm0 + mm5 = p1 - (p1*dx/32768) + (p2*dx/32768)
+      
+      movd_r2m(mm6, *dst);
+
+      dx += step;
+      if (dx > 65536) 
+      {
+	    dx -= 65536;
+	    p1 = *src++;
+	    p2 = *src++;
+      } else 
+      {
+	    dx -= 32768;
+	    p1 = p2;
+	    p2 = *src++;
+      }
+
+      dst ++;
+      width --;
+    }
+  } else 
+  {
+    while (width) 
+    {
+      int offs;
+      
+      dx2 = dx * 2;
+	  if (dx2==65536) 
+	    dx2-= 1;
+      
+      movd_m2r(p1,mm0);          // mm0 = p1;  
+      movq_r2r(mm0,mm1);         // mm1 = mm0;  copy because result of unpack overides mm1 and we need p1 later again
+      pxor_r2r(mm2,mm2);         // mm2 = 0;
+      punpcklbw_r2r(mm2,mm1);    // mm1 = unpacked p1 (00 AA 00 RR 00 GG 00 BB)
+      movd_m2r(dx2,mm3);         // mm3 = dx2;   from here i call dx2 = 0xd1d2
+      movd_m2r(dx2,mm4);         // mm4 = dx2;
+      punpcklwd_r2r(mm3,mm4);    // mm4 = 00 00 00 00 d1 d2 d1 d2;
+      movq_r2r(mm4,mm3);         // mm3 = mm4;
+      punpcklwd_r2r(mm3,mm4);    // mm4 = d1 d2 d1 d2 d1 d2 d1 d2;  4 times dx2
+      movq_r2r(mm4,mm5);         // mm5 = mm4; copy
+      pmulhuw_r2r(mm4,mm1);      // mm1 = mm4 * mm1 = dx2 * p1 = dx * p1 / 32768 // get from multiplication only high 16 bits
+      packuswb_r2r(mm2,mm1);     // mm1 = packed mm1
+      movd_m2r(p2,mm6);          // mm6 = p2;
+      punpcklbw_r2r(mm2,mm6);    // mm6 = unpacked p2 (00 AA 00 RR 00 GG 00 BB)
+      pmulhuw_r2r(mm5,mm6);      // mm6 = mm5 * mm6 = dx2 * p2 = dx * p2 / 32768 // get from multiplication only high 16 bits
+      packuswb_r2r(mm2,mm6);     // mm6 = packed mm6
+      psubusb_r2r(mm1,mm0);      // mm0 = mm0 - mm1 = p1 - (p1*dx/32768)
+      paddusb_r2r(mm0,mm6);      // mm5 = mm0 + mm5 = p1 - (p1*dx/32768) + (p2*dx/32768)
+      
+      movd_r2m(mm6, *dst);
+
+      dx += step;
+      offs=((dx-1)>>15);
+      dx-=offs<<15;
+      src+=offs-2;
+      p1=*src++;
+      p2=*src++;
+      dst ++;
+      width --;
+    }
+  }
+};

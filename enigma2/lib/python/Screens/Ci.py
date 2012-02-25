@@ -8,7 +8,7 @@ from Components.ConfigList import ConfigList
 
 from Components.SystemInfo import SystemInfo
 
-from enigma import eTimer, eDVBCI_UI, eDVBCIInterfaces
+from enigma import eTimer, eDVBCI_UI, eDVBCIInterfaces, eEnv
 
 MAX_NUM_CI = 4
 
@@ -242,7 +242,7 @@ class CiMessageHandler:
 		eDVBCI_UI.getInstance().ciStateChanged.get().append(self.ciStateChanged)
 		SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots() > 0
 		try:
-			file = open("/usr/local/e2/etc/stb/tsmux/ci0_tsclk", "r")
+			file = open(eEnv.resolve("${sysconfdir}/stb/tsmux/ci0_tsclk"), "r")
 			file.close()
 			SystemInfo["CommonInterfaceSupportsHighBitrates"] = True
 		except:

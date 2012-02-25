@@ -4,7 +4,7 @@
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
 #include <lib/base/ebase.h>
-
+#include <lib/base/eenv.h>
 #include <lib/base/eerror.h>
 #include <lib/base/nconfig.h> // access to python config
 #include <lib/dvb/db.h>
@@ -653,7 +653,7 @@ int eDVBCIInterfaces::setInputSource(int tuner_no, data_source source)
 	if (getNumOfSlots() > 1) // FIXME .. we force DM8000 when more than one CI Slot is avail
 	{
 		char buf[64];
-		snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/input%d", tuner_no);
+		snprintf(buf, 64, eEnv::resolve("${sysconfdir}/stb/tsmux/input%d").c_str(), tuner_no);
 
 		FILE *input=0;
 		if((input = fopen(buf, "wb")) == NULL) {
@@ -700,7 +700,7 @@ int eDVBCIInterfaces::setInputSource(int tuner_no, data_source source)
 	else  // DM7025
 	{
 		char buf[64];
-		snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/input%d", tuner_no);
+		snprintf(buf, 64, eEnv::resolve("${sysconfdir}/stb/tsmux/input%d").c_str(), tuner_no);
 
 		if (tuner_no > 1)
 			eDebug("setInputSource(%d, %d) failed... dm7025 just have two inputs", tuner_no, (int)source);
@@ -1277,7 +1277,7 @@ int eDVBCISlot::setSource(data_source source)
 	if (eDVBCIInterfaces::getInstance()->getNumOfSlots() > 1) // FIXME .. we force DM8000 when more than one CI Slot is avail
 	{
 		char buf[64];
-		snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/ci%d_input", slotid);
+		snprintf(buf, 64, eEnv::resolve("${sysconfdir}/stb/tsmux/ci%d_input").c_str(), slotid);
 		FILE *ci = fopen(buf, "wb");
 		switch(source)
 		{
@@ -1315,9 +1315,10 @@ int eDVBCISlot::setSource(data_source source)
 	{
 //		eDebug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 //		eDebug("eDVBCISlot::enableTS(%d %d)", enable, (int)source);
-		FILE *ci = fopen("/usr/local/e2/etc/stb/tsmux/input2", "wb");
+		FILE *ci = fopen(eEnv::resolve("${sysconfdir}/stb/tsmux/input2").c_str(), "wb");
 		if(ci == NULL) {
-			eDebug("cannot open /usr/local/e2/etc/stb/tsmux/input2");
+      std::string err= "cannot open " + eEnv::resolve("${sysconfdir}/stb/tsmux/input2");
+			eDebug(err.c_str());
 			return 0;
 		}
 		if (source != TUNER_A && source != TUNER_B)
@@ -1333,7 +1334,7 @@ int eDVBCISlot::setSource(data_source source)
 int eDVBCISlot::setClockRate(int rate)
 {
 	char buf[64];
-	snprintf(buf, 64, "/usr/local/e2/etc/stb/tsmux/ci%d_tsclk", slotid);
+	snprintf(buf, 64, eEnv::resolve("${sysconfdir}/stb/tsmux/ci%d_tsclk").c_str(), slotid);
 	FILE *ci = fopen(buf, "wb");
 	if (ci)
 	{
