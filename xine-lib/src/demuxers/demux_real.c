@@ -540,7 +540,7 @@ static void real_parse_headers (demux_real_t *this) {
 
 	    lprintf("audio version %d detected\n", version);
 
-	    char *fourcc_ptr = "\0\0\0";
+	    const char *fourcc_ptr = "\0\0\0";
 	    switch(version) {
             case 3:
               /* Version 3 header stores fourcc after meta info - cheat by reading backwards from the
@@ -1251,7 +1251,7 @@ static int demux_real_send_chunk(demux_plugin_t *this_gen) {
           buf->size = 0;
           buf->type = this->video_stream->buf_type;
 
-          xine_fast_memcpy(buf->decoder_info_ptr[2], this->fragment_tab,
+          xine_fast_memcpy(buf->content, this->fragment_tab,
                            this->fragment_count*8);
 
           this->video_fifo->put(this->video_fifo, buf);

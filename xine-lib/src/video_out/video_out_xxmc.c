@@ -1794,6 +1794,8 @@ static void xxmc_display_frame (vo_driver_t *this_gen, vo_frame_t *frame_gen)
 static int xxmc_get_property (vo_driver_t *this_gen, int property) {
   xxmc_driver_t *this = (xxmc_driver_t *) this_gen;
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return 0;
+
   switch (property) {
   case VO_PROP_WINDOW_WIDTH:
     this->props[property].value = this->sc.gui_width;
@@ -1843,6 +1845,8 @@ static void xxmc_property_callback (void *property_gen, xine_cfg_entry_t *entry)
 static int xxmc_set_property (vo_driver_t *this_gen,
 			      int property, int value) {
   xxmc_driver_t *this = (xxmc_driver_t *) this_gen;
+
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return 0;
 
   if (this->props[property].atom != None) {
 
@@ -1932,6 +1936,10 @@ static void xxmc_get_property_min_max (vo_driver_t *this_gen,
 				       int property, int *min, int *max) {
   xxmc_driver_t *this = (xxmc_driver_t *) this_gen;
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) {
+    *min = *max = 0;
+    return;
+  }
   *min = this->props[property].min;
   *max = this->props[property].max;
 }
@@ -2494,8 +2502,8 @@ static vo_driver_t *open_plugin (video_driver_class_t *class_gen, const void *vi
   if (xv_port != 0) {
     if (! xxmc_open_port(this, xv_port)) {
       xprintf(class->xine, XINE_VERBOSITY_NONE,
-	      _("%s: could not open Xv port %d - autodetecting\n"),
-	      LOG_MODULE, xv_port);
+	      _("%s: could not open Xv port %lu - autodetecting\n"),
+	      LOG_MODULE, (unsigned long)xv_port);
       xv_port = xxmc_autodetect_port(this, adaptors, adaptor_info, &adaptor_num, xv_port, prefer_type);
     } else
       adaptor_num = xxmc_find_adaptor_by_port (xv_port, adaptors, adaptor_info);

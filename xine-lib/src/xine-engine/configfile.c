@@ -352,7 +352,7 @@ static void config_remove(config_values_t *this, cfg_entry_t *entry, cfg_entry_t
     prev->next = entry->next;
 }
 
-static char *config_xlate_internal (const char *key, const xine_config_entry_translation_t *trans)
+static const char *config_xlate_internal (const char *key, const xine_config_entry_translation_t *trans)
 {
   --trans;
   while ((++trans)->old_name)
@@ -1284,7 +1284,6 @@ static char* config_get_serialized_entry (config_values_t *this, const char *key
     int str_default_len = 0;
     int description_len = 0;
     int help_len = 0;
-    unsigned long output_len;
     unsigned long total_len;
     int value_count;
     int value_len[10];

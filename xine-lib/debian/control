@@ -24,15 +24,16 @@ Build-Depends: debhelper (>= 5.0.1), binutils (>= 2.12.90.0.9), pkg-config,
 	libflac-dev, libsdl1.2-dev, libwavpack-dev,
 	libsmbclient-dev, libspeex-dev, libmng-dev,
 	libmad0-dev, libmpcdec-dev, libcdio-dev, libvcdinfo-dev,
-	libdvdnav-dev, libdvdread-dev,
+	libdvdnav-dev, libdvdread-dev, libbluray-dev,
 	zlib1g-dev, w3m, xmlto, librsvg2-bin
 Standards-Version: 3.7.2
 
-Package: libxine-dev
+Package: libxine2-dev
 Architecture: any
 Section: libdevel
-Depends: libxine2 (= ${Source-Version}), libc6-dev, zlib1g-dev | libz-dev, libslang2-dev | slang1-dev, libfreetype6-dev, pkg-config
+Depends: libxine2 (= ${Source-Version}), pkg-config
 Conflicts: xine-ui (<< 0.9.10), libxine-dev
+Replaces: libxine-dev (>= 1.1.90)
 Description: the xine video player library, development packages
  This contains development files (headers, documentation and the like)
  for the xine library (libxine).
@@ -71,7 +72,7 @@ Recommends: ${shlibs:Recommends}
 Suggests: ${shlibs:Suggests}, libxine2-doc | libxine-doc
 Conflicts: libxine2-all-plugins, libxine2-bin, libxine2-console, libxine2-ffmpeg, libxine2-gnome, libxine2-misc-plugins, libxine2-plugins, libxine2-x
 Replaces: libxine2-all-plugins, libxine2-bin, libxine2-console, libxine2-ffmpeg, libxine2-gnome, libxine2-misc-plugins, libxine2-plugins, libxine2-x
-Provides: libxine2-all-plugins, libxine2-bin, libxine2-console, libxine2-ffmpeg, libxine2-gnome, libxine2-misc-plugins, libxine2-plugins, libxine2-x
+Provides: libxine2-all-plugins, libxine2-bin, libxine2-console, libxine2-ffmpeg, libxine2-gnome, libxine2-misc-plugins, libxine2-plugins, libxine2-x, libxine2-vdr
 Description: the xine video/media player library, binary files
  This is the xine media player library (libxine).
  .

@@ -63,7 +63,7 @@ if HAVE_RSVG
 .svg.png:
 	$(AM_V_GEN)rsvg -f png $^ $@
 if HAVE_OPTIPNG
-	$(AM_V_at)optipng $@
+	$(AM_V_at)optipng -quiet $@
 endif
 else
 .svg.png:

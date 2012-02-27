@@ -640,6 +640,8 @@ static void xv_display_frame (vo_driver_t *this_gen, vo_frame_t *frame_gen) {
 static int xv_get_property (vo_driver_t *this_gen, int property) {
   xv_driver_t *this = (xv_driver_t *) this_gen;
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return (0);
+
   switch (property) {
     case VO_PROP_WINDOW_WIDTH:
       this->props[property].value = this->sc.gui_width;
@@ -679,6 +681,8 @@ static void xv_property_callback (void *property_gen, xine_cfg_entry_t *entry) {
 static int xv_set_property (vo_driver_t *this_gen,
 			    int property, int value) {
   xv_driver_t *this = (xv_driver_t *) this_gen;
+
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return 0;
 
   if (this->props[property].atom != XCB_NONE) {
     xcb_xv_get_port_attribute_cookie_t get_attribute_cookie;
@@ -757,6 +761,11 @@ static void xv_get_property_min_max (vo_driver_t *this_gen,
 				     int property, int *min, int *max) {
   xv_driver_t *this = (xv_driver_t *) this_gen;
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) {
+    *min = *max = 0;
+    return;
+  }
+
   *min = this->props[property].min;
   *max = this->props[property].max;
 }
@@ -826,7 +835,7 @@ static int xv_gui_data_exchange (vo_driver_t *this_gen,
 
   case XINE_GUI_SEND_DRAWABLE_CHANGED:
     pthread_mutex_lock(&this->main_mutex);
-    this->window = (xcb_window_t) data;
+    this->window = (xcb_window_t) (long) data;
     xcb_free_gc(this->connection, this->gc);
     this->gc = xcb_generate_id(this->connection);
     xcb_create_gc(this->connection, this->gc, this->window, 0, NULL);
@@ -973,9 +982,9 @@ static int xv_check_yv12(xcb_connection_t *connection, xcb_xv_port_t port) {
 static void xv_check_capability (xv_driver_t *this,
 				 int property, xcb_xv_attribute_info_t *attr,
 				 int base_id,
-				 char *config_name,
-				 char *config_desc,
-				 char *config_help) {
+				 const char *config_name,
+				 const char *config_desc,
+				 const char *config_help) {
   int          int_default;
   cfg_entry_t *entry;
   const char  *str_prop = xcb_xv_attribute_info_name(attr);
@@ -1218,8 +1227,8 @@ static vo_driver_t *open_plugin(video_driver_class_t *class_gen, const void *vis
   if (xv_port != 0) {
     if (! xv_open_port(this, xv_port)) {
       xprintf(class->xine, XINE_VERBOSITY_NONE,
-	      _("%s: could not open Xv port %d - autodetecting\n"),
-	      LOG_MODULE, xv_port);
+	      _("%s: could not open Xv port %lu - autodetecting\n"),
+	      LOG_MODULE, (unsigned long)xv_port);
       adaptor_it = adaptor_first;
       xv_port = xv_autodetect_port (this, &adaptor_it, xv_port, prefer_type);
     } else

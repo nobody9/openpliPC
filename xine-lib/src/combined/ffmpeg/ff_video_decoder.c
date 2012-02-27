@@ -50,24 +50,14 @@
 #  include <libpostproc/postprocess.h>
 #endif
 
+#include "ffmpeg_compat.h"
+
 #define VIDEOBUFSIZE        (128*1024)
 #define SLICE_BUFFER_SIZE   (1194*1024)
 
 #define SLICE_OFFSET_SIZE   128
 
 #define ENABLE_DIRECT_RENDERING
-
-#if LIBAVCODEC_VERSION_MAJOR >= 53 || (LIBAVCODEC_VERSION_MAJOR == 52 && LIBAVCODEC_VERSION_MINOR >= 32)
-#  define AVVIDEO 2
-#else
-#  define AVVIDEO 1
-#  define pp_context	pp_context_t
-#  define pp_mode	pp_mode_t
-#endif
-
-#if LIBAVCODEC_VERSION_MAJOR >= 53 || (LIBAVCODEC_VERSION_MAJOR == 52 && LIBAVCODEC_VERSION_MINOR >= 112)
-#  define DEPRECATED_AVCODEC_THREAD_INIT 1
-#endif
 
 typedef struct ff_video_decoder_s ff_video_decoder_t;
 
@@ -137,7 +127,9 @@ struct ff_video_decoder_s {
 
   yuv_planes_t      yuv;
 
+#ifdef AVPaletteControl
   AVPaletteControl  palette_control;
+#endif
 
 #ifdef LOG
   enum PixelFormat  debug_fmt;
@@ -225,7 +217,9 @@ static int get_buffer(AVCodecContext *context, AVFrame *av_frame){
   /* We should really keep track of the ages of xine frames (see
    * avcodec_default_get_buffer in libavcodec/utils.c)
    * For the moment tell ffmpeg that every frame is new (age = bignumber) */
+#ifdef AVFRAMEAGE
   av_frame->age = 256*256*256*64;
+#endif
 
   av_frame->type= FF_BUFFER_TYPE_USER;
 
@@ -1033,7 +1027,9 @@ static void ff_handle_special_buffer (ff_video_decoder_t *this, buf_element_t *b
     memcpy(this->context->extradata, buf->decoder_info_ptr[2],
       buf->decoder_info[2]);
 
-  } else if (buf->decoder_info[1] == BUF_SPECIAL_PALETTE) {
+  }
+#ifdef AVPaletteControl
+  else if (buf->decoder_info[1] == BUF_SPECIAL_PALETTE) {
     unsigned int i;
 
     palette_entry_t *demuxer_palette;
@@ -1052,7 +1048,9 @@ static void ff_handle_special_buffer (ff_video_decoder_t *this, buf_element_t *b
     }
     decoder_palette->palette_changed = 1;
 
-  } else if (buf->decoder_info[1] == BUF_SPECIAL_RV_CHUNK_TABLE) {
+  }
+#endif
+  else if (buf->decoder_info[1] == BUF_SPECIAL_RV_CHUNK_TABLE) {
     int i;
 
     lprintf("BUF_SPECIAL_RV_CHUNK_TABLE\n");
@@ -1625,7 +1623,21 @@ static void ff_reset (video_decoder_t *this_gen) {
   this->size = 0;
 
   if(this->context && this->decoder_ok)
+  {
+    xine_list_iterator_t it;
+    AVFrame *av_frame;
+
     avcodec_flush_buffers(this->context);
+
+    /* frame garbage collector here - workaround for buggy ffmpeg codecs that
+     * don't release their DR1 frames */
+    while( (it = xine_list_front(this->dr1_frames)) != NULL )
+    {
+      av_frame = (AVFrame *)xine_list_get_value(this->dr1_frames, it);
+      release_buffer(this->context, av_frame);
+    }
+    xine_list_clear(this->dr1_frames);
+  }
 
   if (this->is_mpeg12)
     mpeg_parser_reset(this->mpeg_parser);
@@ -1754,7 +1766,9 @@ static video_decoder_t *ff_video_open_plugin (video_decoder_class_t *class_gen, 
   this->av_frame          = avcodec_alloc_frame();
   this->context           = avcodec_alloc_context();
   this->context->opaque   = this;
+#ifdef AVPaletteControl
   this->context->palctrl  = NULL;
+#endif
 
   this->decoder_ok        = 0;
   this->decoder_init_mode = 1;

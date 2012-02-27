@@ -53,7 +53,7 @@
 #elif defined(HAVE_MPC_MPCDEC_H)
 # include <mpc/mpcdec.h>
 #else
-# include "musepack/musepack.h"
+# include "mpcdec/mpcdec.h"
 #endif
 
 #define MPC_DECODER_MEMSIZE  65536

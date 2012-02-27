@@ -732,8 +732,6 @@ static avi_t *XINE_MALLOC AVI_init(demux_avi_t *this) {
   int lasttag = 0;
   int vids_strh_seen = 0;
   int vids_strf_seen = 0;
-  int auds_strh_seen = 0;
-  int auds_strf_seen = 0;
   int num_stream = 0;
   uint8_t data[256];
   int strf_size;
@@ -898,7 +896,6 @@ static avi_t *XINE_MALLOC AVI_init(demux_avi_t *this) {
 
           a->dwSampleSize  = _X_LE_32(hdrl_data + i + 44);
           a->audio_tot     = 0;
-          auds_strh_seen   = 1;
           lprintf("audio stream header, num_stream=%d\n", num_stream);
 
           lasttag = 2; /* auds */
@@ -985,7 +982,6 @@ static avi_t *XINE_MALLOC AVI_init(demux_avi_t *this) {
         AVI->audio[AVI->n_audio-1]->wavex     = wavex;
         AVI->audio[AVI->n_audio-1]->wavex_len = n;
         lprintf("audio stream format\n");
-        auds_strf_seen = 1;
       }
 
     } else if(strncasecmp(hdrl_data + i, "indx",4) == 0) {
@@ -1712,7 +1708,7 @@ static int demux_avi_next_streaming (demux_avi_t *this, int decoder_flags) {
   int64_t        audio_pts, video_pts;
   off_t          current_pos;
   int            left;
-  int            header, chunk_len, audio_stream;
+  int            header, chunk_len = 0, audio_stream;
   avi_audio_t   *audio;
 
   current_pos = this->input->get_current_pos(this->input);

@@ -96,11 +96,12 @@ void lexer_init(const char * buf, int size) {
   static_lexer = lexer_init_r(buf, size);
 }
 
-static enum {
+
+enum {
   NORMAL,
   DATA,
   CDATA,
-} lex_mode = NORMAL;
+};
 
 struct lexer *lexer_init_r(const char * buf, int size) {
   static const char boms[] = { 0xFF, 0xFE, 0, 0, 0xFE, 0xFF },

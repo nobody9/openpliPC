@@ -512,13 +512,13 @@ static int asf_read_header (demux_asf_t *this) {
          * XX bytes : optional palette
          */
 	uint32_t width, height;
-	uint16_t bmiheader_size;
+	/*uint16_t bmiheader_size;*/
 	xine_bmiheader *bmiheader;
 
 	width = _X_LE_32(asf_stream->private_data);
 	height = _X_LE_32(asf_stream->private_data + 4);
 	/* there is one unknown byte between height and the bmiheader size */
-	bmiheader_size = _X_LE_16(asf_stream->private_data + 9);
+	/*bmiheader_size = _X_LE_16(asf_stream->private_data + 9);*/
 
 	/* FIXME: bmiheader_size must be >= sizeof(xine_bmiheader) */
 
@@ -994,8 +994,10 @@ static int asf_parse_packet_ecd(demux_asf_t *this, uint32_t  *p_hdr_size) {
 /* return 0 if ok */
 static int asf_parse_packet_payload_header(demux_asf_t *this, uint32_t p_hdr_size) {
 
+#ifdef LOG
   int64_t   timestamp;
   int64_t   duration;
+#endif
 
   this->packet_len_flags = get_byte(this);  p_hdr_size += 1;
   this->packet_prop_flags = get_byte(this);  p_hdr_size += 1;
@@ -1034,8 +1036,14 @@ static int asf_parse_packet_payload_header(demux_asf_t *this, uint32_t p_hdr_siz
       this->packet_padsize = 0;
   }
 
+#ifdef LOG
   timestamp = get_le32(this); p_hdr_size += 4;
   duration  = get_le16(this); p_hdr_size += 2;
+#else
+  /* skip the above bytes */
+  this->input->seek (this->input, 6, SEEK_CUR);
+  p_hdr_size += 6;
+#endif
 
   lprintf ("timestamp=%"PRId64", duration=%"PRId64"\n", timestamp, duration);
 
@@ -1577,11 +1585,11 @@ static int demux_asf_parse_asx_references( demux_asf_t *this) {
                        ENTRYREF, MOREINFO, PARAM, REPEAT, TITLE
      */
 
-    const char *base_href = NULL;
+    /*const char *base_href = NULL;*/
 
     for (asx_entry = xml_tree->child; asx_entry; asx_entry = asx_entry->next)
     {
-      const char *ref_base_href = base_href;
+      /*const char *ref_base_href = base_href;*/
 
       if (!strcasecmp (asx_entry->name, "ENTRY"))
       {
@@ -1637,9 +1645,11 @@ static int demux_asf_parse_asx_references( demux_asf_t *this) {
               duration = asx_get_time_value (asx_ref);
           }
 
+#if 0
           else if (!strcasecmp (asx_ref->name, "BASE"))
             /* Attributes: HREF */
-                ref_base_href = xml_parser_get_property (asx_entry, "HREF");
+            ref_base_href = xml_parser_get_property (asx_entry, "HREF");
+#endif
         }
 
         /* FIXME: prepend ref_base_href to href */
@@ -1657,9 +1667,11 @@ static int demux_asf_parse_asx_references( demux_asf_t *this) {
           _x_demux_send_mrl_reference (this->stream, 0, href, NULL, 0, -1);
       }
 
+#if 0
       else if (!strcasecmp (asx_entry->name, "BASE"))
         /* Attributes: HREF */
         base_href = xml_parser_get_property (asx_entry, "HREF");
+#endif
     }
   }
   else

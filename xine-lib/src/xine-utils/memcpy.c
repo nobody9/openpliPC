@@ -53,6 +53,7 @@
 */
 
 #include <xine/xine_internal.h>
+#include "../xine-engine/xine_private.h"
 
 void *(* xine_fast_memcpy)(void *to, const void *from, size_t len);
 

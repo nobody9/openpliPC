@@ -395,7 +395,7 @@ static post_plugin_t *deinterlace_open_plugin(post_class_t *class_gen, int input
 
   pthread_mutex_init (&this->lock, NULL);
 
-  set_parameters ((xine_post_t *)&this->post, &class->init_param);
+  set_parameters (&this->post.xine_post, &class->init_param);
 
   port = _x_post_intercept_video_port(&this->post, video_target[0], &input, &output);
   /* replace with our own get_frame function */
@@ -437,6 +437,7 @@ static void deinterlace_dispose(post_plugin_t *this_gen)
   if (_x_post_dispose(this_gen)) {
     _flush_frames(this);
     pthread_mutex_destroy(&this->lock);
+    free(this->tvtime);
     free(this);
   }
 }

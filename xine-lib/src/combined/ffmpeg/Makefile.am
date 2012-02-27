@@ -17,6 +17,8 @@ DISTCLEANFILES = $(ff_generated)
 
 EXTRA_DIST = xine_video.list xine_audio.list mkcodeclist.pl
 
+noinst_HEADERS = ffmpeg_compat.h
+
 xineplug_decode_ff_la_SOURCES = ffmpeg_decoder.c ff_audio_decoder.c ff_video_decoder.c \
                                 ff_mpeg_parser.c ffmpeg_decoder.h ff_mpeg_parser.h
 

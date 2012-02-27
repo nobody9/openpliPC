@@ -315,7 +315,7 @@ static post_plugin_t *upmix_mono_open_plugin(post_class_t *class_gen, int inputs
 
   pthread_mutex_init (&this->lock, NULL);
 
-  set_parameters ((xine_post_t *)&this->post, &init_params);
+  set_parameters (&this->post.xine_post, &init_params);
 
   port = _x_post_intercept_audio_port(&this->post, audio_target[0], &input, &output);
   port->new_port.open       = upmix_mono_port_open;

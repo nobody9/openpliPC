@@ -141,7 +141,6 @@ static int demux_mve_send_chunk(demux_plugin_t *this_gen) {
   demux_mve_t *this = (demux_mve_t *) this_gen;
 
   buf_element_t *buf = NULL;
-  int64_t text_pts = 0;
   int64_t audio_pts = 0;
   unsigned char preamble[PREAMBLE_SIZE];
   unsigned int chunk_tag;
@@ -264,7 +263,7 @@ static int demux_mve_send_chunk(demux_plugin_t *this_gen) {
       }
       this->video_pts += WC3_PTS_INC;
     } else if (chunk_tag == TEXT_TAG) {
-      text_pts = this->video_pts - WC3_PTS_INC;
+      /*text_pts = this->video_pts - WC3_PTS_INC;*/
 
       /* unhandled thus far */
       this->input->seek(this->input, chunk_size, SEEK_CUR);

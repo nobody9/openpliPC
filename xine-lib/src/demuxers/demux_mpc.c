@@ -90,7 +90,7 @@ static int open_mpc_file(demux_mpc_t *this) {
   /* TODO: non-seeking version */
   if (INPUT_IS_SEEKABLE(this->input)) {
     /* Check for id3v2 tag */
-    if (id3v2_istag(this->header)) {
+    if (id3v2_istag(_X_BE_32(this->header))) {
 
       lprintf("found id3v2 header\n");
 

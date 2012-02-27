@@ -354,7 +354,7 @@ exit_error:
 static int asf_header_parse_stream_extended_properties(asf_header_t *header, uint8_t *buffer, int buffer_len) {
   asf_reader_t reader;
   uint32_t flags = 0;
-  uint16_t stream_number;
+  uint16_t stream_number = 0;
   int i;
   int stream_id;
   asf_stream_extension_t *asf_stream_extension;
@@ -527,7 +527,7 @@ static int asf_header_parse_metadata(asf_header_t *header_pub, uint8_t *buffer, 
 
   for (i = 0; i < records_count; i++)
   {
-    uint16_t index, stream, name_len = 0, data_type;
+    uint16_t index, stream = 0, name_len = 0, data_type;
     uint32_t data_len = 0;
     int stream_id;
 

@@ -689,7 +689,6 @@ static int demux_iff_send_chunk(demux_plugin_t *this_gen) {
   int64_t zw_pts;
   int64_t zw_rescale;
   int j, k;
-  int first_buf;
   int interleave_index;
   int size;
 
@@ -791,7 +790,6 @@ static int demux_iff_send_chunk(demux_plugin_t *this_gen) {
         interleave_index                = (current_file_pos *
                                            this->audio_compression_factor);
       }
-      first_buf                         = 1;
 
       zw_pts                            = current_file_pos;
 

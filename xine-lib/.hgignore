@@ -2,8 +2,7 @@ syntax: glob
 *~
 *.orig
 
-xine-lib-*.tar.gz
-xine-lib-*.tar.bz2
+xine-lib-*.tar.{gz,bz2,xz}
 
 *.o
 *.a
@@ -44,7 +43,7 @@ autom4te.cache
 build-stamp
 configure-stamp
 debian/files
-debian/libxine-dev
+debian/libxine2-dev
 debian/libxine2
 debian/libxine2-dbg
 debian/libxine2-doc

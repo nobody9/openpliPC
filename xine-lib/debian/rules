@@ -102,7 +102,7 @@ update-config-sub-guess:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp po/*.gmo po/stamp-po
+	rm -f build-stamp configure-stamp po/*.gmo po/stamp-po debian/dh_xine
 	if test -f .noauto; then \
 	    [ ! -f Makefile ] || $(MAKE) distclean; \
 	  else \
@@ -110,7 +110,10 @@ clean:
 	  fi
 	dh_clean
 
-install: build
+debian/dh_xine: debian/dh_xine.in
+	sed -e's/@VERSION@/'$(shell dpkg-parsechangelog -c1 | sed -e '/^Version:/! d; s/^.* //; s/-[^-]*$$//')'/' $< >$@
+
+install: build debian/dh_xine
 	dh_testdir
 	dh_testroot
 	dh_clean -k

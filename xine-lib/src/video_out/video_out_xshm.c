@@ -34,9 +34,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "xine.h"
-#include <xine/video_out.h>
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -63,6 +60,8 @@
 #define LOG
 */
 
+#include "xine.h"
+#include <xine/video_out.h>
 #include <xine/xine_internal.h>
 #include "yuv2rgb.h"
 #include <xine/xineutils.h>

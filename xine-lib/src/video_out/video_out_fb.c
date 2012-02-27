@@ -54,9 +54,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "xine.h"
-#include <xine/video_out.h>
-
 #include <errno.h>
 
 #include <sys/ipc.h>
@@ -84,6 +81,8 @@
 #define LOG
 */
 
+#include "xine.h"
+#include <xine/video_out.h>
 #include <xine/xine_internal.h>
 #include "yuv2rgb.h"
 #include <xine/xineutils.h>

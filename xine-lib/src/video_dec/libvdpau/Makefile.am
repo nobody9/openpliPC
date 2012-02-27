@@ -4,7 +4,7 @@ include $(top_srcdir)/misc/Makefile.common
 AM_CFLAGS = $(DEFAULT_OCFLAGS) $(VISIBILITY_FLAG)
 AM_LDFLAGS = $(xineplug_ldflags)
 
-noinst_HEADERS = bits_reader.h dpb.h cpb.h h264_parser.h nal.h
+noinst_HEADERS = alterh264_decode.h alterh264_bits_reader.h bits_reader.h dpb.h cpb.h h264_parser.h nal.h
 
 if ENABLE_VDPAU
 vdpau_h264_module = xineplug_decode_vdpau_h264.la

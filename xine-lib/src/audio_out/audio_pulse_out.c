@@ -360,7 +360,6 @@ static int ao_pulse_open(ao_driver_t *this_gen,
   pulse_driver_t *this = (pulse_driver_t *) this_gen;
   pa_sample_spec ss;
   pa_channel_map cm;
-  int r;
 
   xprintf (this->xine, XINE_VERBOSITY_DEBUG,
            "audio_pulse_out: ao_open bits=%d rate=%d, mode=%d\n", bits, rate, mode);
@@ -466,7 +465,7 @@ static int ao_pulse_open(ao_driver_t *this_gen,
   pa_stream_set_write_callback(this->stream, __xine_pa_stream_request_callback, this);
   pa_stream_set_latency_update_callback(this->stream, __xine_pa_stream_notify_callback, this);
 
-  r = pa_stream_connect_playback(this->stream, this->sink, NULL,
+  pa_stream_connect_playback(this->stream, this->sink, NULL,
                              PA_STREAM_INTERPOLATE_TIMING|PA_STREAM_AUTO_TIMING_UPDATE,
                              NULL, NULL);
 

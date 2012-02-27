@@ -122,7 +122,7 @@ typedef struct sputext_class_s {
   char               font_ft[FILENAME_MAX]; /* subtitle font */
   int                use_font_ft;     /* use Freetype */
 #endif
-  char              *src_encoding;    /* encoding of subtitle file */
+  const char        *src_encoding;    /* encoding of subtitle file */
   int                use_unscaled;    /* use unscaled OSD if possible */
 
   xine_t            *xine;

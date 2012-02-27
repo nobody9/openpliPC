@@ -140,9 +140,17 @@ AC_DEFUN([XINE_INPUT_PLUGINS], [
     dnl XXX: This could be cleaned up so that code does not have it ifdef so much
     XINE_ARG_ENABLE([vcd], [Enable VCD (VideoCD) support])
     if test x"$enable_vcd" != x"no"; then
-        PKG_CHECK_MODULES([LIBCDIO], [libcdio >= 0.71])
-        PKG_CHECK_MODULES([LIBVCDINFO], [libvcdinfo >= 0.7.23])
-        AC_DEFINE([HAVE_VCDNAV], 1, [Define this if you use external libcdio/libvcdinfo])
+	no_vcd=no
+        PKG_CHECK_MODULES([LIBCDIO], [libcdio >= 0.71],
+        	[PKG_CHECK_MODULES([LIBVCDINFO], [libvcdinfo >= 0.7.23], [], [no_vcd=yes])],
+		[if test x"$hard_enable_vcd" = 'xyes'; then
+		   AC_MSG_ERROR([$LIBCDIO_PKG_ERRORS])
+		 fi
+		 no_vcd=yes]
+        )
+        if test "$no_vcd" = 'no'; then
+	    AC_DEFINE([HAVE_VCDNAV], 1, [Define this if you use external libcdio/libvcdinfo])
+	fi
     fi
 
     enable_vcdo=no

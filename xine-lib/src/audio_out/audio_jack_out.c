@@ -278,12 +278,13 @@ static int jack_callback (jack_nframes_t nframes, void *arg)
   return 0;
 }
 
-
+#if 0
 static void jack_shutdown (void *arg)
 {
   jack_driver_t *this = (jack_driver_t *) arg;
   this->client = NULL;
 }
+#endif
 
 /*
  * Open the Jack audio device
@@ -295,7 +296,6 @@ static int jack_open_device (ao_driver_t *this_gen, char *jack_device,
 {
   jack_driver_t *this = (jack_driver_t *) this_gen;
   const char **matching_ports = NULL;
-  char *port_name = NULL;
   jack_client_t *client = this->client;
 
   int port_flags = JackPortIsInput;
@@ -686,7 +686,6 @@ static ao_driver_t *open_jack_plugin (audio_driver_class_t *class_gen,
   uint32_t rate;
   char *jack_device;
   const char **matching_ports = NULL;
-  const char **port_names;
 
   /* for usability reasons, keep this in sync with audio_oss_out.c */
   static char *speaker_arrangement[] = {

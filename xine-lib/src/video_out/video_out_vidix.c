@@ -697,6 +697,8 @@ static int vidix_get_property (vo_driver_t *this_gen, int property) {
 
   vidix_driver_t *this = (vidix_driver_t *) this_gen;
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return 0;
+
   switch (property) {
     case VO_PROP_WINDOW_WIDTH:
       this->props[property].value = this->sc.gui_width;
@@ -730,6 +732,8 @@ static int vidix_set_property (vo_driver_t *this_gen,
 
   vidix_driver_t *this = (vidix_driver_t *) this_gen;
   int err;
+
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return 0;
 
   if ((value >= this->props[property].min) &&
       (value <= this->props[property].max))
@@ -853,6 +857,10 @@ static void vidix_get_property_min_max (vo_driver_t *this_gen,
 
   vidix_driver_t *this = (vidix_driver_t *) this_gen;
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) {
+    *min = *max = 0;
+    return;
+  }
   *min = this->props[property].min;
   *max = this->props[property].max;
 }

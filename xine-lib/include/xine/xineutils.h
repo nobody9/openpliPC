@@ -257,6 +257,9 @@ extern void (*yuy2_to_yv12)
 #define SCALEFACTOR 65536
 #define CENTERSAMPLE 128
 
+/* These conversions are normalised for the MPEG Y'CbCr colourspace.
+ * (Yes, we know that we call it YUV elsewhere.)
+ */
 #define COMPUTE_Y(r, g, b) \
   (unsigned char) \
   ((y_r_table[r] + y_g_table[g] + y_b_table[b]) / SCALEFACTOR)

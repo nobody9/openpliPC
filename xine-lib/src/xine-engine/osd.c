@@ -850,7 +850,7 @@ static void osd_set_position (osd_object_t *osd, int x, int y) {
   osd->display_y = y;
 }
 
-static uint16_t gzread_i16(gzFile *fp) {
+static uint16_t gzread_i16(gzFile fp) {
   uint16_t ret;
   ret = gzgetc(fp);
   ret |= (gzgetc(fp)<<8);
@@ -863,7 +863,7 @@ static uint16_t gzread_i16(gzFile *fp) {
 
 static int osd_renderer_load_font(osd_renderer_t *this, char *filename) {
 
-  gzFile      *fp;
+  gzFile       fp;
   osd_font_t  *font = NULL;
   int          i, ret = 0;
 

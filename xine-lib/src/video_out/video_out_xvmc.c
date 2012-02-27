@@ -783,7 +783,7 @@ static void xvmc_update_frame_format (vo_driver_t *this_gen,
     frame->ratio               = ratio;
   }
 
-  xvmc->macroblocks = (xine_macroblocks_t *)&this->macroblocks;
+  xvmc->macroblocks = &this->macroblocks.xine_mc;
   this->macroblocks.num_blocks = 0;
   this->macroblocks.macroblockptr = this->macroblocks.macroblockbaseptr;
   this->macroblocks.xine_mc.blockptr =
@@ -991,6 +991,8 @@ static int xvmc_get_property (vo_driver_t *this_gen, int property) {
 
   lprintf ("xvmc_get_property\n");
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return 0;
+
   switch (property) {
     case VO_PROP_WINDOW_WIDTH:
       this->props[property].value = this->sc.gui_width;
@@ -1032,6 +1034,8 @@ static int xvmc_set_property (vo_driver_t *this_gen,
   xvmc_driver_t *this = (xvmc_driver_t *) this_gen;
 
   lprintf ("xvmc_set_property %d value %d\n",property,value);
+
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) return 0;
 
   if (this->props[property].atom != None) {
     /* value is out of bound */
@@ -1101,6 +1105,10 @@ static void xvmc_get_property_min_max (vo_driver_t *this_gen,
 
   lprintf ("xvmc_get_property_min_max\n");
 
+  if ((property < 0) || (property >= VO_NUM_PROPERTIES)) {
+    *min = *max = 0;
+    return;
+  }
   *min = this->props[property].min;
   *max = this->props[property].max;
 }

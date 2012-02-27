@@ -855,7 +855,7 @@ static void xml_parser_dump_node (const xml_node_t *node, int indent) {
     free (value);
     p = p->next;
     if (p) {
-      printf ("\n%*s", indent+2+l, "");
+      printf ("\n%*s", indent+2+(int)l, "");
     }
   }
   printf (">\n");

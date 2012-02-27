@@ -47,6 +47,10 @@ AC_DEFUN([XINE_VIDEO_OUT_PLUGINS], [
             default_enable_vdpau=yes
             ;;
 
+        gnu*)
+            default_enable_vdpau=yes
+            ;;
+
         linux*)
             default_enable_dxr3=yes
             default_enable_fb=yes
@@ -311,7 +315,7 @@ AC_DEFUN([XINE_VIDEO_OUT_PLUGINS], [
                                             [XINERAMA_LIBS="-lXinerama" have_xinerama="yes"], [],
                                             [$X_LIBS])])
         fi
-        if test x"$enable_xinerama" = x"yes" && test x"$have_xinerama" != x"yes"; then
+        if test x"$hard_enable_xinerama" = x"yes" && test x"$have_xinerama" != x"yes"; then
             AC_MSG_ERROR([Xinerama support requested, but Xinerama not found or X disabled])
         elif test x"$have_xinerama" = x"yes"; then
             AC_DEFINE([HAVE_XINERAMA], 1, [Define this if you have libXinerama installed])

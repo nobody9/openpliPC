@@ -107,6 +107,16 @@ to the extent permitted by law.\n",
     return 0;
 
   xine_t *xine = xine_new ();
+
+  /* Avoid writing catalog.cache if possible */
+  int major, minor, sub;
+  xine_get_version (&major, &minor, &sub);
+  if ((major == 1 && minor == 1 && sub > 20) ||
+      (major == 1 && minor == 2 && sub > 0) ||
+      (major == 1 && minor > 2) ||
+      (major > 1))
+    xine_set_flags (xine, XINE_FLAG_NO_WRITE_CACHE);
+
   xine_init (xine);
 
   char *text = NULL;

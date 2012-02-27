@@ -1326,7 +1326,8 @@ void _x_scan_plugins (xine_t *this) {
 
   load_required_plugins (this);
 
-  XINE_PROFILE(save_catalog (this));
+  if ((_x_flags & XINE_FLAG_NO_WRITE_CACHE) == 0)
+    XINE_PROFILE(save_catalog (this));
 
   map_decoders (this);
 }
@@ -2121,7 +2122,7 @@ video_decoder_t *_x_get_video_decoder (xine_stream_t *stream, uint8_t stream_typ
 
     vd = ((video_decoder_class_t *)node->plugin_class)->open_plugin(node->plugin_class, stream);
 
-    if (vd == 1) {
+    if (vd == (video_decoder_t*)1) {
       /* HACK: plugin failed to instantiate because required resources are unavailable at that time,
          but may be available later, so don't remove this plugin from catalog. */
       xprintf(stream->xine, XINE_VERBOSITY_DEBUG,
@@ -2631,7 +2632,7 @@ void xine_post_dispose(xine_t *xine, xine_post_t *post_gen) {
  * @param joining String to use to join the various strings together.
  * @param final_length The pre-calculated final length of the string.
  */
-static char *_x_concatenate_with_string(char const **strings, size_t count, char *joining, size_t final_length) {
+static char *_x_concatenate_with_string(char const **strings, size_t count, const char *joining, size_t final_length) {
   size_t i;
   char *const result = malloc(final_length+1); /* Better be safe */
   char *str = result;
@@ -2780,7 +2781,7 @@ static void dispose_plugin_list (xine_sarray_t *list, int is_cache) {
       case PLUGIN_VIDEO_DECODER:
 	decoder_info = (decoder_info_t *)node->info->special_info;
 
-	free (decoder_info->supported_types);
+	free ((void *)decoder_info->supported_types);
 
       default:
 	free ((void *)node->info->special_info);
@@ -2788,7 +2789,7 @@ static void dispose_plugin_list (xine_sarray_t *list, int is_cache) {
       }
 
       /* free info structure and string copies */
-      free (node->info->id);
+      free ((void *)node->info->id);
       free (node->info);
 
       /* don't free the entry list if the node is cache */

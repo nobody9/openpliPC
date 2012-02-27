@@ -864,7 +864,7 @@ static int xshm_gui_data_exchange (vo_driver_t *this_gen,
   break;
 
   case XINE_GUI_SEND_DRAWABLE_CHANGED:
-    this->window = (xcb_window_t) data;
+    this->window = (xcb_window_t) (long) data;
 
     pthread_mutex_lock(&this->main_mutex);
     xcb_free_gc(this->connection, this->gc);

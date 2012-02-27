@@ -980,6 +980,7 @@ static int32_t parse_private_stream_1(demux_mpeg_pes_t *this, uint8_t *p, buf_el
     } else if ((p[0]&0xf0) == 0xa0) {
 
       int pcm_offset;
+#if 0
       int number_of_frame_headers;
       int first_access_unit_pointer;
       int audio_frame_number;
@@ -987,13 +988,14 @@ static int32_t parse_private_stream_1(demux_mpeg_pes_t *this, uint8_t *p, buf_el
       int sample_rate;
       int num_channels;
       int dynamic_range;
-
+#endif
       /*
        * found in http://members.freemail.absa.co.za/ginggs/dvd/mpeg2_lpcm.txt
        * appears to be correct.
        */
 
       track = p[0] & 0x0F;
+#if 0
       number_of_frame_headers = p[1];
       /* unknown = p[2]; */
       first_access_unit_pointer = p[3];
@@ -1024,6 +1026,7 @@ static int32_t parse_private_stream_1(demux_mpeg_pes_t *this, uint8_t *p, buf_el
       case 2: bits_per_sample = 24; break;
       }
       dynamic_range = p[6];
+#endif
 
       /* send lpcm config byte */
       buf->decoder_flags |= BUF_FLAG_SPECIAL;

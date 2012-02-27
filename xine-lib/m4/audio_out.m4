@@ -13,7 +13,8 @@ AC_DEFUN([XINE_AUDIO_OUT_PLUGINS], [
     dnl - Jack is Linux and Mac OS X primarily
     dnl - OSS is most unix variants
     dnl - PulseAudio has been tested on Linux, Solaris, FreeBSD, Windows
-    dnl - SunAudio is NetBSD, OpenBSD, Solaris (anything else?)
+    dnl - SunAudio is NetBSD, Solaris (anything else?)
+    dnl - sndio is OpenBSD only
 
     default_enable_coreaudio=no
     default_enable_irixal=no
@@ -41,6 +42,10 @@ AC_DEFUN([XINE_AUDIO_OUT_PLUGINS], [
             default_with_pulseaudio=yes
             default_with_jack=yes
             ;;
+        gnu*)
+            default_with_pulseaudio=yes
+            default_with_jack=yes
+            ;;
         irix*)
             default_enable_irixal=yes
             default_enable_oss=no
@@ -54,7 +59,7 @@ AC_DEFUN([XINE_AUDIO_OUT_PLUGINS], [
             default_enable_sunaudio=yes
             ;;
         openbsd*)
-            default_enable_sunaudio=yes
+            default_enable_oss=no
             default_enable_sndio=yes
             ;;
         solaris*)
@@ -197,8 +202,8 @@ AC_DEFUN([XINE_AUDIO_OUT_PLUGINS], [
         if test x"$hard_enable_sunaudio" = x"yes" && test x"$have_sunaudio" != x"yes"; then
             AC_MSG_ERROR([Sun audio support requested, but Sun audio not found])
         elif test x"$have_sunaudio" = x"yes"; then
-           dnl NetBSD and OpenBSD don't have this, but check for it
-           dnl rather than assuming that it doesn't happen elsewhere.
+           dnl NetBSD doesn't have this, but check for it rather than
+           dnl assuming that it doesn't happen elsewhere.
            AC_CHECK_MEMBERS([audio_info_t.output_muted])
         fi
     fi

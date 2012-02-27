@@ -243,7 +243,7 @@ typedef void *(*thread_run_t)(void *);
 
 typedef struct {
     /* Name of render backend */
-    char *name;
+    const char * const name;
     /* Finally display current image (needed for Redraw) */
     void (*display)(opengl_driver_t *, opengl_frame_t *);
     /* Upload new image; Returns 0 if failed */
@@ -836,7 +836,7 @@ static int render_image_envtex (opengl_driver_t *this, opengl_frame_t *frame) {
 /*
  * Render setup functions
  */
-static int render_help_verify_ext (opengl_driver_t *this, char *ext) {
+static int render_help_verify_ext (opengl_driver_t *this, const char *ext) {
   int ret = 0;
   const size_t l = strlen (ext);
   const char *e;
@@ -1087,7 +1087,7 @@ static int render_setup_torus (opengl_driver_t *this) {
 static int render_setup_fp_yuv (opengl_driver_t *this) {
   GLint errorpos;
   int ret;
-  static char *fragprog_yuv =
+  static const char *fragprog_yuv =
     "!!ARBfp1.0\n"
     "ATTRIB tex = fragment.texcoord[0];"
     "PARAM  off = program.env[0];"
@@ -1659,6 +1659,20 @@ static void opengl_overlay_blend (vo_driver_t *this_gen,
         XUnlockDisplay (this->display);
       }
     } else {
+
+      if (!frame->rgb_dst) {
+        if (frame->format == XINE_IMGFMT_YV12) {
+          _x_blend_yuv(frame->vo_frame.base, overlay,
+                       frame->width, frame->height, frame->vo_frame.pitches,
+                       &this->alphablend_extra_data);
+        } else {
+          _x_blend_yuy2(frame->vo_frame.base[0], overlay,
+                        frame->width, frame->height, frame->vo_frame.pitches[0],
+                        &this->alphablend_extra_data);
+        }
+        return;
+      }
+
       if (!overlay->rgb_clut || !overlay->hili_rgb_clut)
         opengl_overlay_clut_yuv2rgb (this, overlay, frame);
 
@@ -2027,7 +2041,7 @@ static vo_driver_t *opengl_open_plugin (video_driver_class_t *class_gen, const v
   config_values_t      *config  = class->xine->config;
   x11_visual_t         *visual  = (x11_visual_t *) visual_gen;
   opengl_driver_t      *this;
-  char                **render_fun_names;
+  const char          **render_fun_names;
   int                   i;
 
   this = (opengl_driver_t *) calloc(1, sizeof(opengl_driver_t));

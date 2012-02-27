@@ -53,3 +53,4 @@ nodist_noinst_HEADERS = configure.h
 nodist_include_HEADERS = $(inttypes_h)
 
 CONFIG_CLEAN_FILES = $(inttypes_h)
+DISTCLEANFILES = xine/version.h

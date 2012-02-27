@@ -109,7 +109,7 @@ osd_fontchar_t fontchar;
 osd_font_t     font;
 
 
-static int gzwrite_i16(gzFile *fp, uint16_t number) {
+static int gzwrite_i16(gzFile fp, uint16_t number) {
   return gzputc(fp, number & 0xFF) != -1 &&
          gzputc(fp, (number >> 8) & 0xFF) != -1;
 }
@@ -341,7 +341,7 @@ void render_font (FT_Face face, char *fontname, int size, int thickness,
 
   char                filename[1024];
   FT_Bitmap          *out_bitmap;
-  gzFile             *fp;
+  gzFile              fp;
   int                 error;
   int                 error_counter;
   int                 glyph_index;

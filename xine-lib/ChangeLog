@@ -1,3 +1,15 @@
+xine-lib (1.2.1.1) 2012-??-??
+  * Fix musepack decoder compilation if libmpcdec headers aren't available.
+  * Configure tests for xinerama & VideoCD support now soft-fail properly.
+  * The DVB plugin is working again.
+
+xine-lib (1.2.1) 2012-02-04
+  * The "I'm at Tyneside LUG" release.
+  * Enable PulseAudio, JACK and VDPAU on the Hurd.
+  * Rewrite of VDPAU OSD handling.
+  * sndio plugin is now buildable.
+  * Various bug fixes.
+
 xine-lib (1.2.0) 2012-01-01
   * Add support for VDR.
   * Add support for VDPAU.
@@ -70,10 +82,14 @@ xine-lib (1.2.0) 2012-01-01
   * Report more video output capabilities via (port)->get_capabilities():
     colour controls, zooming, colour keying.
 
-xine-lib (1.1.21) 2011-??-??
+xine-lib (1.1.21) ????-??-??
   * mpeg-ts fixes and enhancements
   * Improved syncing of DVB subtitles
   * BluRay support (requires libbluray)
+
+xine-lib (1.1.20.2) ????-??-??
+  * Various bug fixes.
+  * Fix matroska header compression.
 
 xine-lib (1.1.20.1) 2012-01-01
   * Various bug fixes.

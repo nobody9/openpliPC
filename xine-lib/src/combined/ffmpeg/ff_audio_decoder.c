@@ -42,14 +42,9 @@
 #include <xine/xineutils.h>
 #include "bswap.h"
 #include "ffmpeg_decoder.h"
+#include "ffmpeg_compat.h"
 
 #define AUDIOBUFSIZE (64 * 1024)
-
-#if LIBAVCODEC_VERSION_MAJOR >= 53 || (LIBAVCODEC_VERSION_MAJOR == 52 && LIBAVCODEC_VERSION_MINOR >= 32)
-#  define AVAUDIO 3
-#else
-#  define AVAUDIO 2
-#endif
 
 typedef struct {
   audio_decoder_class_t   decoder_class;
@@ -172,7 +167,7 @@ static void ff_audio_init_codec(ff_audio_decoder_t *this, unsigned int codec_typ
    *  - DVB streams where multiple AAC LATM frames are packed to single PES
    *  - DVB streams where MPEG audio frames do not follow PES packet boundaries
    */
-#if LIBAVCODEC_VERSION_MAJOR >= 53 || (LIBAVCODEC_VERSION_MAJOR == 52 && LIBAVCODEC_VERSION_MINOR >= 94)
+#if AVPARSE > 1
   if (codec_type == BUF_AUDIO_AAC_LATM ||
       codec_type == BUF_AUDIO_MPEG) {
 
@@ -355,7 +350,7 @@ static int ff_audio_decode(xine_t *xine,
   int consumed;
   int parser_consumed = 0;
 
-#if LIBAVCODEC_VERSION_MAJOR >= 53 || (LIBAVCODEC_VERSION_MAJOR == 52 && LIBAVCODEC_VERSION_MINOR >= 94)
+#if AVPARSE > 1
   if (parser_ctx) {
     uint8_t *outbuf;
     int      outsize;
@@ -382,7 +377,7 @@ static int ff_audio_decode(xine_t *xine,
     buf  = outbuf;
     size = outsize;
   }
-#endif /* LIBAVCODEC_VERSION_MAJOR >= 53 || (LIBAVCODEC_VERSION_MAJOR == 52 && LIBAVCODEC_VERSION_MINOR >= 94) */
+#endif /* AVPARSE > 1 */
 
 #if AVAUDIO > 2
   AVPacket avpkt;

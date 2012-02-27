@@ -940,21 +940,27 @@ static void decode_video_header (demux_ogg_t *this, const int stream_num, ogg_pa
   xine_bmiheader    bih;
   int               channel;
 
+#ifdef LOG
   int16_t          locbits_per_sample;
+  int32_t          locsize, locdefault_len, locbuffersize;
+  int64_t          locsamples_per_unit;
+#endif
   uint32_t         locsubtype;
-  int32_t          locsize, locdefault_len, locbuffersize, locwidth, locheight;
-  int64_t          loctime_unit, locsamples_per_unit;
+  int32_t          locwidth, locheight;
+  int64_t          loctime_unit;
 
   /* read fourcc with machine endianness */
   locsubtype = *((uint32_t *)&op->packet[9]);
 
   /* everything else little endian */
-  locsize = _X_LE_32(&op->packet[13]);
   loctime_unit = _X_LE_64(&op->packet[17]);
+#ifdef LOG
+  locsize = _X_LE_32(&op->packet[13]);
   locsamples_per_unit = _X_LE_64(&op->packet[25]);
   locdefault_len = _X_LE_32(&op->packet[33]);
   locbuffersize = _X_LE_32(&op->packet[37]);
   locbits_per_sample = _X_LE_16(&op->packet[41]);
+#endif
   locwidth = _X_LE_32(&op->packet[45]);
   locheight = _X_LE_32(&op->packet[49]);
 
@@ -1026,18 +1032,25 @@ static void decode_audio_header (demux_ogg_t *this, const int stream_num, ogg_pa
     char              str[5];
     int               channel;
 
-    int16_t          locbits_per_sample, locchannels, locblockalign;
-    int32_t          locsize, locdefault_len, locbuffersize, locavgbytespersec;
-    int64_t          loctime_unit, locsamples_per_unit;
+#ifdef LOG
+    int16_t          locblockalign;
+    int32_t          locsize, locdefault_len, locbuffersize;
+    int64_t          loctime_unit;
+#endif
+    int16_t          locbits_per_sample, locchannels;
+    int32_t          locavgbytespersec;
+    int64_t          locsamples_per_unit;
 
+#ifdef LOG
     locsize = _X_LE_32(&op->packet[13]);
     loctime_unit = _X_LE_64(&op->packet[17]);
-    locsamples_per_unit = _X_LE_64(&op->packet[25]);
-    locdefault_len = _X_LE_32(&op->packet[33]);
     locbuffersize = _X_LE_32(&op->packet[37]);
+    locdefault_len = _X_LE_32(&op->packet[33]);
+    locblockalign = _X_LE_16(&op->packet[47]);
+#endif
+    locsamples_per_unit = _X_LE_64(&op->packet[25]);
     locbits_per_sample = _X_LE_16(&op->packet[41]);
     locchannels = _X_LE_16(&op->packet[45]);
-    locblockalign = _X_LE_16(&op->packet[47]);
     locavgbytespersec= _X_LE_32(&op->packet[49]);
 
     lprintf ("direct show filter created audio stream detected, hexdump:\n");

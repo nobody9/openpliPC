@@ -109,6 +109,12 @@ struct xine_s {
 #endif
 };
 
+/* FIXME-ABI Some global flag bits */
+/* See xine_set_flags() */
+#ifdef XINE_ENGINE_INTERNAL
+extern int _x_flags XINE_PROTECTED;
+#endif
+
 /*
  * xine thread tickets
  */

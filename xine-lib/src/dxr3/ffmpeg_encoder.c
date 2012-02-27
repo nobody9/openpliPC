@@ -44,6 +44,8 @@
 #  include <libavcodec/avcodec.h>
 #endif
 
+#include "../combined/ffmpeg/ffmpeg_compat.h"
+
 /* buffer size for encoded mpeg1 stream; will hold one intra frame
  * at 640x480 typical sizes are <50 kB. 512 kB should be plenty */
 #define DEFAULT_BUFFER_SIZE 512*1024

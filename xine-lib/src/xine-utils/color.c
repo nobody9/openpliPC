@@ -67,51 +67,46 @@
 
 /*
  * In search of the perfect colorspace conversion formulae...
- * These are the conversion equations that xine currently uses:
+ * These are the conversion equations that xine currently uses
+ * (before normalisation):
  *
  *      Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
  *      U  = -0.16874 * R - 0.33126 * G + 0.50000 * B + 128
  *      V  =  0.50000 * R - 0.41869 * G - 0.08131 * B + 128
- *
- * Feel free to experiment with different coefficients by altering the
- * next 9 defines.
  */
-
-#if 1
-
-#define Y_R (SCALEFACTOR *  0.29900)
-#define Y_G (SCALEFACTOR *  0.58700)
-#define Y_B (SCALEFACTOR *  0.11400)
-
-#define U_R (SCALEFACTOR * -0.16874)
-#define U_G (SCALEFACTOR * -0.33126)
-#define U_B (SCALEFACTOR *  0.50000)
-
-#define V_R (SCALEFACTOR *  0.50000)
-#define V_G (SCALEFACTOR * -0.41869)
-#define V_B (SCALEFACTOR * -0.08131)
-
-#else
 
 /*
- * Here is another promising set of coefficients. If you use these, you
- * must also add 16 to the Y calculation in the COMPUTE_Y macro found
- * in xineutils.h.
+#define Y_R (SCALEFACTOR *  0.29900 * 219.0 / 255.0)
+#define Y_G (SCALEFACTOR *  0.58700 * 219.0 / 255.0)
+#define Y_B (SCALEFACTOR *  0.11400 * 219.0 / 255.0)
+
+#define U_R (SCALEFACTOR * -0.16874 * 224.0 / 255.0)
+#define U_G (SCALEFACTOR * -0.33126 * 224.0 / 255.0)
+#define U_B (SCALEFACTOR *  0.50000 * 224.0 / 255.0)
+
+#define V_R (SCALEFACTOR *  0.50000 * 224.0 / 255.0)
+#define V_G (SCALEFACTOR * -0.41869 * 224.0 / 255.0)
+#define V_B (SCALEFACTOR * -0.08131 * 224.0 / 255.0)
+*/
+
+#define Y_R (SCALEFACTOR *  0.299         * 219.0 / 255.0)
+#define Y_G (SCALEFACTOR *  0.587         * 219.0 / 255.0)
+#define Y_B (SCALEFACTOR *  0.114         * 219.0 / 255.0)
+
+#define U_R (SCALEFACTOR * -0.299 / 1.772 * 224.0 / 255.0)
+#define U_G (SCALEFACTOR * -0.587 / 1.772 * 224.0 / 255.0)
+#define U_B (SCALEFACTOR *  0.886 / 1.772 * 224.0 / 255.0)
+
+#define V_R (SCALEFACTOR *  0.701 / 1.402 * 224.0 / 255.0)
+#define V_G (SCALEFACTOR * -0.587 / 1.402 * 224.0 / 255.0)
+#define V_B (SCALEFACTOR * -0.114 / 1.402 * 224.0 / 255.0)
+
+/*
+ * With the normalisation factors above, Y needs 16 added.
+ * This is done during setup, not in the macros in xineutils.h, because
+ * doing it there would be an API change.
  */
-
-#define Y_R (SCALEFACTOR *  0.257)
-#define Y_G (SCALEFACTOR *  0.504)
-#define Y_B (SCALEFACTOR *  0.098)
-
-#define U_R (SCALEFACTOR * -0.148)
-#define U_G (SCALEFACTOR * -0.291)
-#define U_B (SCALEFACTOR *  0.439)
-
-#define V_R (SCALEFACTOR *  0.439)
-#define V_G (SCALEFACTOR * -0.368)
-#define V_B (SCALEFACTOR * -0.071)
-
-#endif
+#define Y_MOD (16 * SCALEFACTOR)
 
 /*
  * Precalculate all of the YUV tables since it requires fewer than
@@ -1318,7 +1313,7 @@ void init_yuv_conversion(void) {
   /* initialize the RGB -> YUV tables */
   for (i = 0; i < 256; i++) {
 
-    y_r_table[i] = Y_R * i;
+    y_r_table[i] = Y_R * i + Y_MOD;
     y_g_table[i] = Y_G * i;
     y_b_table[i] = Y_B * i;
 

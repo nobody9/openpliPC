@@ -22,14 +22,18 @@ dist-hook:
 
 distclean-local: clean-docs
 
+AM_V_FAKE = $(am__v_FAKE_$(V))
+am__v_FAKE_ = $(am__v_FAKE_$(AM_DEFAULT_VERBOSITY))
+am__v_FAKE_0 = @echo "  FAKE  " $@;
+
 if HAVE_XMLTO
 faq.html: faq.docbook faq.xsl
-	xmlto -m faq.xsl xhtml-nochunks $<
+	$(AM_V_GEN)xmlto -m faq.xsl xhtml-nochunks $<
 faq.txt: faq.docbook faq.xsl
-	xmlto -m faq.xsl txt $<
+	$(AM_V_GEN)xmlto -m faq.xsl txt $<
 else
 faq.html faq.txt: faq.docbook
-	if test x"$(fail_if_missing)" = x"yes"; then \
+	$(AM_V_FAKE)if test x"$(fail_if_missing)" = x"yes"; then \
 	  echo "Please install xmlto."; \
 	  exit 1; \
 	fi
