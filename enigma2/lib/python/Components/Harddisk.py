@@ -35,6 +35,13 @@ def isFileSystemSupported(filesystem):
 	except Exception, ex:
 		print "[Harddisk] Failed to read /proc/filesystems:", ex
 
+def findMountPoint(path):
+	'Example: findMountPoint("/media/hdd/some/file") returns "/media/hdd"'
+	path = os.path.abspath(path)
+	while not os.path.ismount(path):
+		path = os.path.dirname(path)
+	return path
+	
 
 DEVTYPE_UDEV = 0
 DEVTYPE_DEVFS = 1
@@ -267,8 +274,6 @@ class Harddisk:
 			h.write(zero)
 		h.close()
 
-	errorList = [ _("Everything is fine"), _("Creating partition failed"), _("Mkfs failed"), _("Mount failed"), _("Create movie folder failed"), _("Fsck failed"), _("Please Reboot"), _("Filesystem contains uncorrectable errors"), _("Unmount failed")]
-
 	def createInitializeJob(self):
 		job = Task.Job(_("Initializing storage device..."))
 
@@ -310,10 +315,14 @@ class Harddisk:
 
 		task = MkfsTask(job, _("Create Filesystem"))
 		if isFileSystemSupported("ext4"):
-			cmd = "mkfs.ext4"
+			task.setTool("mkfs.ext4")
+			if size > 20000:
+				version = open("/proc/version","r").read().split(' ', 4)[2].split('.',2)[:2]
+				if (version[0] > 3) or ((version[0] > 2) and (version[1] >= 2)):
+					# Linux version 3.2 supports bigalloc and -C option, use 256k blocks
+					task.args += ["-O", "bigalloc", "-C", "262144"]
 		else:
-			cmd = "mkfs.ext3"
-		task.setTool(cmd)
+			task.setTool("mkfs.ext3")
 		if size > 250000:
 			# No more than 256k i-nodes (prevent problems with fsck memory requirements)
 			task.args += ["-T", "largefile", "-O", "sparse_super", "-N", "262144"]
@@ -392,6 +401,8 @@ class Harddisk:
 		task.setTool('tune2fs')
 		task.args.append('-O')
 		task.args.append('extents,uninit_bg,dir_index')
+		task.args.append('-o')
+		task.args.append('journal_data_writeback')
 		task.args.append(dev)
 		task = Task.LoggingTask(job, "fsck")
 		task.setTool('fsck.ext4')
@@ -431,7 +442,10 @@ class Harddisk:
 		from enigma import eTimer
 
 		# disable HDD standby timer
-		Console().ePopen(("hdparm", "hdparm", "-S0", self.disk_path))
+		if self.bus() == "External":
+			Console().ePopen(("sdparm", "sdparm", "--set=SCT=0", self.disk_path))
+		else:
+			Console().ePopen(("hdparm", "hdparm", "-S0", self.disk_path))
 		self.timer = eTimer()
 		self.timer.callback.append(self.runIdle)
 		self.idle_running = True
@@ -458,7 +472,10 @@ class Harddisk:
 			self.is_sleeping = True
 
 	def setSleep(self):
-		Console().ePopen(("hdparm", "hdparm", "-y", self.disk_path))
+		if self.bus() == "External":
+			Console().ePopen(("sdparm", "sdparm", "--flexible", "--readonly", "--command=stop", self.disk_path))
+		else:
+			Console().ePopen(("hdparm", "hdparm", "-y", self.disk_path))
 
 	def setIdleTime(self, idle):
 		self.max_idle_time = idle
@@ -560,7 +577,7 @@ class HarddiskManager:
 		self.partitions = [ ]
 		self.devices_scanned_on_init = [ ]
 		self.on_partition_list_change = CList()
-#		self.enumerateBlockDevices()
+		self.enumerateBlockDevices()
 		# Find stuff not detected by the enumeration
 		p = (
 			("/media/hdd", _("Harddisk")),

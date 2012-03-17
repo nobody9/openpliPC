@@ -9,14 +9,14 @@ class eVideoWidget: public eLabel
 	int m_state;
 	eRect m_user_rect;
 	int m_decoder;
-//	static ePtr<eTimer> fullsizeTimer;
-//	static int pendingFullsize;
+	static ePtr<eTimer> fullsizeTimer;
+	static int pendingFullsize;
 public:
 	eVideoWidget(eWidget *parent);
 	~eVideoWidget();
 	void setDecoder(int target);
 	void setFBSize(eSize size);
-//	static void setFullsize();
+	static void setFullsize(bool force = false);
 protected:
 	int event(int event, void *data=0, void *data2=0);
 	void updatePosition(int disable = 0);

@@ -6,7 +6,7 @@
 #include <lib/dvb/pmt.h>
 #include <lib/dvb/subtitle.h>
 #include <lib/dvb/teletext.h>
-
+#include <gst/gst.h>
 /* for subtitles */
 #include <lib/gui/esubtitle.h>
 
@@ -41,6 +41,7 @@ public:
 	RESULT getName(const eServiceReference &ref, std::string &name);
 	int getLength(const eServiceReference &ref);
 	int getInfo(const eServiceReference &ref, int w);
+	int isPlayable(const eServiceReference &ref, const eServiceReference &ignore, bool simulate) { return 1; }
 	PyObject* getInfoObject(const eServiceReference &ref, int w);
 };
 
@@ -114,12 +115,14 @@ public:
 
 		// iSubtitleOutput
 	RESULT enableSubtitles(eWidget *parent, SWIG_PYOBJECT(ePyObject) entry);
+	RESULT disableSubtitles(eWidget *parent);
 	PyObject *getSubtitleList();
 	PyObject *getCachedSubtitle();
 
 		// iStreamedService
 	RESULT streamed(ePtr<iStreamedService> &ptr);
 	PyObject *getBufferCharge();
+	int setBufferSize(int size);
 
 		// iAudioDelay
 	int getAC3Delay();
@@ -134,7 +137,7 @@ public:
 		bool is_video;
 		bool is_streaming;
 		sourceStream()
-			:audiotype(atUnknown), containertype(ctNone), is_video(0), is_streaming(0)
+			:audiotype(atUnknown), containertype(ctNone), is_video(FALSE), is_streaming(FALSE)
 		{
 		}
 	};
@@ -150,11 +153,15 @@ private:
 	static int ac3_delay;
 	int m_currentAudioStream;
 	int m_currentSubtitleStream;
+	int m_cachedSubtitleStream;
 	int selectAudioStream(int i);
 	eSubtitleWidget *m_subtitle_widget;
+	gdouble m_currentTrickRatio;
 	friend class eServiceFactoryMP3;
 	eServiceReference m_ref;
 	int m_buffer_size;
+	gint64 m_buffer_duration;
+	bool m_use_prefillbuffer;
 	errorInfo m_errorInfo;
 	eServiceMP3(eServiceReference ref);
 	Signal2<void,iPlayableService*,int> m_event;
@@ -185,8 +192,9 @@ private:
 
 	RESULT seekToImpl(pts_t to);
 
+	gint m_aspect, m_width, m_height, m_framerate, m_progressive;
 	std::string m_useragent;
-	RESULT trickSeek(int ratio);
+	RESULT trickSeek(gdouble ratio);
 };
 
 #endif

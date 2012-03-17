@@ -60,6 +60,7 @@ void eListboxServiceContent::FillFinished()
 void eListboxServiceContent::setRoot(const eServiceReference &root, bool justSet)
 {
 	m_list.clear();
+	m_cursor = m_list.end();
 	m_root = root;
 
 	if (justSet)
@@ -613,7 +614,7 @@ void eListboxServiceContent::paint(gPainter &painter, eWindowStyle &style, const
 				}
 				case celServiceInfo:
 				{
-					if ( isPlayable && !service_info->getEvent(*m_cursor, evt) )
+					if ( isPlayable && service_info && !service_info->getEvent(*m_cursor, evt) )
 					{
 						std::string name = evt->getEventName();
 						if (name.empty())

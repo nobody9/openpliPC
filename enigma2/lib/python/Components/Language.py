@@ -25,18 +25,20 @@ class Language:
 		self.addLanguage("Suomi", "fi", "FI")
 		self.addLanguage("Français", "fr", "FR")
 		self.addLanguage("Ελληνικά", "el", "GR")
+		self.addLanguage("Hebrew", "he", "IL")
 		self.addLanguage("Magyar", "hu", "HU")
 		self.addLanguage("Lietuvių", "lt", "LT")
 		self.addLanguage("Latviešu", "lv", "LV")
 		self.addLanguage("Íslenska", "is", "IS")
 		self.addLanguage("Italiano", "it", "IT")
 		self.addLanguage("Norsk", "no", "NO")
+		self.addLanguage("Persian", "fa", "IR")
 		self.addLanguage("Polski", "pl", "PL")
 		self.addLanguage("Português", "pt", "PT")
 		self.addLanguage("Русский", "ru", "RU")
 		self.addLanguage("Srpski", "sr", "YU")
-		self.addLanguage("Slovakian", "sk", "SK")
-		self.addLanguage("Slovensko", "sl", "SI")
+		self.addLanguage("Slovensky", "sk", "SK")
+		self.addLanguage("Slovenščina", "sl", "SI")
 		self.addLanguage("Español", "es", "ES")
 		self.addLanguage("Svenska", "sv", "SE")
 		self.addLanguage("ภาษาไทย", "th", "TH")
@@ -57,7 +59,7 @@ class Language:
 		try:
 			lang = self.lang[index]
 			print "Activating language " + lang[0]
-			gettext.translation('enigma2', resolveFilename(SCOPE_LANGUAGE, ""), languages=[lang[1]]).install()
+			gettext.translation('enigma2', resolveFilename(SCOPE_LANGUAGE, ""), languages=[lang[1]]).install(names=("ngettext"))
 			self.activeLanguage = index
 			for x in self.callbacks:
 				x()

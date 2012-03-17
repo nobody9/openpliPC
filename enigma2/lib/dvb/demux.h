@@ -5,8 +5,6 @@
 #include <lib/dvb/idemux.h>
 #include <lib/dvb/decsa.h>
 
-class eFilePushThread;
-
 class eDVBDemux: public iDVBDemux
 {
 	DECLARE_REF(eDVBDemux);
@@ -19,11 +17,11 @@ public:
 	
 	RESULT setSourceFrontend(int fenum);
 	int getSource() { return source; }
+	RESULT setSourcePVR(int pvrnum);
 	
 	RESULT createSectionReader(eMainloop *context, ePtr<iDVBSectionReader> &reader);
 	RESULT createPESReader(eMainloop *context, ePtr<iDVBPESReader> &reader);
-	RESULT createTSRecorder(ePtr<iDVBTSRecorder> &recorder);
-	RESULT createTSPlayer(ePtr<iDVBTSPlayer> &player);
+	RESULT createTSRecorder(ePtr<iDVBTSRecorder> &recorder, int packetsize = 188);
 	RESULT getMPEGDecoder(ePtr<iTSMPEGDecoder> &reader, int primary);
 	RESULT getSTC(pts_t &pts, int num);
 	RESULT getCADemuxID(uint8_t &id) { id = demux; return 0; }
@@ -41,6 +39,7 @@ private:
 	int adapter, demux, source;
 	cDeCSA *decsa;
 
+	int m_dvr_busy;
 	friend class eDVBSectionReader;
 	friend class eDVBPESReader;
 	friend class eDVBAudio;
@@ -48,7 +47,6 @@ private:
 	friend class eDVBPCR;
 	friend class eDVBTText;
 	friend class eDVBTSRecorder;
-	friend class eDVBTSPlayer;
 	friend class eDVBCAService;
 	friend class eTSMPEGDecoder;
 	Signal1<void, int> m_event;
@@ -99,7 +97,7 @@ class eDVBTSRecorder: public iDVBTSRecorder, public Object
 {
 	DECLARE_REF(eDVBTSRecorder);
 public:
-	eDVBTSRecorder(eDVBDemux *demux);
+	eDVBTSRecorder(eDVBDemux *demux, int packetsize = 188);
 	~eDVBTSRecorder();
 
 	RESULT setBufferSize(int size);
@@ -112,6 +110,7 @@ public:
 	RESULT setTargetFD(int fd);
 	RESULT setTargetFilename(const std::string& filename);
 	RESULT setBoundary(off_t max);
+	RESULT enableAccessPoints(bool enable);
 	
 	RESULT stop();
 
@@ -122,47 +121,19 @@ private:
 	RESULT startPID(int pid);
 	void stopPID(int pid);
 	
+	void filepushEvent(int event);
+	
+	std::map<int,int> m_pids;
+	Signal1<void,int> m_event;
+	
+	ePtr<eDVBDemux> m_demux;
+	
+	int m_running;
+	int m_target_fd;
+	int m_source_fd;
 	eDVBRecordFileThread *m_thread;
-	void filepushEvent(int event);
-	
-	std::map<int,int> m_pids;
-	Signal1<void,int> m_event;
-	
-	ePtr<eDVBDemux> m_demux;
-	
-	int m_running, m_target_fd, m_source_fd;
 	std::string m_target_filename;
-};
-
-class eDVBTSPlayer: public iDVBTSPlayer, public Object
-{
-	DECLARE_REF(eDVBTSPlayer);
-public:
-	eDVBTSPlayer(eDVBDemux *demux);
-	~eDVBTSPlayer();
-
-	RESULT setBufferSize(int size);
-	RESULT start();
-	RESULT addPID(int pid);
-	RESULT removePID(int pid);
-	RESULT setTargetFD(int fd);
-	
-	RESULT stop();
-
-	//RESULT connectEvent(const Slot1<void,int> &event, ePtr<eConnection> &conn);
-private:
-	RESULT startPID(int pid);
-	void stopPID(int pid);
-	
-	eFilePushThread *m_thread;
-	void filepushEvent(int event);
-	
-	std::map<int,int> m_pids;
-	Signal1<void,int> m_event;
-	
-	ePtr<eDVBDemux> m_demux;
-	
-	int m_running, m_target_fd, m_source_fd;
+	int m_packetsize;
 };
 
 #endif

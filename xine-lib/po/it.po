@@ -13,6 +13,7 @@ msgstr ""
 "PO-Revision-Date: 2007-12-24 16:09+0100\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gentoo.org>\n"
 "Language-Team: Italian\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1108,8 +1109,8 @@ msgstr "plugin di input del file"
 #, c-format
 msgid "demux_wc3movie: SHOT chunk referenced invalid palette (%d >= %d)\n"
 msgstr ""
-"demux_wc3movie: parte di SHOT di riferimento con palette non valida (%d >= %"
-"d)\n"
+"demux_wc3movie: parte di SHOT di riferimento con palette non valida (%d >= "
+"%d)\n"
 
 #: src/demuxers/demux_wc3movie.c:408
 #, c-format
@@ -2854,8 +2855,8 @@ msgid ""
 msgstr ""
 "Formato VCD utilizzato nel campo di commento del flusso, simile al comando "
 "date Unix. Gli specificatori di formato iniziano con un simbolo di "
-"percentuale. Gli specificatori sono %a, %C, %c, %F, %I, %L, %N, %P, %p, %S, %"
-"T e %%.\n"
+"percentuale. Gli specificatori sono %a, %C, %c, %F, %I, %L, %N, %P, %p, %S, "
+"%T e %%.\n"
 "Si veda la descrizione di title_format per il loro significato."
 
 #: src/input/vcd/xineplug_inp_vcd.c:1914
@@ -3875,8 +3876,8 @@ msgstr ""
 "  bgamma (gamma per il componente blu)\n"
 "\n"
 "Gli intervalli dei valori sono 0.1-10 per le gamma, -2-2 per il contrasto "
-"(valori negativi risultano in immagini negative), -1-1 per la luminosità e 0-"
-"3 per la saturazione.\n"
+"(valori negativi risultano in immagini negative), -1-1 per la luminosità e "
+"0-3 per la saturazione.\n"
 "\n"
 "* mplayer's eq2 (C) Hampa Hug, Daniel Moreno, Richard Felker\n"
 
@@ -5614,8 +5615,8 @@ msgstr "load_plugins: trovato plugin statico\n"
 #, c-format
 msgid "load_plugins: plugin limit reached, %s could not be loaded\n"
 msgstr ""
-"load_plugins: raggiunto il limite di plugin, non è stato possibile caricare %"
-"s.\n"
+"load_plugins: raggiunto il limite di plugin, non è stato possibile caricare "
+"%s.\n"
 
 #: src/xine-engine/load_plugins.c:511
 #, c-format

@@ -189,9 +189,20 @@ void bsodFatal(const char *component)
 		xml.close();
 
 		xml.open("image");
-		xml.stringFromFile("dreamboxmodel", "/proc/stb/info/model");
+		xml.stringFromFile("dreamboxmodel", eEnv::resolve("${sysconfdir}/stb/info/model").c_str());
 		xml.stringFromFile("kernelcmdline", "/proc/cmdline");
-		xml.stringFromFile("nimsockets", "/proc/bus/nim_sockets");
+		xml.stringFromFile("nimsockets", eEnv::resolve("${sysconfdir}/tuxbox/nim_sockets").c_str());
+		if (!getConfigBool("config.plugins.crashlogautosubmit.sendAnonCrashlog", true)) {
+			xml.cDataFromFile("dreamboxca", eEnv::resolve("${sysconfdir}/stb/info/ca").c_str());
+			xml.cDataFromFile("enigma2settings", eEnv::resolve("${sysconfdir}/enigma2/settings"), ".password=");
+		}
+		if (getConfigBool("config.plugins.crashlogautosubmit.addNetwork", false)) {
+			xml.cDataFromFile("networkinterfaces", "/etc/network/interfaces");
+			xml.cDataFromFile("dns", "/etc/resolv.conf");
+			xml.cDataFromFile("defaultgateway", "/etc/default_gw");
+		}
+		if (getConfigBool("config.plugins.crashlogautosubmit.addWlan", false))
+			xml.cDataFromFile("wpasupplicant", "/etc/wpa_supplicant.conf");
 		xml.cDataFromFile("imageversion", "/etc/image-version");
 		xml.cDataFromFile("imageissue", "/etc/issue.net");
 		xml.close();

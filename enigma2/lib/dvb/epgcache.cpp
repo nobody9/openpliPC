@@ -12,6 +12,7 @@
 #include <sys/vfs.h> // for statfs
 // #include <libmd5sum.h>
 #include <lib/base/eerror.h>
+#include <lib/base/encoding.h>
 #include <lib/base/estring.h>
 #include <lib/dvb/pmt.h>
 #include <lib/dvb/db.h>
@@ -48,7 +49,7 @@ const eServiceReference &handleGroup(const eServiceReference &ref)
 	return ref;
 }
 
-eventData::eventData(const eit_event_struct* e, int size, int type)
+eventData::eventData(const eit_event_struct* e, int size, int type, int tsidonid)
 	:ByteSize(size&0xFF), type(type&0xFF)
 {
 	if (!e)
@@ -71,7 +72,6 @@ eventData::eventData(const eit_event_struct* e, int size, int type)
 			switch (descr[0])
 			{
 				case EXTENDED_EVENT_DESCRIPTOR:
-				case SHORT_EVENT_DESCRIPTOR:
 				case LINKAGE_DESCRIPTOR:
 				case COMPONENT_DESCRIPTOR:
 				{
@@ -79,9 +79,8 @@ eventData::eventData(const eit_event_struct* e, int size, int type)
 					int cnt=0;
 					while(cnt++ < descr_len)
 						crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ data[ptr++]) & 0xFF];
-	
-					descriptorMap::iterator it =
-						descriptors.find(crc);
+
+					descriptorMap::iterator it = descriptors.find(crc);
 					if ( it == descriptors.end() )
 					{
 						CacheSize+=descr_len;
@@ -92,6 +91,107 @@ eventData::eventData(const eit_event_struct* e, int size, int type)
 					else
 						++it->second.first;
 					*pdescr++=crc;
+					break;
+				}
+				case SHORT_EVENT_DESCRIPTOR:
+				{
+					//parse the data out from the short event descriptor
+					//get the country code, which will be used for converting to UTF8
+					std::string cc( (const char*)&descr[2], 3);
+					std::transform(cc.begin(), cc.end(), cc.begin(), tolower);
+					int table = encodingHandler.getCountryCodeDefaultMapping(cc);
+
+					int eventNameLen = descr[5];
+					int eventTextLen = descr[6 + eventNameLen];
+
+					//convert our strings to UTF8
+					std::string eventNameUTF8 = convertDVBUTF8((const unsigned char*)&descr[6], eventNameLen, table, tsidonid);
+					std::string textUTF8 = convertDVBUTF8((const unsigned char*)&descr[7 + eventNameLen], eventTextLen, table, tsidonid);
+					unsigned int eventNameUTF8len = eventNameUTF8.length();
+					unsigned int textUTF8len = textUTF8.length();
+
+					//Rebuild the short event descriptor with UTF-8 strings
+
+					//Save the title first
+					if( eventNameUTF8len > 0 ) //only store the data if there is something to store
+					{
+						/*this will actually cause us to save some memory
+						 previously some descriptors didnt match because there text was different and titles the same.
+						 Now that we store them seperatly we can save some space on title data some rough calculation show anywhere from 20 - 40% savings
+						*/
+						eventNameUTF8len = truncateUTF8(eventNameUTF8, 255 - 6);
+						int title_len = 6 + eventNameUTF8len;
+						__u8 *title_data = new __u8[title_len + 2];
+						title_data[0] = SHORT_EVENT_DESCRIPTOR;
+						title_data[1] = title_len;
+						title_data[2] = descr[2];
+						title_data[3] = descr[3];
+						title_data[4] = descr[4];
+						title_data[5] = eventNameUTF8len + 1;
+						title_data[6] = 0x15; //identify event name as UTF-8
+						memcpy(&title_data[7], eventNameUTF8.c_str(), eventNameUTF8len);
+						title_data[7 + eventNameUTF8len] = 0;
+
+						//Calculate the CRC, based on our new data
+						__u32 title_crc = 0;
+						int cnt=0;
+						int tmpPtr = 0;
+						title_len += 2; //add 2 the length to include the 2 bytes in the header
+						while(cnt++ < title_len)
+							title_crc = (title_crc << 8) ^ crc32_table[((title_crc >> 24) ^ title_data[tmpPtr++]) & 0xFF];
+
+						descriptorMap::iterator it = descriptors.find(title_crc);
+						if ( it == descriptors.end() )
+						{
+							CacheSize+=title_len;
+							descriptors[title_crc] = descriptorPair(1, title_data);
+						}
+						else
+						{
+							++it->second.first;
+							delete [] title_data;
+						}
+						*pdescr++=title_crc;
+					}
+
+					//save the text
+					if( textUTF8len > 0 ) //only store the data if there is something to store
+					{
+						textUTF8len = truncateUTF8(textUTF8, 255 - 6);
+						int text_len = 6 + textUTF8len;
+						__u8 *text_data = new __u8[text_len + 2];
+						text_data[0] = SHORT_EVENT_DESCRIPTOR;
+						text_data[1] = text_len;
+						text_data[2] = descr[2];
+						text_data[3] = descr[3];
+						text_data[4] = descr[4];
+						text_data[5] = 0;
+						text_data[6] = textUTF8len + 1; //identify text as UTF-8
+						text_data[7] = 0x15; //identify text as UTF-8
+						memcpy(&text_data[8], textUTF8.c_str(), textUTF8len);
+
+						__u32 text_crc = 0;
+						int cnt=0;
+						int tmpPtr = 0;
+						text_len += 2; //add 2 the length to include the 2 bytes in the header
+						while(cnt++ < text_len)
+							text_crc = (text_crc << 8) ^ crc32_table[((text_crc >> 24) ^ text_data[tmpPtr++]) & 0xFF];
+
+						descriptorMap::iterator it = descriptors.find(text_crc);
+						if ( it == descriptors.end() )
+						{
+							CacheSize+=text_len;
+							descriptors[text_crc] = descriptorPair(1, text_data);
+						}
+						else
+						{
+							++it->second.first;
+							delete [] text_data;
+						}
+						*pdescr++=text_crc;
+					}
+
+					ptr += descr_len;
 					break;
 				}
 				default: // do not cache all other descriptors
@@ -237,6 +337,7 @@ eEPGCache::eEPGCache()
 	eDebug("[EPGC] Initialized EPGCache (wait for setCacheFile call now)");
 
 	enabledSources = 0;
+	historySeconds = 0;
 
 	CONNECT(messages.recv_msg, eEPGCache::gotMessage);
 	CONNECT(eDVBLocalTimeHandler::getInstance()->m_timeUpdated, eEPGCache::timeUpdated);
@@ -589,7 +690,7 @@ void eEPGCache::sectionRead(const __u8 *data, int source, channel_data *channel)
 		channel->haveData |= source;
 
 	singleLock s(cache_lock);
-	// hier wird immer eine eventMap zurück gegeben.. entweder eine vorhandene..
+	// hier wird immer eine eventMap zurck gegeben.. entweder eine vorhandene..
 	// oder eine durch [] erzeugte
 	std::pair<eventMap,timeMap> &servicemap = eventDB[service];
 	eventMap::iterator prevEventIt = servicemap.first.end();
@@ -651,7 +752,7 @@ void eEPGCache::sectionRead(const __u8 *data, int source, channel_data *channel)
 						// exempt memory
 						eventData *tmp = ev_it->second;
 						ev_it->second = tm_it_tmp->second =
-							new eventData(eit_event, eit_event_size, source);
+							new eventData(eit_event, eit_event_size, source, (tsid<<16)|onid);
 						if (FixOverlapping(servicemap, TM, duration, tm_it_tmp, service))
 						{
 							prevEventIt = servicemap.first.end();
@@ -694,7 +795,7 @@ void eEPGCache::sectionRead(const __u8 *data, int source, channel_data *channel)
 					prevEventIt=servicemap.first.end();
 				}
 			}
-			evt = new eventData(eit_event, eit_event_size, source);
+			evt = new eventData(eit_event, eit_event_size, source, (tsid<<16)|onid);
 #ifdef EPG_DEBUG
 			bool consistencyCheck=true;
 #endif
@@ -841,7 +942,7 @@ void eEPGCache::cleanLoop()
 	singleLock s(cache_lock);
 	if (!eventDB.empty())
 	{
-		time_t now = ::time(0);
+		time_t now = ::time(0) - historySeconds;
 
 		for (eventCache::iterator DBIt = eventDB.begin(); DBIt != eventDB.end(); DBIt++)
 		{
@@ -1387,7 +1488,7 @@ void eEPGCache::channel_data::startEPG()
 	{
 		mask.data[0] = 0x4E;
 		mask.mask[0] = 0xFE;
-		m_NowNextReader->connectRead(slot(*this, &eEPGCache::channel_data::readData), m_NowNextConn);
+		m_NowNextReader->connectRead(bind(slot(*this, &eEPGCache::channel_data::readData), (int)eEPGCache::NOWNEXT), m_NowNextConn);
 		m_NowNextReader->start(mask);
 		isRunning |= NOWNEXT;
 	}
@@ -1396,7 +1497,7 @@ void eEPGCache::channel_data::startEPG()
 	{
 		mask.data[0] = 0x50;
 		mask.mask[0] = 0xF0;
-		m_ScheduleReader->connectRead(slot(*this, &eEPGCache::channel_data::readData), m_ScheduleConn);
+		m_ScheduleReader->connectRead(bind(slot(*this, &eEPGCache::channel_data::readData), (int)eEPGCache::SCHEDULE), m_ScheduleConn);
 		m_ScheduleReader->start(mask);
 		isRunning |= SCHEDULE;
 	}
@@ -1405,7 +1506,7 @@ void eEPGCache::channel_data::startEPG()
 	{
 		mask.data[0] = 0x60;
 		mask.mask[0] = 0xF0;
-		m_ScheduleOtherReader->connectRead(slot(*this, &eEPGCache::channel_data::readData), m_ScheduleOtherConn);
+		m_ScheduleOtherReader->connectRead(bind(slot(*this, &eEPGCache::channel_data::readData), (int)eEPGCache::SCHEDULE_OTHER), m_ScheduleOtherConn);
 		m_ScheduleOtherReader->start(mask);
 		isRunning |= SCHEDULE_OTHER;
 	}
@@ -1416,7 +1517,7 @@ void eEPGCache::channel_data::startEPG()
 		mask.pid = 0x1388;
 		mask.data[0] = 0x50;
 		mask.mask[0] = 0xF0;
-		m_NetmedScheduleReader->connectRead(slot(*this, &eEPGCache::channel_data::readDataNetmed), m_NetmedScheduleConn);
+		m_NetmedScheduleReader->connectRead(bind(slot(*this, &eEPGCache::channel_data::readData), (int)eEPGCache::NETMED_SCHEDULE), m_NetmedScheduleConn);
 		m_NetmedScheduleReader->start(mask);
 		isRunning |= NETMED_SCHEDULE;
 	}
@@ -1426,7 +1527,7 @@ void eEPGCache::channel_data::startEPG()
 		mask.pid = 0x1388;
 		mask.data[0] = 0x60;
 		mask.mask[0] = 0xF0;
-		m_NetmedScheduleOtherReader->connectRead(slot(*this, &eEPGCache::channel_data::readDataNetmed), m_NetmedScheduleOtherConn);
+		m_NetmedScheduleOtherReader->connectRead(bind(slot(*this, &eEPGCache::channel_data::readData), (int)eEPGCache::NETMED_SCHEDULE_OTHER), m_NetmedScheduleOtherConn);
 		m_NetmedScheduleOtherReader->start(mask);
 		isRunning |= NETMED_SCHEDULE_OTHER;
 	}
@@ -1437,7 +1538,7 @@ void eEPGCache::channel_data::startEPG()
 
 		mask.data[0] = 0x40;
 		mask.mask[0] = 0x40;
-		m_ViasatReader->connectRead(slot(*this, &eEPGCache::channel_data::readDataViasat), m_ViasatConn);
+		m_ViasatReader->connectRead(bind(slot(*this, &eEPGCache::channel_data::readData), (int)eEPGCache::VIASAT), m_ViasatConn);
 		m_ViasatReader->start(mask);
 		isRunning |= VIASAT;
 	}
@@ -1642,124 +1743,40 @@ void eEPGCache::channel_data::abortEPG()
 	pthread_mutex_unlock(&channel_active);
 }
 
-
-void eEPGCache::channel_data::readDataViasat( const __u8 *data)
+void eEPGCache::channel_data::readData( const __u8 *data, int source)
 {
-	__u8 *d=0;
-	memcpy(&d, &data, sizeof(__u8*));
-	d[0] |= 0x80;
-	readData(data);
-}
-
+	int map;
+	iDVBSectionReader *reader = NULL;
+	switch (source)
+	{
+		case NOWNEXT:
+			reader = m_NowNextReader;
+			map = 0;
+			break;
+		case SCHEDULE:
+			reader = m_ScheduleReader;
+			map = 1;
+			break;
+		case SCHEDULE_OTHER:
+			reader = m_ScheduleOtherReader;
+			map = 2;
+			break;
+		case VIASAT:
+			reader = m_ViasatReader;
+			map = 3;
+			break;
 #ifdef ENABLE_NETMED
-void eEPGCache::channel_data::readDataNetmed( const __u8 *data)
-{
-	int source;
-	int map;
-	iDVBSectionReader *reader=NULL;
-	switch(data[0])
-	{
-		case 0x50 ... 0x5F:
-			reader=m_NetmedScheduleReader;
-			source=NETMED_SCHEDULE;
-			map=1;
+		case NETMED_SCHEDULE:
+			reader = m_NetmedScheduleReader;
+			map = 1;
 			break;
-		case 0x60 ... 0x6F:
-			reader=m_NetmedScheduleOtherReader;
-			source=NETMED_SCHEDULE_OTHER;
-			map=2;
+		case NETMED_SCHEDULE_OTHER:
+			reader = m_NetmedScheduleOtherReader;
+			map = 2;
 			break;
-		default:
-			eDebug("[EPGC] unknown table_id !!!");
-			return;
-	}
-	tidMap &seenSections = this->seenSections[map];
-	tidMap &calcedSections = this->calcedSections[map];
-	if ( (state == 1 && calcedSections == seenSections) || state > 1 )
-	{
-		eDebugNoNewLine("[EPGC] ");
-		switch (source)
-		{
-			case NETMED_SCHEDULE:
-				m_NetmedScheduleConn=0;
-				eDebugNoNewLine("netmed schedule");
-				break;
-			case NETMED_SCHEDULE_OTHER:
-				m_NetmedScheduleOtherConn=0;
-				eDebugNoNewLine("netmed schedule other");
-				break;
-			default: eDebugNoNewLine("unknown");break;
-		}
-		eDebug(" finished(%ld)", ::time(0));
-		if ( reader )
-			reader->stop();
-		isRunning &= ~source;
-		if (!isRunning)
-			finishEPG();
-	}
-	else
-	{
-		eit_t *eit = (eit_t*) data;
-		__u32 sectionNo = data[0] << 24;
-		sectionNo |= data[3] << 16;
-		sectionNo |= data[4] << 8;
-		sectionNo |= eit->section_number;
-
-		tidMap::iterator it =
-			seenSections.find(sectionNo);
-
-		if ( it == seenSections.end() )
-		{
-			seenSections.insert(sectionNo);
-			calcedSections.insert(sectionNo);
-			__u32 tmpval = sectionNo & 0xFFFFFF00;
-			__u8 incr = source == NOWNEXT ? 1 : 8;
-			for ( int i = 0; i <= eit->last_section_number; i+=incr )
-			{
-				if ( i == eit->section_number )
-				{
-					for (int x=i; x <= eit->segment_last_section_number; ++x)
-						calcedSections.insert(tmpval|(x&0xFF));
-				}
-				else
-					calcedSections.insert(tmpval|(i&0xFF));
-			}
-			cache->sectionRead(data, source, this);
-		}
-	}
-}
 #endif
-
-void eEPGCache::channel_data::readData( const __u8 *data)
-{
-	int source;
-	int map;
-	iDVBSectionReader *reader=NULL;
-	switch(data[0])
-	{
-		case 0x4E ... 0x4F:
-			reader=m_NowNextReader;
-			source=NOWNEXT;
-			map=0;
-			break;
-		case 0x50 ... 0x5F:
-			reader=m_ScheduleReader;
-			source=SCHEDULE;
-			map=1;
-			break;
-		case 0x60 ... 0x6F:
-			reader=m_ScheduleOtherReader;
-			source=SCHEDULE_OTHER;
-			map=2;
-			break;
-		case 0xD0 ... 0xDF:
-		case 0xE0 ... 0xEF:
-			reader=m_ViasatReader;
-			source=VIASAT;
-			map=3;
-			break;
 		default:
-			eDebug("[EPGC] unknown table_id !!!");
+			eDebug("[EPGC] unknown source");
 			return;
 	}
 	tidMap &seenSections = this->seenSections[map];
@@ -1785,6 +1802,16 @@ void eEPGCache::channel_data::readData( const __u8 *data)
 				m_ViasatConn=0;
 				eDebugNoNewLine("viasat");
 				break;
+#ifdef ENABLE_NETMED
+			case NETMED_SCHEDULE:
+				m_NetmedScheduleConn=0;
+				eDebugNoNewLine("netmed schedule");
+				break;
+			case NETMED_SCHEDULE_OTHER:
+				m_NetmedScheduleOtherConn=0;
+				eDebugNoNewLine("netmed schedule other");
+				break;
+#endif
 			default: eDebugNoNewLine("unknown");break;
 		}
 		eDebug(" finished(%ld)", ::time(0));
@@ -2154,8 +2181,9 @@ RESULT eEPGCache::getNextTimeEntry(ePtr<eServiceEvent> &result)
 	return -1;
 }
 
-void fillTuple(ePyObject tuple, const char *argstring, int argcount, ePyObject service, eServiceEvent *ptr, ePyObject nowTime, ePyObject service_name )
+void fillTuple(ePyObject tuple, const char *argstring, int argcount, ePyObject service_reference, eServiceEvent *ptr, ePyObject service_name, ePyObject nowTime, eventData *evData )
 {
+	// eDebug("[EPGC] fillTuple arg=%s argcnt=%d, ptr=%d evData=%d", argstring, argcount, ptr ? 1 : 0, evData ? 1 : 0);
 	ePyObject tmp;
 	int spos=0, tpos=0;
 	char c;
@@ -2168,13 +2196,13 @@ void fillTuple(ePyObject tuple, const char *argstring, int argcount, ePyObject s
 				tmp = PyLong_FromLong(0);
 				break;
 			case 'I': // Event Id
-				tmp = ptr ? PyLong_FromLong(ptr->getEventId()) : ePyObject();
+				tmp = evData ? PyLong_FromLong(evData->getEventID()) : (ptr ? PyLong_FromLong(ptr->getEventId()) : ePyObject());
 				break;
 			case 'B': // Event Begin Time
-				tmp = ptr ? PyLong_FromLong(ptr->getBeginTime()) : ePyObject();
+				tmp = ptr ? PyLong_FromLong(ptr->getBeginTime()) : (evData ? PyLong_FromLong(evData->getStartTime()) : ePyObject());
 				break;
 			case 'D': // Event Duration
-				tmp = ptr ? PyLong_FromLong(ptr->getDuration()) : ePyObject();
+				tmp = ptr ? PyLong_FromLong(ptr->getDuration()) : (evData ? PyLong_FromLong(evData->getDuration()) : ePyObject());
 				break;
 			case 'T': // Event Title
 				tmp = ptr ? PyString_FromString(ptr->getEventName().c_str()) : ePyObject();
@@ -2190,7 +2218,7 @@ void fillTuple(ePyObject tuple, const char *argstring, int argcount, ePyObject s
 				inc_refcount = true;
 				break;
 			case 'R': // service reference string
-				tmp = service;
+				tmp = service_reference;
 				inc_refcount = true;
 				break;
 			case 'n': // short service name
@@ -2220,7 +2248,7 @@ int handleEvent(eServiceEvent *ptr, ePyObject dest_list, const char* argstring, 
 {
 	if (convertFunc)
 	{
-		fillTuple(convertFuncArgs, argstring, argcount, service, ptr, nowTime, service_name);
+		fillTuple(convertFuncArgs, argstring, argcount, service, ptr, service_name, nowTime, 0);
 		ePyObject result = PyObject_CallObject(convertFunc, convertFuncArgs);
 		if (!result)
 		{
@@ -2241,7 +2269,7 @@ int handleEvent(eServiceEvent *ptr, ePyObject dest_list, const char* argstring, 
 	else
 	{
 		ePyObject tuple = PyTuple_New(argcount);
-		fillTuple(tuple, argstring, argcount, service, ptr, nowTime, service_name);
+		fillTuple(tuple, argstring, argcount, service, ptr, service_name, nowTime, 0);
 		PyList_Append(dest_list, tuple);
 		Py_DECREF(tuple);
 	}
@@ -2501,66 +2529,6 @@ skip_entry:
 	return dest_list;
 }
 
-void fillTuple2(ePyObject tuple, const char *argstring, int argcount, eventData *evData, eServiceEvent *ptr, ePyObject service_name, ePyObject service_reference)
-{
-	ePyObject tmp;
-	int pos=0;
-	while(pos < argcount)
-	{
-		bool inc_refcount=false;
-		switch(argstring[pos])
-		{
-			case '0': // PyLong 0
-				tmp = PyLong_FromLong(0);
-				break;
-			case 'I': // Event Id
-				tmp = PyLong_FromLong(evData->getEventID());
-				break;
-			case 'B': // Event Begin Time
-				if (ptr)
-					tmp = ptr ? PyLong_FromLong(ptr->getBeginTime()) : ePyObject();
-				else
-					tmp = PyLong_FromLong(evData->getStartTime());
-				break;
-			case 'D': // Event Duration
-				if (ptr)
-					tmp = ptr ? PyLong_FromLong(ptr->getDuration()) : ePyObject();
-				else
-					tmp = PyLong_FromLong(evData->getDuration());
-				break;
-			case 'T': // Event Title
-				tmp = ptr ? PyString_FromString(ptr->getEventName().c_str()) : ePyObject();
-				break;
-			case 'S': // Event Short Description
-				tmp = ptr ? PyString_FromString(ptr->getShortDescription().c_str()) : ePyObject();
-				break;
-			case 'E': // Event Extended Description
-				tmp = ptr ? PyString_FromString(ptr->getExtendedDescription().c_str()) : ePyObject();
-				break;
-			case 'R': // service reference string
-				tmp = service_reference;
-				inc_refcount = true;
-				break;
-			case 'n': // short service name
-			case 'N': // service name
-				tmp = service_name;
-				inc_refcount = true;
-				break;
-			default:  // ignore unknown
-				tmp = ePyObject();
-				eDebug("fillTuple2 unknown '%c'... insert None in Result", argstring[pos]);
-		}
-		if (!tmp)
-		{
-			tmp = Py_None;
-			inc_refcount = true;
-		}
-		if (inc_refcount)
-			Py_INCREF(tmp);
-		PyTuple_SET_ITEM(tuple, pos++, tmp);
-	}
-}
-
 static void fill_eit_start(eit_event_struct *evt, time_t t)
 {
     tm *time = gmtime(&t);
@@ -2733,6 +2701,11 @@ void eEPGCache::submitEventData(const std::vector<eServiceReferenceDVB>& service
 }
 #undef SET_HILO
 
+
+void eEPGCache::setEpgHistorySeconds(time_t seconds)
+{
+	historySeconds = seconds;
+}
 
 void eEPGCache::setEpgSources(unsigned int mask)
 {
@@ -3197,7 +3170,8 @@ PyObject *eEPGCache::search(ePyObject arg)
 						// create tuple
 							ePyObject tuple = PyTuple_New(argcount);
 						// fill tuple
-							fillTuple2(tuple, argstring, argcount, evit->second, ev_data ? &ptr : 0, service_name, service_reference);
+							ePyObject tmp = ePyObject();
+							fillTuple(tuple, argstring, argcount, service_reference, ev_data ? &ptr : 0, service_name, tmp, evit->second);
 							PyList_Append(ret, tuple);
 							Py_DECREF(tuple);
 							if (service_name)

@@ -2,7 +2,8 @@ installdir = $(pkglibdir)/python/Plugins/SystemPlugins
 
 SUBDIRS = SoftwareManager PositionerSetup Satfinder \
 	SkinSelector SatelliteEquipmentControl Videomode VideoTune Hotplug \
-	CableScan FastScan OSDPositionSetup OSD3DSetup VideoClippingSetup \
+	DefaultServicesScanner DiseqcTester CommonInterfaceAssignment \
+	CableScan FastScan OSDPositionSetup OSD3DSetup HdmiCEC VideoClippingSetup \
 	VideoEnhancement WirelessLan NetworkWizard
 
 if HAVE_TEMPFANCONTROL

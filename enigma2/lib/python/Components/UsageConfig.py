@@ -1,5 +1,5 @@
 from Components.Harddisk import harddiskmanager
-from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations
+from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber
 from Tools.Directories import resolveFilename, SCOPE_HDD
 from enigma import setTunerTypePriorityOrder, setPreferredTuner, setSpinnerOnOff, setEnableTtCachingOnOff;
 from enigma import Misc_Options, eEnv;
@@ -17,25 +17,26 @@ def InitUsageConfig():
 
 	config.usage.quickzap_bouquet_change = ConfigYesNo(default = False)
 	config.usage.e1like_radio_mode = ConfigYesNo(default = True)
-	config.usage.infobar_timeout = ConfigSelection(default = "5", choices = [
-		("0", _("no timeout")), ("1", "1 " + _("second")), ("2", "2 " + _("seconds")), ("3", "3 " + _("seconds")),
-		("4", "4 " + _("seconds")), ("5", "5 " + _("seconds")), ("6", "6 " + _("seconds")), ("7", "7 " + _("seconds")),
-		("8", "8 " + _("seconds")), ("9", "9 " + _("seconds")), ("10", "10 " + _("seconds"))])
+	choicelist = []
+	for i in range(1, 12):
+		choicelist.append(("%d" % i, ngettext("%d second", "%d seconds", i) % i))
+	config.usage.infobar_timeout = ConfigSelection(default = "5", choices = [("0", _("no timeout"))] + choicelist)
 	config.usage.show_infobar_on_zap = ConfigYesNo(default = True)
 	config.usage.show_infobar_on_skip = ConfigYesNo(default = True)
 	config.usage.show_infobar_on_event_change = ConfigYesNo(default = False)
-	config.usage.show_second_infobar = ConfigSelection(default = None, choices = [
-		(None, _("None")), ("0", _("no timeout")), ("1", "1 " + _("second")), ("2", "2 " + _("seconds")),
-		("3", "3 " + _("seconds")), ("4", "4 " + _("seconds")), ("5", "5 " + _("seconds")), ("6", "6 " + _("seconds")),
-		("7", "7 " + _("seconds")), ("8", "8 " + _("seconds")), ("9", "9 " + _("seconds")), ("10", "10 " + _("seconds"))])
+	config.usage.show_second_infobar = ConfigSelection(default = None, choices = [(None, _("None")), ("0", _("no timeout"))] + choicelist) 
 	config.usage.show_spinner = ConfigYesNo(default = True)
 	config.usage.enable_tt_caching = ConfigYesNo(default = True)
-	config.usage.hdd_standby = ConfigSelection(default = "300", choices = [
-		("0", _("no standby")), ("10", "10 " + _("seconds")), ("30", "30 " + _("seconds")),
-		("60", "1 " + _("minute")), ("120", "2 " + _("minutes")),
-		("300", "5 " + _("minutes")), ("600", "10 " + _("minutes")), ("1200", "20 " + _("minutes")),
-		("1800", "30 " + _("minutes")), ("3600", "1 " + _("hour")), ("7200", "2 " + _("hours")),
-		("14400", "4 " + _("hours")) ])
+	choicelist = []
+	for i in (10, 30):
+		choicelist.append(("%d" % i, ngettext("%d second", "%d seconds", i) % i))
+	for i in (60, 120, 300, 600, 1200, 1800):
+		m = i / 60
+		choicelist.append(("%d" % i, ngettext("%d minute", "%d minutes", m) % m))
+	for i in (3600, 7200, 14400):
+		h = i / 3600
+		choicelist.append(("%d" % i, ngettext("%d hour", "%d hours", h) % h))
+	config.usage.hdd_standby = ConfigSelection(default = "300", choices = [("0", _("no standby"))] + choicelist)
 	config.usage.output_12V = ConfigSelection(default = "do not change", choices = [
 		("do not change", _("do not change")), ("off", _("off")), ("on", _("on")) ])
 
@@ -155,6 +156,12 @@ def InitUsageConfig():
 	config.epg.viasat.addNotifier(EpgSettingsChanged)
 	config.epg.netmed.addNotifier(EpgSettingsChanged)
 
+	config.epg.histminutes = ConfigSelectionNumber(min = 0, max = 120, stepwidth = 15, default = 0, wraparound = True)
+	def EpgHistorySecondsChanged(configElement):
+		from enigma import eEPGCache
+		eEPGCache.getInstance().setEpgHistorySeconds(config.epg.histminutes.getValue()*60)
+	config.epg.histminutes.addNotifier(EpgHistorySecondsChanged)
+
 	def setHDDStandby(configElement):
 		for hdd in harddiskmanager.HDDList():
 			hdd[1].setIdleTime(int(configElement.value))
@@ -210,9 +217,6 @@ def InitUsageConfig():
 	def updateFlushSize(el):
 		enigma.setFlushSize(int(el.value))
 		print "[SETTING] getFlushSize=", enigma.getFlushSize()
-	def updateDemuxSize(el):
-		enigma.setDemuxSize(int(el.value))
-		print "[SETTING] getDemuxSize=", enigma.getDemuxSize()
 	config.misc.flush_size = ConfigSelection(default = "0", choices = [
 		("0", "Off"),
 		("524288", "512kB"),
@@ -220,12 +224,6 @@ def InitUsageConfig():
 		("2097152", "2 MB"),
 		("4194304", "4 MB")])
 	config.misc.flush_size.addNotifier(updateFlushSize, immediate_feedback = False)
-	config.misc.demux_size = ConfigSelection(default = "1540096", choices = [
-		("770048", "Small 0.7 MB"),
-		("962560", "Normal 1 MB"),
-		("1540096", "Large 1.5MB"),
-		("1925120", "Huge 2 MB")])
-	config.misc.demux_size.addNotifier(updateDemuxSize, immediate_feedback = False)
 	
 	def updateEraseSpeed(el):
 		enigma.eBackgroundFileEraser.getInstance().setEraseSpeed(int(el.value))
@@ -263,34 +261,17 @@ def InitUsageConfig():
 		("2", _("yellow")) ])
 	config.subtitles.ttx_subtitle_original_position = ConfigYesNo(default = False)
 	config.subtitles.subtitle_position = ConfigSelection( choices = ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100", "150", "200", "250", "300", "350", "400", "450"], default = "50")
-	config.subtitles.subtitle_alignment = ConfigSelection(choices = ["left", "center", "right"], default = "center")
+	config.subtitles.subtitle_alignment = ConfigSelection(choices = [("left", _("left")), ("center", _("center")), ("right", _("right"))], default = "center")
 	config.subtitles.subtitle_rewrap = ConfigYesNo(default = False)
 	config.subtitles.subtitle_borderwidth = ConfigSelection(choices = ["1", "2", "3", "4", "5"], default = "3")
 	config.subtitles.subtitle_fontsize  = ConfigSelection(choices = ["16", "18", "20", "22", "24", "26", "28", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54"], default = "34")
-	config.subtitles.subtitle_noPTSrecordingdelay  = ConfigSelection(default = "315000", choices = [
-		("0", "No Delay"),
-		("45000", "0.5 sec"),
-		("90000", "1.0 sec"),
-		("135000", "1.5 sec"),
-		("180000", "2.0 sec"),
-		("225000", "2.5 sec"),
-		("270000", "3.0 sec"),
-		("315000", "3.5 sec"),
-		("360000", "4.0 sec"),
-		("405000", "4.5 sec"),
-		("450000", "5.0 sec"),
-		("495000", "5.5 sec"),
-		("540000", "6.0 sec"),
-		("585000", "6.5 sec"),
-		("630000", "7.0 sec"),
-		("475000", "7.5 sec"),
-		("720000", "8.0 sec"),
-		("765000", "8.5 sec"),
-		("810000", "9.0 sec"),
-		("855000", "9.5 sec"),
-		("900000", "10.0 sec")])
+	choicelist = []
+	for i in range(45000, 945000, 45000):
+		choicelist.append(("%d" % i, "%2.1f sec" % (i / 90000.)))
+	config.subtitles.subtitle_noPTSrecordingdelay = ConfigSelection(default = "315000", choices = [("0", _("No Delay"))] + choicelist)
 
 	config.subtitles.dvb_subtitles_yellow = ConfigYesNo(default = False)
+	config.subtitles.dvb_subtitles_original_position = ConfigSelection(default = "0", choices = [("0", _("original")), ("1", _("fixed")), ("2", _("relative"))])
 	config.subtitles.dvb_subtitles_centered = ConfigYesNo(default = False)
 	config.subtitles.dvb_subtitles_backtrans = ConfigSelection(default = "0", choices = [
 		("0", _("no transparency")),
@@ -308,39 +289,39 @@ def InitUsageConfig():
 
 	config.autolanguage = ConfigSubsection()
 	audio_language_choices=[	
-		("---", "None"),
-		("orj dos ory org esl qaa und mis mul ORY", "Original"),
-		("ara", "Arabic"),
-		("eus baq", "Basque"),
-		("bul", "Bulgarian"), 
-		("hrv", "Croatian"),
-		("ces cze", "Czech"),
-		("dan", "Danish"),
-		("dut ndl", "Dutch"),
-		("eng", "English"),
-		("est", "Estonian"),
-		("fin", "Finnish"),
-		("fra fre", "French"),
-		("deu ger", "German"),
-		("ell gre", "Greek"),
-		("heb", "Hebrew"),
-		("hun", "Hungarian"),
-		("ita", "Italian"),
-		("lat", "Latvian"),
-		("lit", "Lithuanian"),
-		("ltz", "Letzeburgesch"),
-		("nor", "Norwegian"),
-		("pol", "Polish"),
-		("por", "Portuguese"),
-		("fas per", "Persian"),
-		("ron rum", "Romanian"),
-		("rus", "Russian"),
-		("srp", "Serbian"),
-		("slk slo", "Slovak"),
-		("slv", "Slovenian"),
-		("spa", "Spanish"),
-		("swe", "Swedish"),
-		("tur", "Turkish")]
+		("---", _("None")),
+		("orj dos ory org esl qaa und mis mul ORY ORJ Audio_ORJ", _("Original")),
+		("ara", _("Arabic")),
+		("eus baq", _("Basque")),
+		("bul", _("Bulgarian")), 
+		("hrv", _("Croatian")),
+		("ces cze", _("Czech")),
+		("dan", _("Danish")),
+		("dut ndl", _("Dutch")),
+		("eng qaa", _("English")),
+		("est", _("Estonian")),
+		("fin", _("Finnish")),
+		("fra fre", _("French")),
+		("deu ger", _("German")),
+		("ell gre", _("Greek")),
+		("heb", _("Hebrew")),
+		("hun", _("Hungarian")),
+		("ita", _("Italian")),
+		("lat", _("Latvian")),
+		("lit", _("Lithuanian")),
+		("ltz", _("Letzeburgesch")),
+		("nor", _("Norwegian")),
+		("pol", _("Polish")),
+		("por", _("Portuguese")),
+		("fas per", _("Persian")),
+		("ron rum", _("Romanian")),
+		("rus", _("Russian")),
+		("srp", _("Serbian")),
+		("slk slo", _("Slovak")),
+		("slv", _("Slovenian")),
+		("spa", _("Spanish")),
+		("swe", _("Swedish")),
+		("tur Audio_TUR", _("Turkish"))]
 
 	def setEpgLanguage(configElement):
 		enigma.eServiceEvent.setEPGLanguage(configElement.value)
@@ -368,7 +349,7 @@ def InitUsageConfig():
 	config.autolanguage.subtitle_defaultimpaired = ConfigYesNo(default = False)
 	config.autolanguage.subtitle_defaultdvb = ConfigYesNo(default = False)
 	config.autolanguage.subtitle_usecache = ConfigYesNo(default = True)
-	config.autolanguage.equal_languages = ConfigSelection(default = "0", choices = [
+	config.autolanguage.equal_languages = ConfigSelection(default = "15", choices = [
 		("0", "None"),("1", "1"),("2", "2"),("3", "1,2"),
 		("4", "3"),("5", "1,3"),("6", "2,3"),("7", "1,2,3"),
 		("8", "4"),("9", "1,4"),("10", "2,4"),("11", "1,2,4"),
@@ -376,11 +357,16 @@ def InitUsageConfig():
 
 	config.pc = ConfigSubsection();
 	config.pc.default_fullscreen = ConfigYesNo(default = False)
- 	config.pc.zoom_enable = ConfigYesNo(default = False);
- 	config.pc.image4_3_zoom_x = ConfigNumber(default = 100)
- 	config.pc.image4_3_zoom_y = ConfigNumber(default = 100)
- 	config.pc.image16_9_zoom_x = ConfigNumber(default = 100)
- 	config.pc.image16_9_zoom_y = ConfigNumber(default = 100)
+	config.pc.zoom_enable = ConfigYesNo(default = False);
+	config.pc.image4_3_zoom_x = ConfigNumber(default = 100)
+	config.pc.image4_3_zoom_y = ConfigNumber(default = 100)
+	config.pc.image16_9_zoom_x = ConfigNumber(default = 100)
+	config.pc.image16_9_zoom_y = ConfigNumber(default = 100)
+	config.streaming = ConfigSubsection()
+	config.streaming.stream_ecm = ConfigYesNo(default = False)
+	config.streaming.descramble = ConfigYesNo(default = True)
+	config.streaming.stream_eit = ConfigYesNo(default = True)
+	config.streaming.stream_ait = ConfigYesNo(default = True)
 
 def updateChoices(sel, choices):
 	if choices:

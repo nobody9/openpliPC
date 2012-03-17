@@ -162,10 +162,11 @@ class InputDeviceSetup(Screen, ConfigListScreen):
 		self.list = [ ]
 		ConfigListScreen.__init__(self, self.list, session = session, on_change = self.changedEntry)
 
-		self["actions"] = ActionMap(["SetupActions"],
+		self["actions"] = ActionMap(["SetupActions", "MenuActions"],
 			{
 				"cancel": self.keyCancel,
 				"save": self.apply,
+				"menu": self.closeRecursive,
 			}, -2)
 
 		self["key_red"] = StaticText(_("Cancel"))
@@ -173,6 +174,9 @@ class InputDeviceSetup(Screen, ConfigListScreen):
 		self["key_yellow"] = StaticText()
 		self["key_blue"] = StaticText()
 		self["introduction"] = StaticText()
+
+		# for generating strings into .po only
+		devicenames = [_("dreambox front panel"),_("dreambox front panel"),_("dreambox remote control (native)"),_("dreambox advanced remote control (native)"),_("dreambox ir keyboard"),_("dreambox ir mouse")]
 
 		self.createSetup()
 		self.onLayoutFinish.append(self.layoutFinished)
@@ -186,13 +190,17 @@ class InputDeviceSetup(Screen, ConfigListScreen):
 
 	def createSetup(self):
 		self.list = [ ]
-		cmd = "self.enableEntry = getConfigListEntry(_('"'Change repeat and delay settings?'"'), config.inputDevices." + self.inputDevice + ".enabled)"
+		string = _("Change repeat and delay settings?")
+		cmd = "self.enableEntry = getConfigListEntry(string, config.inputDevices." + self.inputDevice + ".enabled)"
 		exec (cmd)
-		cmd = "self.repeatEntry = getConfigListEntry(_('"'Interval between keys when repeating:'"'), config.inputDevices." + self.inputDevice + ".repeat)"
+		string = _("Interval between keys when repeating:")
+		cmd = "self.repeatEntry = getConfigListEntry(string, config.inputDevices." + self.inputDevice + ".repeat)"
 		exec (cmd)
-		cmd = "self.delayEntry = getConfigListEntry(_('"'Delay before key repeat starts:'"'), config.inputDevices." + self.inputDevice + ".delay)"
+		string = _("Delay before key repeat starts:")
+		cmd = "self.delayEntry = getConfigListEntry(string, config.inputDevices." + self.inputDevice + ".delay)"
 		exec (cmd)
-		cmd = "self.nameEntry = getConfigListEntry(_('"'Devicename:'"'), config.inputDevices." + self.inputDevice + ".name)"
+		string = _("Devicename:")
+		cmd = "self.nameEntry = getConfigListEntry(string, config.inputDevices." + self.inputDevice + ".name)"
 		exec (cmd)
 		if self.enableEntry:
 			if isinstance(self.enableEntry[1], ConfigYesNo):
@@ -220,7 +228,7 @@ class InputDeviceSetup(Screen, ConfigListScreen):
 
 	def selectionChanged(self):
 		if self["config"].getCurrent() == self.enableEntry:
-			self["introduction"].setText(_("Current device: ") + str(iInputDevices.getDeviceAttribute(self.inputDevice, 'name')) )
+			self["introduction"].setText(_("Current device: ") + _(str(iInputDevices.getDeviceAttribute(self.inputDevice, 'name'))))
 		else:
 			self["introduction"].setText(_("Current value: ") + self.getCurrentValue() + _(" ms"))
 

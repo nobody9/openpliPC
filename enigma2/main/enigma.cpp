@@ -31,6 +31,7 @@
 #include "bsod.h"
 #include "version_info.h"
 
+#include <gst/gst.h>
 
 #ifdef OBJECT_DEBUG
 int object_total_remaining;
@@ -132,6 +133,7 @@ int main(int argc, char **argv)
 	atexit(object_dump);
 #endif
 
+	gst_init(&argc, &argv);
 
 	// set pythonpath if unset
 	setenv("PYTHONPATH", eEnv::resolve("${libdir}/enigma2/python").c_str(), 0);
@@ -225,12 +227,14 @@ int main(int argc, char **argv)
 
 	setIoPrio(IOPRIO_CLASS_BE, 3);
 
+	/* start at full size */
+	eVideoWidget::setFullsize(true);
+
 //	python.execute("mytest", "__main__");
 	python.execFile(eEnv::resolve("${libdir}/enigma2/python/mytest.py").c_str());
 
 	/* restore both decoders to full size */
-	extern void setFullsize();
-	setFullsize();
+	eVideoWidget::setFullsize(true);
 
 	if (exit_code == 5) /* python crash */
 	{

@@ -16,7 +16,6 @@ class CurrentService(PerServiceBase, Source):
 				iPlayableService.evUpdatedEventInfo: self.serviceEvent,
 				iPlayableService.evCuesheetChanged: self.serviceEvent,
 				iPlayableService.evVideoSizeChanged: self.serviceEvent,
-				iPlayableService.evVideoFramerateChanged: self.serviceEvent,
 				iPlayableService.evHBBTVInfo: self.serviceEvent
 			}, with_event=True)
 		self.navcore = navcore

@@ -135,7 +135,7 @@ class eDVBResourceManager: public iObject, public Object
 	DECLARE_REF(eDVBResourceManager);
 	int avail, busy;
 
-	enum { DM7025, DM800, DM500HD, DM800SE, DM8000, DM7020HD, X86 };
+	enum { DM7025, DM800, DM500HD, DM800SE, DM8000, DM7020HD };
 
 	int m_boxtype;
 
@@ -195,7 +195,7 @@ public:
 
 		/* allocate channel... */
 	RESULT allocateChannel(const eDVBChannelID &channelid, eUsePtr<iDVBChannel> &channel, bool simulate=false);
-	RESULT allocatePVRChannel(eUsePtr<iDVBPVRChannel> &channel);
+	RESULT allocatePVRChannel(const eDVBChannelID &channelid, eUsePtr<iDVBPVRChannel> &channel);
 	static RESULT getInstance(ePtr<eDVBResourceManager> &);
 
 			/* allocates a frontend able to tune to frontend paramters 'feperm'.
@@ -265,7 +265,8 @@ public:
 	void stopSource();
 
 	void setCueSheet(eCueSheet *cuesheet);
-	
+	void setOfflineDecodeMode(int parityswitchdelay);
+
 	RESULT getLength(pts_t &len);
 	RESULT getCurrentPosition(iDVBDemux *decoding_demux, pts_t &pos, int mode);
 
@@ -282,6 +283,7 @@ private:
 	Signal1<void,iDVBChannel*> m_stateChanged;
 	Signal2<void,iDVBChannel*,int> m_event;
 	int m_state;
+	ePtr<iTsSource> m_source;
 
 			/* for channel list */
 	ePtr<eDVBResourceManager> m_mgr;
@@ -294,6 +296,7 @@ private:
 	void pvrEvent(int event);
 	
 	int m_pvr_fd_dst;
+	eSingleLock m_tstools_lock;
 	eDVBTSTools m_tstools;
 	
 	ePtr<eCueSheet> m_cue;

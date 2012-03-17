@@ -78,15 +78,10 @@ int eDVBTSTools::getPTS(off_t &offset, pts_t &pts, int fixed)
 	{
 		off_t local_offset = offset;
 		unsigned long long data;
-		if (m_streaminfo.getStructureEntry(local_offset, data, 0) == 0)
+		if (m_streaminfo.getStructureEntryFirst(local_offset, data) == 0)
 		{
 			for(int retries = 8; retries != 0; --retries)
 			{
-				if (local_offset == 0x7fffffffffffffffULL) // EOF
-				{
-					eDebug("eDVBTSTools::getPTS EOF");
-					break;
-				}
 				if ((data & 0x1000000) != 0)
 				{
 					pts = data >> 31;
@@ -108,7 +103,7 @@ int eDVBTSTools::getPTS(off_t &offset, pts_t &pts, int fixed)
 				{
 					eDebug("No PTS, try next");
 				}
-				if (m_streaminfo.getStructureEntry(local_offset, data, 1) != 0)
+				if (m_streaminfo.getStructureEntryNext(local_offset, data, 1) != 0)
 				{
 					eDebug("Cannot find next structure entry");
 					break;
@@ -300,7 +295,7 @@ int eDVBTSTools::fixupPTS(const off_t &offset, pts_t &now)
 		calcBegin();
 		if (!m_begin_valid)
 		{	
-			eDebug("begin not valid, can't fixup");
+			eDebug("eDVBTSTools::fixupPTS begin not valid, can't fixup");
 			return -1;
 		}
 		
@@ -374,7 +369,7 @@ int eDVBTSTools::getOffset(off_t &offset, pts_t &pts, int marg)
 				
 				pts_t pts_diff = u->first - l->first;
 				off_t offset_diff = u->second - l->second;
-				
+
 				if (offset_diff < 0)
 				{
 					eDebug("something went wrong when taking samples.");
@@ -395,7 +390,7 @@ int eDVBTSTools::getOffset(off_t &offset, pts_t &pts, int marg)
 				offset = l->second;
 				offset += ((pts - l->first) * (pts_t)bitrate) / 8ULL / 90000ULL;
 				offset -= offset % 188;
-				
+
 				p = pts;
 				
 				if (!takeSample(offset, p))
@@ -413,7 +408,7 @@ int eDVBTSTools::getOffset(off_t &offset, pts_t &pts, int marg)
 
 				break;
 			}
-			
+
 				/* if even the first sample couldn't be taken, fall back. */
 				/* otherwise, return most refined result. */
 			if (p != -1)
@@ -466,9 +461,11 @@ void eDVBTSTools::calcEnd()
 	if (!m_source || !m_source->valid())
 		return;
 
+	// If there's a structure file, the calculation is much smarter, so we can try more often
+	off_t threshold = m_streaminfo.hasStructure() ? 100*1024 : 1024*1024;
+
 	off_t end = m_source->lseek(0, SEEK_END);
-	
-	if (llabs(end - m_last_filelength) > 1*1024*1024)
+	if (llabs(end - m_last_filelength) > threshold)
 	{
 		m_last_filelength = end;
 		m_end_valid = 0;
@@ -489,6 +486,7 @@ void eDVBTSTools::calcEnd()
 		}
 		else
 		{
+			eDebug("[@ML] m_streaminfo.getLastFrame failed, fallback");
 			while (!(m_end_valid || m_futile))
 			{
 				if (!--maxiter)
@@ -707,82 +705,79 @@ int eDVBTSTools::findFrame(off_t &_offset, size_t &len, int &direction, int fram
 
 	off_t offset = _offset;
 	int nr_frames = 0;
+	bool is_mpeg2 = false;
 
 		/* let's find the iframe before the given offset */
-	unsigned long long data;
-	
 	if (direction < 0)
 		offset--;
 
+	unsigned long long longdata;
+	if (m_streaminfo.getStructureEntryFirst(offset, longdata) != 0)
+	{
+		eDebug("findFrame: getStructureEntryFirst failed");
+		return -1;
+	}
+	if (direction == 0)
+	{
+		// Special case, move an extra frame ahead
+		if (m_streaminfo.getStructureEntryNext(offset, longdata, 1) != 0)
+			return -1;
+		direction = 1;
+	}
 	while (1)
 	{
-		if (m_streaminfo.getStructureEntry(offset, data, (direction == 0) ? 1 : 0))
-		{
-			eDebug("getting structure info for origin offset failed.");
-			return -1;
-		}
-		if (offset == 0x7fffffffffffffffLL) /* eof */
-		{
-			eDebug("reached eof");
-			return -1;
-		}
+		unsigned int data = (unsigned int)longdata; // only the lower bits are interesting
 			/* data is usually the start code in the lower 8 bit, and the next byte <<8. we extract the picture type from there */
 			/* we know that we aren't recording startcode 0x09 for mpeg2, so this is safe */
 			/* TODO: check frame_types */
-		int is_start = (data & 0xE0FF) == 0x0009; /* H.264 NAL unit access delimiter with I-frame*/
-		is_start |= (data & 0x3800FF) == 0x080000; /* MPEG2 picture start code with I-frame */
-		
-		int is_frame = ((data & 0xFF) == 0x0009) || ((data & 0xFF) == 0x00); /* H.264 UAD or MPEG2 start code */
-		
-		if (is_frame)
+		// is_frame
+		if (((data & 0xFF) == 0x0009) || ((data & 0xFF) == 0x00)) /* H.264 UAD or MPEG2 start code */
 		{
 			if (direction < 0)
 				--nr_frames;
 			else
 				++nr_frames;
+			if ((data & 0xE0FF) == 0x0009)		/* H.264 NAL unit access delimiter with I-frame*/
+			{
+				break;
+			}
+			if ((data & 0x3800FF) == 0x080000)	/* MPEG2 picture start code with I-frame */
+			{
+				is_mpeg2 = true;
+				break;
+			}
 		}
-//		eDebug("%08llx@%llu -> %d, %d", data, offset, is_start, nr_frames);
-		if (is_start)
-			break;
-
-		if (direction == -1)
-			--offset; /* move to previous entry */
-		else if (direction == +1)
-			direction = 0;
+		if (m_streaminfo.getStructureEntryNext(offset, longdata, direction) != 0)
+			return -1;
 	}
 	off_t start = offset;
 
-#if 0
-			/* backtrack to find the previous sequence start, in case of MPEG2 */
-	if ((data & 0xFF) == 0x00) {
-		do {
-			--start;
-			if (m_streaminfo.getStructureEntry(start, data, 0))
-			{
-				eDebug("get previous failed");
-				return -1;
-			}
-		} while (((data & 0xFF) != 9) && ((data & 0xFF) != 0x00) && ((data & 0xFF) != 0xB3)); /* sequence start or previous frame */
-		if ((data & 0xFF) != 0xB3)
-			start = offset;  /* Failed to find corresponding sequence start, so never mind */
-	}
-
-#endif
-
-			/* let's find the next frame after the given offset */
-	do {
-		if (m_streaminfo.getStructureEntry(offset, data, 1))
+	/* let's find the next frame after the given offset */
+	unsigned int data;
+	do
+	{
+		if (m_streaminfo.getStructureEntryNext(offset, longdata, 1))
 		{
 			eDebug("get next failed");
 			return -1;
 		}
-		if (offset == 0x7fffffffffffffffLL) /* eof */
+		data = ((unsigned int)longdata) & 0xFF;
+	}
+	while ((data != 0x09) && (data != 0x00)); /* next frame */
+
+	if (is_mpeg2)
+	{
+		// Seek back to sequence start (appears to be needed for some...)
+		do
 		{
-			eDebug("reached eof (while looking for end of iframe)");
-			return -1;
+			if (m_streaminfo.getStructureEntryNext(start, longdata, -1))
+			{
+				eDebug("Failed to find MPEG2 start frame");
+				break;
+			}
 		}
-//		eDebug("%08llx@%llu (next)", data, offset);
-	} while (((data & 0xFF) != 9) && ((data & 0xFF) != 0x00)); /* next frame */
+		while ((((unsigned int)longdata) & 0xFF) != 0xB3); /* sequence start or previous frame */
+	}
 
 	len = offset - start;
 	_offset = start;

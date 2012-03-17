@@ -110,7 +110,7 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 		# 'None' is magic to start at the list of mountpoints
 		defaultDir = config.mediaplayer.defaultDir.getValue()
-		self.filelist = FileList(defaultDir, matchingPattern = "(?i)^.*\.(mp2|mp3|ogg|ts|mts|m2ts|wav|wave|m3u|pls|e2pls|mpg|vob|avi|divx|m4v|mkv|mp4|m4a|dat|flac|flv|mov|dts)", useServiceRef = True, additionalExtensions = "4098:m3u 4098:e2pls 4098:pls")
+		self.filelist = FileList(defaultDir, matchingPattern = "(?i)^.*\.(mp2|mp3|ogg|ts|mts|m2ts|wav|wave|m3u|pls|e2pls|mpg|vob|avi|divx|m4v|mkv|mp4|m4a|dat|flac|flv|mov|dts|3gp|3g2)", useServiceRef = True, additionalExtensions = "4098:m3u 4098:e2pls 4098:pls")
 		self["filelist"] = self.filelist
 
 		self.playlist = MyPlayList()
@@ -526,11 +526,7 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 		if choice[1] == "copydir":
 			self.copyDirectory(self.filelist.getSelection()[0])
 		elif choice[1] == "copyfiles":
-			self.stopEntry()
-			self.playlist.clear()
-			self.isAudioCD = False
 			self.copyDirectory(os.path.dirname(self.filelist.getSelection()[0].getPath()) + "/", recursive = False)
-			self.playServiceRefEntry(self.filelist.getServiceRef())
 		elif choice[1] == "playlist":
 			self.switchToPlayList()
 		elif choice[1] == "filelist":
@@ -560,8 +556,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 	def playAudioCD(self):
 		from enigma import eServiceReference
-		from Plugins.Extensions.CDInfo.plugin import Query
-
 		if len(self.cdAudioTrackFiles):
 			self.playlist.clear()
 			self.savePlaylistOnExit = False
@@ -569,8 +563,12 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 			for file in self.cdAudioTrackFiles:
 				ref = eServiceReference(4097, 0, file)
 				self.playlist.addFile(ref)
-			cdinfo = Query(self)
-			cdinfo.scan()
+			try:
+				from Plugins.Extensions.CDInfo.plugin import Query
+				cdinfo = Query(self)
+				cdinfo.scan()
+			except ImportError:
+				pass # we can live without CDInfo
 			self.changeEntry(0)
 			self.switchToPlayList()
 
@@ -973,7 +971,7 @@ def main(session, **kwargs):
 	session.open(MediaPlayer)
 
 def menu(menuid, **kwargs):
-	if menuid == "mainmenu":
+	if menuid == "mainmenu" and config.mediaplayer.onMainMenu.getValue():
 		return [(_("Media player"), main, "media_player", 45)]
 	return []
 
@@ -1022,7 +1020,7 @@ def movielist_open(list, session, **kwargs):
 
 def filescan(**kwargs):
 	from Components.Scanner import Scanner, ScanPath
-	mediatypes = [
+	return [
 		Scanner(mimetypes = ["video/mpeg", "video/MP2T", "video/x-msvideo", "video/mkv"],
 			paths_to_scan =
 				[
@@ -1050,10 +1048,7 @@ def filescan(**kwargs):
 			name = "Music",
 			description = _("Play Music..."),
 			openfnc = filescan_open,
-		)]
-	try:
-		from Plugins.Extensions.CDInfo.plugin import Query
-		mediatypes.append(
+		),
 		Scanner(mimetypes = ["audio/x-cda"],
 			paths_to_scan =
 				[
@@ -1062,14 +1057,13 @@ def filescan(**kwargs):
 			name = "Audio-CD",
 			description = _("Play Audio-CD..."),
 			openfnc = audioCD_open,
-		))
-		return mediatypes
-	except ImportError:
-		return mediatypes
+		),
+		]
 
 from Plugins.Plugin import PluginDescriptor
 def Plugins(**kwargs):
 	return [
-		PluginDescriptor(name = "MediaPlayer", description = "Play back media files", where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = menu),
-		PluginDescriptor(name = "MediaPlayer", where = PluginDescriptor.WHERE_FILESCAN, needsRestart = False, fnc = filescan)
+		PluginDescriptor(name = "MediaPlayer", description = "Play back media files", where = PluginDescriptor.WHERE_PLUGINMENU, needsRestart = False, fnc = main),
+		PluginDescriptor(name = "MediaPlayer", where = PluginDescriptor.WHERE_FILESCAN, needsRestart = False, fnc = filescan),
+		PluginDescriptor(name = "MediaPlayer", description = "Play back media files", where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc = menu)
 	]

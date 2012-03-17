@@ -29,11 +29,12 @@ class GraphMultiEpgSetup(Screen, ConfigListScreen):
 		self["oktext"] = Label(_("OK"))
 		self["canceltext"] = Label(_("Cancel"))
 		
-		self["actions"] = ActionMap(["SetupActions"],
+		self["actions"] = ActionMap(["SetupActions", "MenuActions"],
 		{
 			"ok": self.keySave,
 			"save": self.keySave,
 			"cancel": self.keyCancel,
+			"menu": self.closeRecursive,
 		}, -1)
 		
 		self.onChangedEntry = [ ]
@@ -45,10 +46,13 @@ class GraphMultiEpgSetup(Screen, ConfigListScreen):
 	def createSetup(self):
 		print "Creating Graph Epg Setup"
 		self.list = [ ]
-		self.list.append(getConfigListEntry(_("Event Fontsize"), config.misc.graph_mepg.ev_fontsize))
+		self.list.append(getConfigListEntry(_("Event Fontsize (relative to skin size)"), config.misc.graph_mepg.ev_fontsize))
 		self.list.append(getConfigListEntry(_("Time Scale"), config.misc.graph_mepg.prev_time_period))
 		self.list.append(getConfigListEntry(_("Items per Page "), config.misc.graph_mepg.items_per_page))
-		self.list.append(getConfigListEntry(_("Skip Empty Services (may need restart)"), config.misc.graph_mepg.overjump))
+		self.list.append(getConfigListEntry(_("Skip Empty Services"), config.misc.graph_mepg.overjump))
+		self.list.append(getConfigListEntry(_("Show Picons"), config.misc.graph_mepg.showpicon))
+		self.list.append(getConfigListEntry(_("Show Service Names "), config.misc.graph_mepg.showservicetitle))
+		self.list.append(getConfigListEntry(_("Round start time on"), config.misc.graph_mepg.roundTo))
+
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
-

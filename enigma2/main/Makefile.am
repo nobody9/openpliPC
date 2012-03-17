@@ -54,6 +54,7 @@ enigma2_LDADD = \
 	@X11_LIBS@ \
 	@LIBDDVD_LIBS@ \
 	-lcrypt -lnl -lnl-genl -ldvbcsa -lrt
+	-ltuxtxt32bpp -lcrypt
 
 enigma2_LDFLAGS = -Wl,--export-dynamic
 

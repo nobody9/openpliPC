@@ -7,7 +7,6 @@
 #include <lib/base/message.h>
 #include <sys/types.h>
 #include <lib/base/rawfile.h>
-//#include <lib/dvb/demux.h>
 
 class iFilePushScatterGather
 {
@@ -18,20 +17,16 @@ public:
 
 class eFilePushThread: public eThread, public Object
 {
-
 public:
 	eFilePushThread(int prio_class=IOPRIO_CLASS_BE, int prio_level=0, int blocksize=188, size_t buffersize=188*1024);
 	~eFilePushThread();
 	void thread();
 	void stop();
-
 	void start(int sourcefd, int destfd);
 	int start(const char *filename, int destfd);
 
 	void start(ePtr<iTsSource> &source, int destfd);
 
-	void start(ePtr<eDVBDemux> &demux, int fd, int fd_dest);
-	
 	void pause();
 	void resume();
 	
@@ -44,7 +39,7 @@ public:
 	
 	void setScatterGather(iFilePushScatterGather *);
 	
-	enum { evtEOF, evtReadError, evtWriteError, evtUser };
+	enum { evtEOF, evtReadError, evtWriteError, evtUser, evtStopped };
 	Signal1<void,int> m_event;
 
 		/* you can send private events if you want */
@@ -79,26 +74,28 @@ public:
 	~eFilePushThreadRecorder();
 	void thread();
 	void stop();
-	void start(int sourcefd, int destfd);
-  void start(ePtr<eDVBDemux> &demux, int fd, int fd_dest);
-
-	enum { evtEOF, evtReadError, evtWriteError, evtUser };
+	void start(int sourcefd);
+	void start(int fd, ePtr<eDVBDemux> &demux);
+	enum { evtEOF, evtReadError, evtWriteError, evtUser, evtStopped };
 	Signal1<void,int> m_event;
 
 	void sendEvent(int evt);
 protected:
-	virtual void filterRecordData(const unsigned char *data, int len) = 0;
+	// This method should write the data out and return the number of bytes written.
+	// If result <0, set 'errno'. The simplest implementation is just "::write(...)"
+	virtual int writeData(const unsigned char *data, int len) = 0;
 private:
 	int prio_class;
 	int prio;
 	int m_stop;
-	int m_fd_dest;
 	int m_fd_source;
 	int m_blocksize;
 	size_t m_buffersize;
 	unsigned char* m_buffer;
-	off_t m_current_position;
 	eFixedMessagePump<int> m_messagepump;
+ 
+	ePtr<iTsSource> m_source;
+ 
 	void recvEvent(const int &evt);
 };
 

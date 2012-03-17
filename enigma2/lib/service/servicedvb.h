@@ -4,7 +4,6 @@
 #include <lib/service/iservice.h>
 #include <lib/dvb/idvb.h>
 
-#include <lib/dvb/dvb.h>
 #include <lib/dvb/pmt.h>
 #include <lib/dvb/eit.h>
 #include <lib/dvb/subtitle.h>
@@ -231,6 +230,11 @@ protected:
 	ePtr<iDVBTSRecorder> m_record;
 	std::set<int> m_pids_active;
 
+		/* openpliPC */
+	ePtr<iDVBTSRecorder> m_openpliPC_record;
+	std::string m_openpliPC_file;
+	int m_openpliPC_fd;
+
 	void updateTimeshiftPids();
 	void switchToLive();
 
@@ -297,13 +301,10 @@ protected:
 	ePtr<eConnection> m_rds_decoder_event_connection;
 	void rdsDecoderEvent(int);
 
+	ePtr<eConnection> m_video_event_connection;
 	void video_event(struct iTSMPEGDecoder::videoEvent);
 
-	virtual ePtr<iTsSource> createTsSource(eServiceReferenceDVB &ref);
-
-		/* Live TV */
-	ePtr<iDVBTSPlayer> m_player;
-	int m_fd_dst;
+	virtual ePtr<iTsSource> createTsSource(eServiceReferenceDVB &ref, int packetsize = 188);
 
 	Connection xine_connection;
 	cXineLib* xineLib;

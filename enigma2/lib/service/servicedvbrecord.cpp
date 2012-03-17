@@ -2,6 +2,7 @@
 #include <lib/base/eerror.h>
 #include <lib/dvb/epgcache.h>
 #include <lib/dvb/metaparser.h>
+#include <lib/base/httpstream.h>
 #include <fcntl.h>
 
 	/* for cutlist */
@@ -17,12 +18,15 @@
 
 DEFINE_REF(eDVBServiceRecord);
 
-eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref): m_ref(ref)
+eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref, bool isstreamclient): m_ref(ref)
 {
 	CONNECT(m_service_handler.serviceEvent, eDVBServiceRecord::serviceEvent);
 	CONNECT(m_event_handler.m_eit_changed, eDVBServiceRecord::gotNewEvent);
 	m_state = stateIdle;
 	m_want_record = 0;
+	m_record_ecm = false;
+	m_descramble = true;
+	m_is_stream_client = isstreamclient;
 	m_tuned = 0;
 	m_target_fd = -1;
 	m_error = 0;
@@ -84,14 +88,21 @@ void eDVBServiceRecord::serviceEvent(int event)
 		m_error = errNoResources;
 		m_event((iRecordableService*)this, evTuneFailed);
 		break;
+	case eDVBServicePMTHandler::eventStopped:
+		/* recording data source has stopped, stop recording */
+		stop();
+		m_event((iRecordableService*)this, evRecordAborted);
+		break;
 	}
 }
 
-RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags)
+RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags, bool descramble, bool recordecm)
 {
 	m_filename = filename;
 	m_streaming = 0;
-	
+	m_descramble = descramble;
+	m_record_ecm = recordecm;
+
 	if (m_state == stateIdle)
 	{
 		int ret = doPrepare();
@@ -137,6 +148,7 @@ RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t e
 				meta.m_description = descr;
 			if (tags)
 				meta.m_tags = tags;
+			meta.m_scrambled = m_record_ecm; /* assume we will record scrambled data, when ecm will be included in the recording */
 			ret = meta.updateMeta(filename) ? -255 : 0;
 			if (!ret)
 			{
@@ -184,10 +196,12 @@ RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t e
 	return -1;
 }
 
-RESULT eDVBServiceRecord::prepareStreaming()
+RESULT eDVBServiceRecord::prepareStreaming(bool descramble, bool includeecm)
 {
 	m_filename = "";
 	m_streaming = 1;
+	m_descramble = descramble;
+	m_record_ecm = includeecm;
 	if (m_state == stateIdle)
 		return doPrepare();
 	return -1;
@@ -235,9 +249,43 @@ int eDVBServiceRecord::doPrepare()
 		/* allocate a ts recorder if we don't already have one. */
 	if (m_state == stateIdle)
 	{
+		eDVBServicePMTHandler::serviceType servicetype;
+		if (m_streaming)
+		{
+			servicetype = m_record_ecm ? eDVBServicePMTHandler::scrambled_streamserver : eDVBServicePMTHandler::streamserver;
+		}
+		else
+		{
+			servicetype = m_record_ecm ? eDVBServicePMTHandler::scrambled_recording : eDVBServicePMTHandler::recording;
+		}
 		m_pids_active.clear();
 		m_state = statePrepared;
-		return m_service_handler.tune(m_ref, 0, 0, m_simulate);
+		ePtr<iTsSource> source;
+		if (!m_ref.path.empty())
+		{
+			if (m_is_stream_client)
+			{
+				/* 
+				* streams are considered to be descrambled by default;
+				* user can indicate a stream is scrambled, by using servicetype id + 0x100
+				*/
+				m_descramble = (m_ref.type == eServiceFactoryDVB::id + 0x100);
+				m_record_ecm = false;
+				servicetype = eDVBServicePMTHandler::streamclient;
+				eHttpStream *f = new eHttpStream();
+				f->open(m_ref.path.c_str());
+				source = ePtr<iTsSource>(f);
+			}
+			else
+			{
+				/* re-record a recording */
+				servicetype = eDVBServicePMTHandler::offline;
+				eRawFile *f = new eRawFile();
+				f->open(m_ref.path.c_str());
+				source = ePtr<iTsSource>(f);
+			}
+		}
+		return m_service_handler.tuneExt(m_ref, 0, source, m_ref.path.c_str(), 0, m_simulate, NULL, servicetype, m_descramble);
 	}
 	return 0;
 }
@@ -384,6 +432,15 @@ int eDVBServiceRecord::doRecord()
 			if (program.textPid != -1)
 				pids_to_record.insert(program.textPid); // Videotext
 
+			if (m_record_ecm)
+			{
+				for (std::list<eDVBServicePMTHandler::program::capid_pair>::const_iterator i(program.caids.begin()); 
+							i != program.caids.end(); ++i)
+				{
+					if (i->capid >= 0) pids_to_record.insert(i->capid);
+				}
+			}
+
 				/* find out which pids are NEW and which pids are obsolete.. */
 			std::set<int> new_pids, obsolete_pids;
 
@@ -458,7 +515,7 @@ PyObject *eDVBServiceRecord::getStreamingData()
 	ePtr<iDVBDemux> demux;
 	if (!m_service_handler.getDataDemux(demux))
 	{
-		uint8_t demux_id, adapter_id;;
+		uint8_t demux_id, adapter_id;
 		if (!demux->getCADemuxID(demux_id))
 			PutToDict(r, "demux", demux_id);
 		if (!demux->getCAAdapterID(adapter_id))
@@ -543,11 +600,7 @@ void eDVBServiceRecord::saveCutlist()
 				continue;
 			}
 			eDebug("fixed up %llx to %llx (offset %llx)", i->second, p, offset);
-#if BYTE_ORDER == BIG_ENDIAN
-			where = p;
-#else
-			where = bswap_64(p);
-#endif
+			where = htobe64(p);
 			what = htonl(2); /* mark */
 			fwrite(&where, sizeof(where), 1, f);
 			fwrite(&what, sizeof(what), 1, f);

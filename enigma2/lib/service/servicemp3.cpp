@@ -14,11 +14,22 @@
 #include <lib/gdi/gpixmap.h>
 
 #include <string>
+
+#include <gst/gst.h>
+#include <gst/pbutils/missing-plugins.h>
 #include <sys/stat.h>
 
 #define HTTP_TIMEOUT 10
 
 // eServiceFactoryMP3
+
+/*
+ * gstreamer suffers from a bug causing sparse streams to loose sync, after pause/resume / skip
+ * see: https://bugzilla.gnome.org/show_bug.cgi?id=619434
+ * As a workaround, we run the subsink in sync=false mode
+ */
+#define GSTREAMER_SUBTITLE_SYNC_MODE_BUG
+/**/
 
 eServiceFactoryMP3::eServiceFactoryMP3()
 {
@@ -46,8 +57,8 @@ eServiceFactoryMP3::eServiceFactoryMP3()
 		extensions.push_back("mp4");
 		extensions.push_back("mov");
 		extensions.push_back("m4a");
-		extensions.push_back("mts");
-		extensions.push_back("m2ts");
+		extensions.push_back("3gp");
+		extensions.push_back("3g2");
 		sc->addServiceFactory(eServiceFactoryMP3::id, this, extensions);
 	}
 
@@ -227,40 +238,214 @@ int eServiceMP3::ac3_delay,
     eServiceMP3::pcm_delay;
 
 eServiceMP3::eServiceMP3(eServiceReference ref)
-	:m_ref(ref)
+	:m_ref(ref)//, m_pump(eApp, 1) openpliPC
 {
-	cXineLib *xineLib = cXineLib::getInstance();
-//xineLib->stopVideo();
+	m_subtitle_sync_timer = eTimer::create(eApp);
+	m_streamingsrc_timeout = 0;
+	//m_stream_tags = 0; openpliPC
+	m_currentAudioStream = -1;
+	m_currentSubtitleStream = -1;
+	m_cachedSubtitleStream = 0; /* report the first subtitle stream to be 'cached'. TODO: use an actual cache. */
+	m_subtitle_widget = 0;
+	m_currentTrickRatio = 1.0;
+	m_buffer_size = 5*1024*1024;
+	m_buffer_duration = 5 * GST_SECOND;
+	m_use_prefillbuffer = FALSE;
+	m_prev_decoder_time = -1;
+	m_decoder_time_valid_state = 0;
+	m_errorInfo.missing_codec = "";
+
+	CONNECT(m_subtitle_sync_timer->timeout, eServiceMP3::pushSubtitles);
+	//CONNECT(m_pump.recv_msg, eServiceMP3::gstPoll); openpliPC
+	m_aspect = m_width = m_height = m_framerate = m_progressive = -1;
+
 	m_state = stIdle;
 	eDebug("eServiceMP3::construct!");
 
 	const char *filename = m_ref.path.c_str();
-//const char *ext = strrchr(filename, '.');
+	const char *ext = strrchr(filename, '.');
+	if (!ext)
+		ext = filename;
+
+	m_sourceinfo.is_video = FALSE;
+	m_sourceinfo.audiotype = atUnknown;
+	if ( (strcasecmp(ext, ".mpeg") && strcasecmp(ext, ".mpg") && strcasecmp(ext, ".vob") && strcasecmp(ext, ".bin") && strcasecmp(ext, ".dat") ) == 0 )
+	{
+		m_sourceinfo.containertype = ctMPEGPS;
+		m_sourceinfo.is_video = TRUE;
+	}
+	else if ( strcasecmp(ext, ".ts") == 0 )
+	{
+		m_sourceinfo.containertype = ctMPEGTS;
+		m_sourceinfo.is_video = TRUE;
+	}
+	else if ( strcasecmp(ext, ".mkv") == 0 )
+	{
+		m_sourceinfo.containertype = ctMKV;
+		m_sourceinfo.is_video = TRUE;
+	}
+	else if ( strcasecmp(ext, ".avi") == 0 || strcasecmp(ext, ".divx") == 0)
+	{
+		m_sourceinfo.containertype = ctAVI;
+		m_sourceinfo.is_video = TRUE;
+	}
+	else if ( strcasecmp(ext, ".mp4") == 0 || strcasecmp(ext, ".mov") == 0 || strcasecmp(ext, ".m4v") == 0 || strcasecmp(ext, ".3gp") == 0 || strcasecmp(ext, ".3g2") == 0)
+	{
+		m_sourceinfo.containertype = ctMP4;
+		m_sourceinfo.is_video = TRUE;
+	}
+	else if ( strcasecmp(ext, ".m4a") == 0 )
+	{
+		m_sourceinfo.containertype = ctMP4;
+		m_sourceinfo.audiotype = atAAC;
+	}
+	else if ( strcasecmp(ext, ".mp3") == 0 )
+		m_sourceinfo.audiotype = atMP3;
+	else if ( (strncmp(filename, "/autofs/", 8) || strncmp(filename+strlen(filename)-13, "/track-", 7) || strcasecmp(ext, ".wav")) == 0 )
+		m_sourceinfo.containertype = ctCDA;
+	if ( strcasecmp(ext, ".dat") == 0 )
+	{
+		m_sourceinfo.containertype = ctVCD;
+		m_sourceinfo.is_video = TRUE;
+	}
+	if ( strstr(filename, "://") )
+		m_sourceinfo.is_streaming = TRUE;
+	if ( strstr(filename, " buffer=1") )
+		m_use_prefillbuffer = TRUE;
+
+	/*gchar *uri; openpliPC
+
+	if ( m_sourceinfo.is_streaming )
+	{
+		uri = g_strdup_printf ("%s", filename);
+		m_streamingsrc_timeout = eTimer::create(eApp);;
+		CONNECT(m_streamingsrc_timeout->timeout, eServiceMP3::sourceTimeout);
+
+		std::string config_str;
+		if( ePythonConfigQuery::getConfigValue("config.mediaplayer.useAlternateUserAgent", config_str) == 0 )
+		{
+			if ( config_str == "True" )
+				ePythonConfigQuery::getConfigValue("config.mediaplayer.alternateUserAgent", m_useragent);
+		}
+		if ( m_useragent.length() == 0 )
+			m_useragent = "Dream Multimedia Dreambox Enigma2 Mediaplayer";
+	}
+	else if ( m_sourceinfo.containertype == ctCDA )
+	{
+		int i_track = atoi(filename+18);
+		uri = g_strdup_printf ("cdda://%i", i_track);
+	}
+	else if ( m_sourceinfo.containertype == ctVCD )
+	{
+		int ret = -1;
+		int fd = open(filename,O_RDONLY);
+		if (fd >= 0)
+		{
+			char tmp[128*1024];
+			ret = read(fd, tmp, 128*1024);
+			close(fd);
+		}
+		if ( ret == -1 ) // this is a "REAL" VCD
+			uri = g_strdup_printf ("vcd://");
+		else
+			uri = g_filename_to_uri(filename, NULL, NULL);
+	}
+	else
+		uri = g_filename_to_uri(filename, NULL, NULL);
+
+	eDebug("eServiceMP3::playbin2 uri=%s", uri);
+
+	m_gst_playbin = gst_element_factory_make("playbin2", "playbin");
+	if ( m_gst_playbin )
+	{
+		g_object_set (G_OBJECT (m_gst_playbin), "uri", uri, NULL);
+		int flags = 0x47; // ( GST_PLAY_FLAG_VIDEO | GST_PLAY_FLAG_AUDIO | GST_PLAY_FLAG_NATIVE_VIDEO | GST_PLAY_FLAG_TEXT );
+		if ( m_sourceinfo.is_streaming )
+		{
+			g_signal_connect (G_OBJECT (m_gst_playbin), "notify::source", G_CALLBACK (gstHTTPSourceSetAgent), this);
+			if (m_use_prefillbuffer)
+			{
+				g_object_set (G_OBJECT (m_gst_playbin), "buffer_duration", m_buffer_duration, NULL);
+				flags |= 0x100; // USE_BUFFERING
+			}
+		}
+		g_object_set (G_OBJECT (m_gst_playbin), "flags", flags, NULL);
+		GstElement *subsink = gst_element_factory_make("subsink", "subtitle_sink");
+		if (!subsink)
+			eDebug("eServiceMP3::sorry, can't play: missing gst-plugin-subsink");
+		else
+		{
+			m_subs_to_pull_handler_id = g_signal_connect (subsink, "new-buffer", G_CALLBACK (gstCBsubtitleAvail), this);
+			g_object_set (G_OBJECT (subsink), "caps", gst_caps_from_string("text/plain; text/x-plain; text/x-pango-markup; video/x-dvd-subpicture; subpicture/x-pgs"), NULL);
+			g_object_set (G_OBJECT (m_gst_playbin), "text-sink", subsink, NULL);
+			g_object_set (G_OBJECT (m_gst_playbin), "current-text", m_currentSubtitleStream, NULL);
+		}
+		gst_bus_set_sync_handler(gst_pipeline_get_bus (GST_PIPELINE (m_gst_playbin)), gstBusSyncHandler, this);
+		char srt_filename[strlen(filename)+1];
+		strncpy(srt_filename,filename,strlen(filename)-3);
+		srt_filename[strlen(filename)-3]='\0';
+		strcat(srt_filename, "srt");
+		struct stat buffer;
+		if (stat(srt_filename, &buffer) == 0)
+		{
+			eDebug("eServiceMP3::subtitle uri: %s", g_filename_to_uri(srt_filename, NULL, NULL));
+			g_object_set (G_OBJECT (m_gst_playbin), "suburi", g_filename_to_uri(srt_filename, NULL, NULL), NULL);
+		}
+	} else
+	{
+		m_event((iPlayableService*)this, evUser+12);
+		m_gst_playbin = 0;
+		m_errorInfo.error_message = "failed to create GStreamer pipeline!\n";
+
+		eDebug("eServiceMP3::sorry, can't play: %s",m_errorInfo.error_message.c_str());
+	}
+	g_free(uri);
+
+	setBufferSize(m_buffer_size);*/
+  
+  cXineLib *xineLib = cXineLib::getInstance();
 	int uzunluk;
 	uzunluk=strlen(filename);
 	char myfilesrt[1000];
 	sprintf(myfilesrt,"%s",filename);
 	myfilesrt[uzunluk-4]='\0';
 	char myfile[1000];
-//xine videoFileName.avi#subtitle:subtitleFileName.srt
 	sprintf(myfile,"%s#subtitle:%s.srt",filename,myfilesrt);
-//sprintf(myfile,"%s",filename);
-	ASSERT(m_state == stIdle);
-	xineLib->FilmVideo(myfile);
-	m_state = stRunning;
-	m_event(this, evStart);
-	return ;
- 
+	xineLib->FilmVideo(myfile); 
 }
 
 eServiceMP3::~eServiceMP3()
 {
+	// disconnect subtitle callback
+	/*GstElement *subsink = gst_bin_get_by_name(GST_BIN(m_gst_playbin), "subtitle_sink"); openpliPC
+
+	if (subsink)
+	{
+		g_signal_handler_disconnect (subsink, m_subs_to_pull_handler_id);
+		gst_object_unref(subsink);
+	}
+
+	delete m_subtitle_widget;
+
+	// disconnect sync handler callback
+	gst_bus_set_sync_handler(gst_pipeline_get_bus (GST_PIPELINE (m_gst_playbin)), NULL, NULL);*/
+  
 	if (m_state == stRunning)
 		stop();
+
+	/*if (m_stream_tags) openpliPC
+		gst_tag_list_free(m_stream_tags);
+	
+	if (m_gst_playbin)
+	{
+		gst_object_unref (GST_OBJECT (m_gst_playbin));
+		eDebug("eServiceMP3::destruct!");
+	}*/
 }
 
 DEFINE_REF(eServiceMP3);
 
+//DEFINE_REF(eServiceMP3::GstMessageContainer); openpliPC
 
 RESULT eServiceMP3::connectEvent(const Slot2<void,iPlayableService*,int> &event, ePtr<eConnection> &connection)
 {
@@ -270,8 +455,15 @@ RESULT eServiceMP3::connectEvent(const Slot2<void,iPlayableService*,int> &event,
 
 RESULT eServiceMP3::start()
 {
-//	ASSERT(m_state == stIdle);
+//	ASSERT(m_state == stIdle); openpliPC
+
 	m_state = stRunning;
+	/*if (m_gst_playbin) openpliPC
+	{
+		eDebug("eServiceMP3::starting pipeline");
+		gst_element_set_state (m_gst_playbin, GST_STATE_PLAYING);
+	}*/
+
 	m_event(this, evStart);
 
 	return 0;
@@ -290,6 +482,8 @@ RESULT eServiceMP3::stop()
 	if (m_state == stStopped)
 		return -1;
 
+	eDebug("eServiceMP3::stop %s", m_ref.path.c_str());
+	//gst_element_set_state(m_gst_playbin, GST_STATE_NULL); openpliPC
 	m_state = stStopped;
 	cXineLib *xineLib = cXineLib::getInstance();
 	xineLib->stopVideo();
@@ -312,7 +506,8 @@ RESULT eServiceMP3::setSlowMotion(int ratio)
 {
 	if (!ratio)
 		return 0;
-return 0;
+	eDebug("eServiceMP3::setSlowMotion ratio=%f",1.0/(gdouble)ratio);
+	return trickSeek(1.0/(gdouble)ratio);
 }
 
 RESULT eServiceMP3::setFastForward(int ratio)
@@ -324,8 +519,11 @@ RESULT eServiceMP3::setFastForward(int ratio)
 		// iPausableService
 RESULT eServiceMP3::pause()
 {
+	//if (!m_gst_playbin || m_state != stRunning) openpliPC
 	if (m_state != stRunning)
 		return -1;
+
+	//trickSeek(0.0); openpliPC
 
 	cXineLib *xineLib = cXineLib::getInstance();
 	xineLib->VideoPause();
@@ -335,8 +533,11 @@ RESULT eServiceMP3::pause()
 
 RESULT eServiceMP3::unpause()
 {
+	//if (!m_gst_playbin || m_state != stRunning) openpliPC
 	if (m_state != stRunning)
 		return -1;
+
+	//trickSeek(1.0); openpliPC
 
 	cXineLib *xineLib = cXineLib::getInstance();
 	xineLib->VideoResume();
@@ -374,12 +575,15 @@ RESULT eServiceMP3::seekTo(pts_t to)
 }
 
 
-RESULT eServiceMP3::trickSeek(int ratio)
+RESULT eServiceMP3::trickSeek(gdouble ratio)
 {
 	printf("----Ratio=%d\n",ratio);
 	cXineLib *xineLib = cXineLib::getInstance();
 	xineLib->VideoIleriF();
-	//if (!ratio) return seekRelative(0, 0);
+	//if (!ratio) return seekRelative(0, 0);	
+	m_subtitle_pages.clear();
+	m_prev_decoder_time = -1;
+	m_decoder_time_valid_state = 0;
 	return 0;
 }
 
@@ -541,10 +745,12 @@ RESULT eServiceMP3::audioDelay(ePtr<iAudioDelay> &ptr)
 
 int eServiceMP3::getNumberOfTracks()
 {
+	return 0;
 }
 
 int eServiceMP3::getCurrentTrack()
 {
+  return 0;
 }
 
 RESULT eServiceMP3::selectTrack(unsigned int i)
@@ -566,6 +772,7 @@ RESULT eServiceMP3::selectTrack(unsigned int i)
 
 int eServiceMP3::selectAudioStream(int i)
 {
+  return 0;
 }
 
 int eServiceMP3::getCurrentChannel()
@@ -592,6 +799,12 @@ void eServiceMP3::pushSubtitles()
 
 RESULT eServiceMP3::enableSubtitles(eWidget *parent, ePyObject tuple)
 {
+  return 0;
+}
+
+RESULT eServiceMP3::disableSubtitles(eWidget *parent)
+{
+	return 0;
 }
 
 PyObject *eServiceMP3::getCachedSubtitle()
@@ -612,6 +825,23 @@ PyObject *eServiceMP3::getSubtitleList()
 RESULT eServiceMP3::streamed(ePtr<iStreamedService> &ptr)
 {
 	ptr = this;
+	return 0;
+}
+
+PyObject *eServiceMP3::getBufferCharge()
+{
+	ePyObject tuple = PyTuple_New(5);
+	PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(0));
+	PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(0));
+	PyTuple_SET_ITEM(tuple, 2, PyInt_FromLong(0));
+	PyTuple_SET_ITEM(tuple, 3, PyInt_FromLong(0));
+	PyTuple_SET_ITEM(tuple, 4, PyInt_FromLong(0));
+	return tuple;
+}
+
+int eServiceMP3::setBufferSize(int size)
+{
+	m_buffer_size = size;
 	return 0;
 }
 

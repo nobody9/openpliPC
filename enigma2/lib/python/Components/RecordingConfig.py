@@ -13,3 +13,4 @@ def InitRecordingConfig():
 		("standard", _("standard")),
 		("short", _("Short filenames")),
 		("long", _("Long filenames")) ] )
+	config.recording.offline_decode_delay = ConfigNumber(default = 1000)

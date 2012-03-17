@@ -2,23 +2,8 @@
 #include <lib/gui/ewidgetdesktop.h>
 #include <lib/gdi/xineLib.h>
 
-ePtr<eTimer> fullsizeTimer;
-//int eVideoWidget::pendingFullsize = 0;
-static int pendingFullsize;
-
-void setFullsize()
-{
-	for (int decoder=0; decoder < 1; ++decoder)
-	{
-		if (pendingFullsize & (1 << decoder))
-		{
-			cXineLib* xineLib = cXineLib::getInstance();
-			xineLib->setVideoWindow(0, 0, 0, 0);
-			pendingFullsize &= ~(1 << decoder);
-		}
-	}
-}
-
+ePtr<eTimer> eVideoWidget::fullsizeTimer;
+int eVideoWidget::pendingFullsize = 0;
 
 eVideoWidget::eVideoWidget(eWidget *parent)
 	:eLabel(parent), m_fb_size(720, 576), m_state(0), m_decoder(1)
@@ -26,7 +11,7 @@ eVideoWidget::eVideoWidget(eWidget *parent)
 	if (!fullsizeTimer)
 	{
 		fullsizeTimer = eTimer::create(eApp);
-		fullsizeTimer->timeout.connect(slot(setFullsize));
+		fullsizeTimer->timeout.connect(bind(slot(eVideoWidget::setFullsize), false));
 	}
 	parent->setPositionNotifyChild(1);
 }
@@ -83,6 +68,18 @@ void eVideoWidget::setPosition(int index, int left, int top, int width, int heig
 	writeProc(filename + "apply", 1);
 }
 
+void eVideoWidget::setFullsize(bool force)
+{
+	for (int decoder=0; decoder < 2; ++decoder)
+	{
+		if (force || (pendingFullsize & (1 << decoder)))
+		{
+			cXineLib* xineLib = cXineLib::getInstance();
+			xineLib->setVideoWindow(0, 0, 0, 0);
+			pendingFullsize &= ~(1 << decoder);      
+		}
+	}
+}
 
 void eVideoWidget::updatePosition(int disable)
 {
@@ -91,17 +88,13 @@ void eVideoWidget::updatePosition(int disable)
 
 	if (disable && !(m_state & 4))
 	{
-//		eDebug("was not visible!");
 		return;
 	}
 
 	if ((m_state & 2) != 2)
 	{
-//		eDebug("no size!");
 		return;
 	}
-
-//	eDebug("position %d %d -> %d %d", position().x(), position().y(), size().width(), size().height());
 
 	eRect pos(0,0,0,0);
 	if (!disable)
@@ -109,11 +102,8 @@ void eVideoWidget::updatePosition(int disable)
 	else
 		m_state &= ~4;
 
-//	eDebug("abs position %d %d -> %d %d", pos.left(), pos.top(), pos.width(), pos.height());
-
 	if (!disable && m_state & 8 && pos == m_user_rect)
 	{
-//		eDebug("matched");
 		return;
 	}
 
@@ -121,15 +111,26 @@ void eVideoWidget::updatePosition(int disable)
 	{
 		m_user_rect = pos;
 		m_state |= 1;
-//		eDebug("set user rect pos!");
 	}
 
-//	eDebug("m_user_rect %d %d -> %d %d", m_user_rect.left(), m_user_rect.top(), m_user_rect.width(), m_user_rect.height());
+	int left = pos.left() * 720 / m_fb_size.width();
+	int top = pos.top() * 576 / m_fb_size.height();
+	int width = pos.width() * 720 / m_fb_size.width();
+	int height = pos.height() * 576 / m_fb_size.height();
+
+	int tmp = left - (width * 4) / 100;
+	left = tmp < 0 ? 0 : tmp;
+	tmp = top - (height * 4) / 100;
+	top = tmp < 0 ? 0 : tmp;
+	tmp = (width * 108) / 100;
+	width = left + tmp > 720 ? 720 - left : tmp;
+	tmp = (height * 108) / 100;
+	height = top + tmp > 576 ? 576 - top : tmp;
 
 	if (!disable)
 	{
 		cXineLib* xineLib = cXineLib::getInstance();
-		xineLib->setVideoWindow(pos.left(), pos.top(), pos.width(), pos.height());
+		xineLib->setVideoWindow(left, top, width, height);
 		pendingFullsize &= ~(1 << m_decoder);
 		m_state |= 8;
 	}
@@ -139,9 +140,7 @@ void eVideoWidget::updatePosition(int disable)
 		pendingFullsize |= (1 << m_decoder);
 		fullsizeTimer->start(100, true);
 	}
-
 }
-
 
 void eVideoWidget::setDecoder(int decoder)
 {

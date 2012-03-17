@@ -12,6 +12,7 @@ msgstr ""
 "PO-Revision-Date: 2005-02-17 14:29+0100\n"
 "Last-Translator: Piarres Beobide <pi@beobide.net>\n"
 "Language-Team: lubrezale <librezale@librezale.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2709,8 +2710,8 @@ msgid ""
 "See the help for the title_format for the meanings of these."
 msgstr ""
 "GUI Izenburuan erabilitako formatua. Unix date komandoaren antzerakoa. "
-"Formatu espezifikazioakehuneko ikur bates hasten dira. Ezpezifikazioak: %A, %"
-"C,  %c, %F, %I, %L, %N, %P, %p, %S, %T, %V, %v, eta %%."
+"Formatu espezifikazioakehuneko ikur bates hasten dira. Ezpezifikazioak: %A, "
+"%C,  %c, %F, %I, %L, %N, %P, %p, %S, %T, %V, %v, eta %%."
 
 #: src/input/vcd/xineplug_inp_vcd.c:1914
 #, fuzzy
@@ -4176,8 +4177,8 @@ msgstr "video_out_pgx64: Errorea: ezinda '%s' framebuffer ireki\n"
 msgid ""
 "video_out_pgx64: Error: ioctl failed (VIS_GETIDENTIFIER), bad device (%s)\n"
 msgstr ""
-"video_out_pgx64: Error: ioctl hutsa (VIS_GETIDENTIFIER), okerreko gailua (%"
-"s)\n"
+"video_out_pgx64: Error: ioctl hutsa (VIS_GETIDENTIFIER), okerreko gailua "
+"(%s)\n"
 
 #: src/video_out/video_out_pgx64.c:316
 #, c-format

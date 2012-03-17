@@ -19,6 +19,7 @@ public:
 	off_t lseek(off_t offset, int whence);
 	ssize_t read(off_t offset, void *buf, size_t count);
 	off_t length();
+	off_t offset();
 	int valid();
 private:
 	int m_sync_offset;
@@ -39,7 +40,7 @@ public:
 	RESULT getName(const eServiceReference &ref, std::string &name);
 	int getLength(const eServiceReference &ref);
 	RESULT getEvent(const eServiceReference &ref, ePtr<eServiceEvent> &SWIG_OUTPUT, time_t start_time);
-	int isPlayable(const eServiceReference &ref, const eServiceReference &ignore) { return 1; }
+	int isPlayable(const eServiceReference &ref, const eServiceReference &ignore, bool simulate) { return 1; }
 	int getInfo(const eServiceReference &ref, int w);
 	std::string getInfoString(const eServiceReference &ref,int w);
 	PyObject *getInfoObject(const eServiceReference &r, int what);
@@ -311,14 +312,13 @@ off_t eM2TSFile::length()
 	return m_length;
 }
 
+off_t eM2TSFile::offset()
+{
+	return m_current_offset;
+}
+
 eServiceFactoryM2TS::eServiceFactoryM2TS()
 {
-	struct stat dummy;
-	if (stat("/usr/lib/libpassthrough.so", &dummy) != 0)
-	{
-		eDebug("eServiceFactoryM2TS aborted, no /usr/lib/libpassthrough.so");
-		return;
-	}
 	ePtr<eServiceCenter> sc;
 	eServiceCenter::getPrivInstance(sc);
 	if (sc)
@@ -374,7 +374,7 @@ eServiceM2TS::eServiceM2TS(const eServiceReference &ref)
 {
 }
 
-ePtr<iTsSource> eServiceM2TS::createTsSource(eServiceReferenceDVB &ref)
+ePtr<iTsSource> eServiceM2TS::createTsSource(eServiceReferenceDVB &ref, int packetsize)
 {
 	ePtr<iTsSource> source = new eM2TSFile(ref.path.c_str());
 	return source;

@@ -139,6 +139,7 @@ class MovieList(GUIComponent):
 		self.descr_state = descr_state or self.HIDE_DESCRIPTION
 		self.sort_type = sort_type or self.SORT_RECORDED
 		self.firstFileEntry = 0
+		self.parentDirectory = 0
 		self.fontName = "Regular"
 		self.fontSizesOriginal = (22,18,16)
 		self.fontSizesCompact = (20,14)
@@ -147,6 +148,7 @@ class MovieList(GUIComponent):
 		self.reloadDelayTimer = None
 		self.l = eListboxPythonMultiContent()
 		self.tags = set()
+		self.root = None
 		
 		if root is not None:
 			self.reload(root)
@@ -335,7 +337,7 @@ class MovieList(GUIComponent):
 			else:
 				iconSize = 22
 			if data.part is not None:
-				res.append(MultiContentEntryProgress(pos=(0,5), size=(iconSize-2,16), percent=data.part, borderWidth=2, foreColor=data.partcol, backColor=data.partcol, backColorSelected=None))
+				res.append(MultiContentEntryProgress(pos=(0,5), size=(iconSize-2,16), percent=data.part, borderWidth=2, foreColor=data.partcol, foreColorSelected=None, backColor=None, backColorSelected=None))
 		elif switch == 'i':
 			iconSize = 22
 		else:
@@ -408,7 +410,13 @@ class MovieList(GUIComponent):
 		else:
 			# there are no movies, just directories...
 			self.moveToFirst()
-
+	
+	def moveToParentDirectory(self):
+		if self.parentDirectory < len(self.list):
+			self.instance.moveSelectionTo(self.parentDirectory)
+		else:
+			self.moveToFirst()
+	
 	def moveToLast(self):
 		if self.list:
 			self.instance.moveSelectionTo(len(self.list) - 1)
@@ -430,7 +438,12 @@ class MovieList(GUIComponent):
 	def getCurrent(self):
 		l = self.l.getCurrentSelection()
 		return l and l[0]
-
+		
+	def getItem(self, index):
+		if self.list:
+			if len(self.list) > index:
+				return self.list[index] and self.list[index][0]
+					
 	GUI_WIDGET = eListbox
 
 	def postWidgetCreate(self, instance):
@@ -469,7 +482,6 @@ class MovieList(GUIComponent):
 		serviceHandler = eServiceCenter.getInstance()
 		numberOfDirs = 0
 		
-		self.root = root
 		reflist = serviceHandler.list(root)
 		if reflist is None:
 			print "listing of movies failed"
@@ -477,6 +489,7 @@ class MovieList(GUIComponent):
 		realtags = set()
 		tags = {}
 		rootPath = os.path.normpath(root.getPath());
+		parent = None
 		# Don't navigate above the "root"
 		if len(rootPath) > 1 and (os.path.realpath(rootPath) != config.movielist.root.value):
 			parent = os.path.split(os.path.normpath(rootPath))[0]
@@ -525,10 +538,11 @@ class MovieList(GUIComponent):
 			self.list.append((serviceref, info, begin, -1))
 		
 		self.firstFileEntry = numberOfDirs
+		self.parentDirectory = 0
 		if self.sort_type == MovieList.SORT_ALPHANUMERIC:
 			self.list.sort(key=self.buildAlphaNumericSortKey)
 		else:
-			#always sort first always this way to avoid shuffle and reverse-sort directories
+			#always sort first this way to avoid shuffle and reverse-sort directories
 			self.list.sort(key=self.buildBeginTimeSortKey)
 		if self.sort_type == MovieList.SHUFFLE:
 			dirlist = self.list[:numberOfDirs]
@@ -540,6 +554,20 @@ class MovieList(GUIComponent):
 		elif self.sort_type == MovieList.SORT_RECORDED_REVERSE:
 			self.list = self.list[:numberOfDirs] + sorted(self.list[numberOfDirs:], key=self.buildBeginTimeSortKey, reverse = True)
 	
+		if self.root and numberOfDirs > 0:				
+			rootPath = os.path.normpath(self.root.getPath())
+			if not rootPath.endswith('/'):
+				rootPath += '/'
+			if rootPath != parent:
+				dirlist = self.list[:numberOfDirs]
+				for index, item in enumerate(dirlist):
+					itempath = os.path.normpath(item[0].getPath())
+					if not itempath.endswith('/'):
+						itempath += '/'
+					if itempath == rootPath: 
+						self.parentDirectory = index
+						break
+		self.root = root
 		# finally, store a list of all tags which were found. these can be presented
 		# to the user to filter the list
 		# ML: Only use the tags that occur more than once in the list OR that were
@@ -565,13 +593,13 @@ class MovieList(GUIComponent):
 		ref = x[0]
 		name = x[1] and x[1].getName(ref)
 		if ref.flags & eServiceReference.mustDescent:
-			return (0, name, -x[2])
+			return (0, name and name.lower() or "", -x[2])
 		return (1, name and name.lower() or "", -x[2])
 		
 	def buildBeginTimeSortKey(self, x):
 		ref = x[0]
 		if ref.flags & eServiceReference.mustDescent:
-			return (0, x[1] and x[1].getName(ref))
+			return (0, x[1] and x[1].getName(ref).lower() or "")
 		return (1, -x[2])
 
 	def moveTo(self, serviceref):
@@ -585,3 +613,51 @@ class MovieList(GUIComponent):
 	
 	def moveDown(self):
 		self.instance.moveSelection(self.instance.moveDown)
+
+	def moveUp(self):
+		self.instance.moveSelection(self.instance.moveUp)
+		
+	def moveToChar(self, char, lbl=None):
+		self._char = char
+		self._lbl = lbl
+		if lbl:			
+			lbl.setText(char)
+			lbl.visible = True
+		self.moveToCharTimer = eTimer()
+		self.moveToCharTimer.callback.append(self._moveToChar)
+		self.moveToCharTimer.start(1000, True) #time to wait for next key press to decide which letter to use...		
+		
+	def _moveToChar(self):
+		currentIndex = self.instance.getCurrentIndex()
+		found = False
+		if currentIndex < (len(self.list) - 1):
+			itemsBelow = self.list[currentIndex + 1:]
+			#first search the items below the selection
+			for index, item in enumerate(itemsBelow):
+				ref = item[0]
+				itemName = getShortName(item[1].getName(ref).upper(), ref)
+				if itemName.startswith(self._char):
+					found = True
+					self.instance.moveSelectionTo(index + currentIndex + 1)
+					break
+		if found == False and currentIndex > 0:
+			itemsAbove = self.list[1:currentIndex] #first item (0) points parent folder - no point to include
+			for index, item in enumerate(itemsAbove):
+				ref = item[0]
+				itemName = getShortName(item[1].getName(ref).upper(), ref)
+				if itemName.startswith(self._char):
+					found = True
+					self.instance.moveSelectionTo(index + 1)
+					break
+		if self._lbl:
+			self._lbl.visible = False			
+
+def getShortName(name, serviceref):
+	if serviceref.flags & eServiceReference.mustDescent: #Directory			
+		pathName = serviceref.getPath()
+		p = os.path.split(pathName)
+		if not p[1]: #if path ends in '/', p is blank.
+			p = os.path.split(p[0])
+		return p[1].upper()
+	else:
+		return name

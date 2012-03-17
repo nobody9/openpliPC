@@ -85,7 +85,7 @@ class SkinSelector(Screen):
 		for x in names:
 			if x == "skin.xml":
 				if dirname <> self.root:
-					subdir = path.basename(dirname)
+					subdir = dirname[19:]
 					self.skinlist.append(subdir)
 				else:
 					subdir = "Default Skin"

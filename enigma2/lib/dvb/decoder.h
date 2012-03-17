@@ -11,15 +11,23 @@ class eDVBAudio: public iObject
 {
 	DECLARE_REF(eDVBAudio);
 private:
-	int m_dev, m_is_freezed;
+	ePtr<eDVBDemux> m_demux;
+	int m_fd, m_fd_demux, m_dev, m_is_freezed;
 public:
 	enum { aMPEG, aAC3, aDTS, aAAC, aAACHE, aLPCM, aDTSHD, aDDP };
-	eDVBAudio(int dev);
+	eDVBAudio(eDVBDemux *demux, int dev);
 	enum { aMonoLeft, aStereo, aMonoRight };
 	void setChannel(int channel);
 	void stop();
+#if HAVE_DVB_API_VERSION < 3
+	int setPid(int pid, int type);
+	int startPid();
+	int start();
+	int stopPid();
+	int setAVSync(int val);
+#else
 	int startPid(int pid, int type);
-
+#endif
 	void flush();
 	void freeze();
 	void unfreeze();
@@ -31,19 +39,28 @@ class eDVBVideo: public iObject, public Object
 {
 	DECLARE_REF(eDVBVideo);
 private:
-	int m_dev;
-
+	ePtr<eDVBDemux> m_demux;
+	int m_fd, m_fd_demux, m_dev;
+#if HAVE_DVB_API_VERSION < 3
+	m_fd_video;
+#endif
 	int m_is_slow_motion, m_is_fast_forward, m_is_freezed;
 	ePtr<eSocketNotifier> m_sn;
 	void video_event(int what);
 	Signal1<void, struct iTSMPEGDecoder::videoEvent> m_event;
-	int m_progressive;
+	int m_width, m_height, m_framerate, m_aspect, m_progressive;
 public:
 	enum { MPEG2, MPEG4_H264, MPEG1, MPEG4_Part2, VC1, VC1_SM };
-	eDVBVideo(int dev);
+	eDVBVideo(eDVBDemux *demux, int dev);
 	void stop();
+#if HAVE_DVB_API_VERSION < 3
+	int setPid(int pid);
+	int startPid();
+	int start();
+	int stopPid();
+#else
 	int startPid(int pid, int type=MPEG2, bool is_pvr=false);
-
+#endif
 	void flush();
 	void freeze();
 	int setSlowMotion(int repeat);
@@ -51,16 +68,28 @@ public:
 	void unfreeze();
 	int getPTS(pts_t &now);
 	virtual ~eDVBVideo();
+	RESULT connectEvent(const Slot1<void, struct iTSMPEGDecoder::videoEvent> &event, ePtr<eConnection> &conn);
+	int getWidth();
+	int getHeight();
+	int getProgressive();
+	int getFrameRate();
+	int getAspect();
 };
 
 class eDVBPCR: public iObject
 {
 	DECLARE_REF(eDVBPCR);
 private:
-	int m_dev;
+	ePtr<eDVBDemux> m_demux;
+	int m_fd_demux, m_dev;
 public:
-	eDVBPCR(int dev);
+	eDVBPCR(eDVBDemux *demux, int dev);
+#if HAVE_DVB_API_VERSION < 3
+	int setPid(int pid);
+	int startPid();
+#else
 	int startPid(int pid);
+#endif
 	void stop();
 	virtual ~eDVBPCR();
 };
@@ -69,9 +98,10 @@ class eDVBTText: public iObject
 {
 	DECLARE_REF(eDVBTText);
 private:
-	int m_dev;
+	ePtr<eDVBDemux> m_demux;
+	int m_fd_demux, m_dev;
 public:
-	eDVBTText(int dev);
+	eDVBTText(eDVBDemux *demux, int dev);
 	int startPid(int pid);
 	void stop();
 	virtual ~eDVBTText();
@@ -85,6 +115,7 @@ private:
 	static int m_ac3_delay;
 	static int m_audio_channel;
 	std::string m_radio_pic;
+	ePtr<eDVBDemux> m_demux;
 	ePtr<eDVBAudio> m_audio;
 	ePtr<eDVBVideo> m_video;
 	ePtr<eDVBPCR> m_pcr;
@@ -104,7 +135,11 @@ private:
 	int m_ff_sm_ratio;
 	bool m_has_audio;
 	int setState();
+	ePtr<eConnection> m_demux_event_conn;
+	ePtr<eConnection> m_video_event_conn;
 	
+	void demux_event(int event);
+	void video_event(struct videoEvent);
 	Signal1<void, struct videoEvent> m_video_event;
 	int m_video_clip_fd;
 	ePtr<eTimer> m_showSinglePicTimer;
@@ -113,7 +148,7 @@ private:
 public:
 
 	enum { pidNone = -1 };
-	eTSMPEGDecoder(int decoder);
+	eTSMPEGDecoder(eDVBDemux *demux, int decoder);
 	virtual ~eTSMPEGDecoder();
 	RESULT setVideoPID(int vpid, int type, int streamtype);
 	RESULT setAudioPID(int apid, int type);
@@ -158,11 +193,11 @@ public:
 		/* what 0=auto, 1=video, 2=audio. */
 	RESULT getPTS(int what, pts_t &pts);
 	RESULT connectVideoEvent(const Slot1<void, struct videoEvent> &event, ePtr<eConnection> &connection);
-	int getVideoWidth() { return -1; };
-	int getVideoHeight() { return -1; };
-	int getVideoProgressive() { return -1; };
-	int getVideoFrameRate() { return -1; };
-	int getVideoAspect() { return -1; };
+	int getVideoWidth();
+	int getVideoHeight();
+	int getVideoProgressive();
+	int getVideoFrameRate();
+	int getVideoAspect();
 	static RESULT setHwPCMDelay(int delay);
 	static RESULT setHwAC3Delay(int delay);
 };

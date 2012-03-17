@@ -41,7 +41,7 @@ def ServiceInfoListEntry(a, b, valueType=TYPE_TEXT, param=4):
 		#PyObject *type, *px, *py, *pwidth, *pheight, *pfnt, *pstring, *pflags;
 		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 200, 30, 0, RT_HALIGN_LEFT, ""),
 		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 200, 25, 0, RT_HALIGN_LEFT, a),
-		(eListboxPythonMultiContent.TYPE_TEXT, 220, 0, 350, 25, 0, RT_HALIGN_LEFT, b)
+		(eListboxPythonMultiContent.TYPE_TEXT, 230, 0, 450, 25, 0, RT_HALIGN_LEFT, b)
 	]
 
 class ServiceInfoList(HTMLComponent, GUIComponent):
@@ -92,16 +92,11 @@ class ServiceInfo(Screen):
 			self["green"] = Label(_("PIDs"))
 			self["yellow"] = Label(_("Multiplex"))
 			self["blue"] = Label(_("Tuner status"))
-
-			try:
-				service = session.nav.getCurrentService()
-			except:
-				service = None
-
+			service = session.nav.getCurrentService()
 			if service is not None:
 				self.info = service.info()
 				self.feinfo = service.frontendInfo()
-				# print self.info.getInfoObject(iServiceInformation.sCAIDs);
+				print self.info.getInfoObject(iServiceInformation.sCAIDs);
 			else:
 				self.info = None
 				self.feinfo = None

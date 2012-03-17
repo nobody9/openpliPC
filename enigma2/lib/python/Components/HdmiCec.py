@@ -7,7 +7,6 @@ from Tools.DreamboxHardware import getFPWasTimerWakeup
 config.hdmicec = ConfigSubsection()
 config.hdmicec.enabled = ConfigYesNo(default = True)
 config.hdmicec.control_tv_standby = ConfigYesNo(default = True)
-config.hdmicec.control_tv_deepstandby = ConfigYesNo(default = False)
 config.hdmicec.control_tv_wakeup = ConfigYesNo(default = True)
 config.hdmicec.report_active_source = ConfigYesNo(default = True)
 config.hdmicec.report_active_menu = ConfigYesNo(default = True)
@@ -110,6 +109,12 @@ class HdmiCec:
 		elif message == "vendorid":
 			cmd = 0x87
 			data = '\x00\x00\x00'
+		elif message == "keypoweron":
+			cmd = 0x44
+			data = str(struct.pack('B', 0x6d))
+		elif message == "keypoweroff":
+			cmd = 0x44
+			data = str(struct.pack('B', 0x6c))
 		if cmd:
 			eHdmiCEC.getInstance().sendMessage(address, cmd, data, len(data))
 
@@ -129,7 +134,8 @@ class HdmiCec:
 			if messages:
 				self.sendMessages(0, messages)
 
-			if config.hdmicec.control_receiver_wakeup:
+			if config.hdmicec.control_receiver_wakeup.value:
+				self.sendMessage(5, "keypoweron")
 				self.sendMessage(5, "setsystemaudiomode")
 
 	def standbyMessages(self):
@@ -145,7 +151,8 @@ class HdmiCec:
 			if messages:
 				self.sendMessages(0, messages)
 
-			if config.hdmicec.control_receiver_standby:
+			if config.hdmicec.control_receiver_standby.value:
+				self.sendMessage(5, "keypoweroff")
 				self.sendMessage(5, "standby")
 
 	def onLeaveStandby(self):
@@ -157,9 +164,8 @@ class HdmiCec:
 		self.standbyMessages()
 
 	def onEnterDeepStandby(self, configElement):
-		if config.hdmicec.enabled.value:
-			if config.hdmicec.control_tv_deepstandby.value:
-				self.sendMessage(0, "standby")
+		if config.hdmicec.handle_deepstandby_events.value:
+			self.standbyMessages()
 
 	def standby(self):
 		from Screens.Standby import Standby, inStandby
@@ -189,7 +195,7 @@ class HdmiCec:
 					self.volumeForwardingDestination = 5; # on: send volume keys to receiver 
 				else:
 					self.volumeForwardingDestination = 0; # off: send volume keys to tv
-				if config.hdmicec.volume_forwarding:
+				if config.hdmicec.volume_forwarding.value:
 					print 'eHdmiCec: volume forwarding to device %02x enabled'%(self.volumeForwardingDestination)
 					self.volumeForwardingEnabled = True;
 			elif cmd == 0x8f: # request power status

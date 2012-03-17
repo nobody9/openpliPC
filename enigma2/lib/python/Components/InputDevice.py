@@ -8,8 +8,8 @@ from os import path as os_path, listdir, open as os_open, close as os_close, wri
 # asm-generic/ioctl.h
 IOC_NRBITS = 8L
 IOC_TYPEBITS = 8L
-IOC_SIZEBITS = 14L
-IOC_DIRBITS = 2L
+IOC_SIZEBITS = 13L
+IOC_DIRBITS = 3L
 
 IOC_NRSHIFT = 0L
 IOC_TYPESHIFT = IOC_NRSHIFT+IOC_NRBITS

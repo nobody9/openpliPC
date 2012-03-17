@@ -6,18 +6,19 @@
 
 DEFINE_REF(eRawFile);
 
-eRawFile::eRawFile()
-	:m_lock(false)
+eRawFile::eRawFile(int packetsize)
+	: iTsSource(packetsize)
+	, m_lock(false)
+	, m_fd(-1)
+	, m_file(NULL)
+	, m_splitsize(0)
+	, m_totallength(0)
+	, m_current_offset(0)
+	, m_base_offset(0)
+	, m_last_offset(0)
+	, m_nrfiles(0)
+	, m_current_file(0)
 {
-	m_fd = -1;
-	m_file = 0;
-	m_splitsize = 0;
-	m_totallength = 0;
-	m_current_offset = 0;
-	m_base_offset = 0;
-	m_last_offset = 0;
-	m_nrfiles = 0;
-	m_current_file = 0;
 }
 
 eRawFile::~eRawFile()
@@ -33,7 +34,7 @@ int eRawFile::open(const char *filename, int cached)
 	scan();
 	m_current_offset = 0;
 	m_last_offset = 0;
-	if (!m_cached)
+	if (!cached)
 	{
 		m_fd = ::open(filename, O_RDONLY | O_LARGEFILE);
 		return m_fd;
@@ -256,6 +257,11 @@ off_t eRawFile::length()
 	return m_totallength;
 }
 
+off_t eRawFile::offset()
+{
+	return m_last_offset;
+}
+
 #define KILOBYTE(n) ((n) * 1024)
 #define MEGABYTE(n) ((n) * 1024LL * 1024LL)
 #define AUDIO_STREAM_S   0xC0
@@ -263,7 +269,8 @@ off_t eRawFile::length()
 #define VIDEO_STREAM_S   0xE0
 #define VIDEO_STREAM_E   0xEF
 
-eDecryptRawFile::eDecryptRawFile()
+eDecryptRawFile::eDecryptRawFile(int packetsize)
+ : eRawFile(packetsize)
 {
 	ringBuffer = new cRingBufferLinear(KILOBYTE(1024),TS_SIZE,true,"IN-TS");
 	ringBuffer->SetTimeouts(200,200);

@@ -44,6 +44,9 @@ from RecordTimer import RecordTimerEntry, RecordTimer
 # hack alert!
 from Menu import MainMenu, mdom
 
+def isStandardInfoBar(self):
+	return ".InfoBar'>" in `self`
+
 def setResumePoint(session):
 	global resumePointCache, resumePointCacheLast
 	service = session.nav.getCurrentService()
@@ -186,10 +189,20 @@ class InfoBarShowHide:
 		self.onShow.append(self.__onShow)
 		self.onHide.append(self.__onHide)
 
+		self.onShowHideNotifiers = []
+
 		self.secondInfoBarScreen = "" 
-		if ".InfoBar'>" in str(self):
+		if isStandardInfoBar(self):
 			self.secondInfoBarScreen = self.session.instantiateDialog(SecondInfoBar)
 			self.secondInfoBarScreen.hide()
+
+	def connectShowHideNotifier(self, fnc):
+		if not fnc in self.onShowHideNotifiers:
+			self.onShowHideNotifiers.append(fnc)
+
+	def disconnectShowHideNotifier(self, fnc):
+		if fnc in self.onShowHideNotifiers:
+				self.onShowHideNotifiers.remove(fnc)
 
 	def serviceStarted(self):
 		if self.execing:
@@ -198,6 +211,8 @@ class InfoBarShowHide:
 
 	def __onShow(self):
 		self.__state = self.STATE_SHOWN
+		for x in self.onShowHideNotifiers:
+			x(True)
 		self.startHideTimer()
 
 	def startHideTimer(self):
@@ -214,6 +229,8 @@ class InfoBarShowHide:
 		self.__state = self.STATE_HIDDEN
 		if self.secondInfoBarScreen:
 			self.secondInfoBarScreen.hide()
+		for x in self.onShowHideNotifiers:
+			x(False)
 
 	def doShow(self):
 		self.show()
@@ -437,8 +454,8 @@ class InfoBarChannelSelection:
 							self.servicelist.prevBouquet()
 					self.servicelist.moveUp()
 					cur = self.servicelist.getCurrentSelection()
-					if not cur or (not (cur.flags & 64)) or cur.toString() == prev:
-						break
+					if cur and (cur.toString() == prev or self.isPlayable(cur)):
+							break
 		else:
 			self.servicelist.moveUp()
 		self.servicelist.zap(enable_pipzap = True)
@@ -454,11 +471,21 @@ class InfoBarChannelSelection:
 					else:
 						self.servicelist.moveDown()
 					cur = self.servicelist.getCurrentSelection()
-					if not cur or (not (cur.flags & 64)) or cur.toString() == prev:
-						break
+					if cur and (cur.toString() == prev or self.isPlayable(cur)):
+							break
 		else:
 			self.servicelist.moveDown()
 		self.servicelist.zap(enable_pipzap = True)
+
+	def isPlayable(self, ref):
+		if not (ref.flags & eServiceReference.isMarker):
+			cur_running = self.session.nav.getCurrentlyPlayingServiceReference()
+			if not cur_running:
+				cur_running = eServiceReference()
+			info = eServiceCenter.getInstance().info(ref)
+			if info and info.isPlayable(ref, cur_running):
+				return True
+		return False
 
 class InfoBarMenu:
 	""" Handles a menu action, to open the (main) menu """
@@ -938,7 +965,7 @@ class InfoBarSeek:
 		return seek
 
 	def isSeekable(self):
-		if self.getSeek() is None:
+		if self.getSeek() is None or (isStandardInfoBar(self) and not self.timeshift_enabled):
 			return False
 		return True
 
