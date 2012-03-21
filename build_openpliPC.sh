@@ -197,6 +197,7 @@ sudo mkdir -p $INSTALL_E2DIR/etc/enigma2
 sudo mkdir -p $INSTALL_E2DIR/etc/tuxbox
 sudo cp share/fonts/* $INSTALL_E2DIR/share/fonts
 sudo cp -rf etc/* $INSTALL_E2DIR/etc
+sudo cp enigma2/data/black.mvi $INSTALL_E2DIR/etc/tuxbox/logo.mvi
 
 ln -sf $INSTALL_E2DIR/bin/enigma2 ./e2bin
 
