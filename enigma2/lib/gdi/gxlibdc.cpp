@@ -127,7 +127,13 @@ gXlibDC::gXlibDC() : m_pump(eApp, 1)
 
 	xineLib = new cXineLib(&vis);
 
-	setResolution(width, height); // default res
+	setResolution(windowWidth, windowHeight); // default res
+
+	if (fullscreen)
+	{
+		fullscreen=false;
+		fullscreen_switch();
+	}
 
 	run();
 
@@ -251,8 +257,8 @@ void gXlibDC::setResolution(int xres, int yres)
 
 	m_pixmap = new gPixmap(&m_surface);
 
-	if (initialWindowWidth == 0 || initialWindowHeight == 0) 
-	  XResizeWindow(display, window, windowWidth, windowHeight);
+	if (initialWindowWidth == 0 || initialWindowHeight == 0)
+		XResizeWindow(display, window, windowWidth, windowHeight);
 	updateWindowState();
 }
 
@@ -280,9 +286,10 @@ void gXlibDC::fullscreen_switch() {
 	fullscreen ^= 1;
 	
 	XEvent xev;
+	XLockDisplay(display);
 	Atom wm_state = XInternAtom(display, "_NET_WM_STATE", False);
 	Atom fullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
-
+	XUnlockDisplay(display);
 	memset(&xev, 0, sizeof(xev));
 	xev.type = ClientMessage;
 	xev.xclient.window = window;
