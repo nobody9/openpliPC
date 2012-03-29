@@ -1564,9 +1564,6 @@ RESULT eDVBServicePlay::seekTo(pts_t to)
 	if (!m_cue)
 		return -1;
 
-	xineLib = cXineLib::getInstance();
-	xineLib->SeekTo(to);
-
 	m_cue->seekTo(0, to);
 	m_dvb_subtitle_pages.clear();
 	m_subtitle_pages.clear();

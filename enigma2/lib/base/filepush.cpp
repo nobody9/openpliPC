@@ -48,7 +48,7 @@ void eFilePushThread::thread()
 	size_t bytes_read = 0;
 	off_t current_span_offset = 0;
 	size_t current_span_remaining = 0;
-	eDebug("FILEPUSH THREAD START");fflush(stdout);
+	eDebug("FILEPUSH THREAD START");
 	
 		/* we set the signal to not restart syscalls, so we can detect our signal. */
 	struct sigaction act;
@@ -62,7 +62,7 @@ void eFilePushThread::thread()
 
 		/* m_stop must be evaluated after each syscall. */
 	while (!m_stop)
-	{eDebug("[eFilePushThread] buf start %d buf end %d", m_buf_start, m_buf_end);
+	{
 			/* first try flushing the bufptr */
 		if (m_buf_start != m_buf_end)
 		{
@@ -91,10 +91,8 @@ void eFilePushThread::thread()
 			do
 			{
 				filter_res = filterRecordData(m_buffer + m_filter_end, m_buf_end - m_filter_end, current_span_remaining);
-eDebug("[eFilePushThread] filter res %d", filter_res);
 				if (filter_res < 0)
 				{
-					eDebug("[eFilePushThread] filterRecordData re-syncs and skips %d bytes", -filter_res);
 					m_buf_start = m_filter_end + -filter_res;  /* this will also drop unwritten data */
 					ASSERT(m_buf_start <= m_buf_end); /* otherwise filterRecordData skipped more data than available. */
 					continue; /* try again */
@@ -104,7 +102,6 @@ eDebug("[eFilePushThread] filter res %d", filter_res);
 				m_buf_end = m_filter_end + filter_res;
 					/* mark data as filtered. */
 				m_filter_end = m_buf_end;
-eDebug("[eFilePushThread] filter buf start %d buf end %d", m_buf_start, m_buf_end);
 			} while (0);
 			
 			ASSERT(m_filter_end == m_buf_end);
@@ -127,21 +124,18 @@ eDebug("[eFilePushThread] filter buf start %d buf end %d", m_buf_start, m_buf_en
 				// ... we would stop the thread
 			}
 
-			printf("FILEPUSH: wrote %d bytes\n", w);
 			m_buf_start += w;
 			continue;
 		}
 
 			/* now fill our buffer. */
-			eDebug("[eFilePushThread] fill buffer current_pos %d", m_current_position);
 		if (m_sg && !current_span_remaining)
-		{eDebug("[eFilePushThread] getNextSourceSpan");
+		{
 			m_sg->getNextSourceSpan(m_current_position, bytes_read, current_span_offset, current_span_remaining);
 			ASSERT(!(current_span_remaining % m_blocksize));
 			m_current_position = current_span_offset;
 			bytes_read = 0;
 		}
-		eDebug("[eFilePushThread] current_pos %d", m_current_position);
 		size_t maxread = m_buffersize;
 		
 			/* if we have a source span, don't read past the end */

@@ -133,19 +133,20 @@ void cXineLib::playVideo(void) {
 		printf("Unable to open stream !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	}
 
-//	setStreamType(1);
-//	setStreamType(0);
-xine_pids_data_t data;
-xine_event_t event;
-  event.type = XINE_EVENT_PIDS_CHANGE;
-  data.vpid = videoData.pid;
-  data.apid = audioData.pid;
-  event.data = &data;
-  event.data_length = sizeof (xine_pids_data_t);
+	//	setStreamType(1);
+	//	setStreamType(0);
+	xine_pids_data_t data;
+	xine_event_t event;
+	event.type = XINE_EVENT_PIDS_CHANGE;
+	data.vpid = videoData.pid;
+	data.apid = audioData.pid;
+	event.data = &data;
+	event.data_length = sizeof (xine_pids_data_t);
 
-  printf ("input_dvb: sending event\n");
+	printf ("input_dvb: sending event\n");
 
-  xine_event_send (stream, &event);
+	xine_event_send (stream, &event);
+
 setStreamType(1);
 setStreamType(0);
 
@@ -203,7 +204,7 @@ ASSERT(stream);
 		eWarning("xine_play failed!");
 		return ;
 	}
-videoPlayed = true;
+	videoPlayed = true;
 }
 
 int

@@ -496,6 +496,7 @@ int eDVBVideo::startPid(int pid, int type, bool is_pvr)
 		return -errno;
 	}
 	eDebug("ok");*/
+	xineLib->setVideoType(pid, type);
 	freeze();  // why freeze here?!? this is a problem when only a pid change is requested... because of the unfreeze logic in Decoder::setState
 	eDebugNoNewLine("VIDEO_PLAY - ");
 	/*if (::ioctl(m_fd, VIDEO_PLAY) < 0)
@@ -503,7 +504,6 @@ int eDVBVideo::startPid(int pid, int type, bool is_pvr)
 	else*/
 		eDebug("ok");
     
-	xineLib->setVideoType(pid, type);
 	xineLib->playVideo();
 	return 0;
 }
