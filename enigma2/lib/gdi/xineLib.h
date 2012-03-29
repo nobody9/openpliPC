@@ -68,7 +68,10 @@ public:
 	int Vpos; 
 	int Vlength;
 	int VideoGeriT(pts_t Sar);
-    void SeekTo(long long value);
+	void SeekTo(long long value);
+	int getNumberOfTracksAudio();
+	void selectAudioStream(int value);
+	int getCurrentTrackAudio();
 	///////////////////////
 	
 

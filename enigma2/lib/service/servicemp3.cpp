@@ -744,12 +744,22 @@ RESULT eServiceMP3::audioDelay(ePtr<iAudioDelay> &ptr)
 
 int eServiceMP3::getNumberOfTracks()
 {
+	cXineLib *xineLib = cXineLib::getInstance();
+	int ret=xineLib->getNumberOfTracksAudio();
+	//printf("Number of tracks - %d\n", ret);
+	if (ret) 
+	{
+		return ret;
+	}
 	return 0;
 }
 
 int eServiceMP3::getCurrentTrack()
 {
-  return 0;
+	cXineLib *xineLib = cXineLib::getInstance();
+	int ret = xineLib->getCurrentTrackAudio();
+	//printf("Current  track audio - %d\n", ret);
+	return ret;
 }
 
 RESULT eServiceMP3::selectTrack(unsigned int i)
@@ -763,7 +773,7 @@ RESULT eServiceMP3::selectTrack(unsigned int i)
 	int ret = selectAudioStream(i);
 	if (!ret) {
 		/* flush */
-		seekTo(ppos);
+		//seekTo(ppos);
 	}
 
 	return ret;
@@ -771,7 +781,11 @@ RESULT eServiceMP3::selectTrack(unsigned int i)
 
 int eServiceMP3::selectAudioStream(int i)
 {
-  return 0;
+	cXineLib *xineLib = cXineLib::getInstance();
+	xineLib->selectAudioStream(i);
+
+	//return 0;
+	return i;
 }
 
 int eServiceMP3::getCurrentChannel()

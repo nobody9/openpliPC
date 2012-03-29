@@ -204,6 +204,7 @@ ASSERT(stream);
 		eWarning("xine_play failed!");
 		return ;
 	}
+	xine_set_param(this->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -1);
 	videoPlayed = true;
 }
 
@@ -276,6 +277,23 @@ void cXineLib::SeekTo(long long value) {
 void cXineLib::setAudioType(int pid, int type) {
 	audioData.pid = pid;
 	audioData.streamtype = type;
+}
+
+int cXineLib::getNumberOfTracksAudio() {
+	int ret = xine_get_stream_info(this->stream, XINE_STREAM_INFO_MAX_AUDIO_CHANNEL);
+	return ret;
+}
+
+void cXineLib::selectAudioStream(int value) {
+	xine_set_param(this->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
+}
+
+int cXineLib::getCurrentTrackAudio() {
+	if (getNumberOfTracksAudio()) {
+		int ret=xine_get_param(this->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+		return ret;
+	}
+	return 0;
 }
 
 void cXineLib::setPrebuffer(int prebuffer) {
