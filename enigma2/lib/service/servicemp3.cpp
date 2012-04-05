@@ -801,6 +801,12 @@ RESULT eServiceMP3::selectChannel(int i)
 
 RESULT eServiceMP3::getTrackInfo(struct iAudioTrackInfo &info, unsigned int i)
 {
+	cXineLib *xineLib = cXineLib::getInstance();
+	info.m_description = "???";
+
+	if (info.m_language.empty())
+		info.m_language = xineLib->getAudioLang(i);
+
 	return 0;
 }
 

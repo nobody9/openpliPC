@@ -124,7 +124,6 @@ void cXineLib::newOsd(int width, int height, uint32_t *argb_buffer) {
 }
 
 void cXineLib::playVideo(void) {
-	xine_stop(stream);
 	end_of_stream = false;
 	videoPlayed = false;
 
@@ -147,8 +146,10 @@ void cXineLib::playVideo(void) {
 
 	xine_event_send (stream, &event);
 
-setStreamType(1);
-setStreamType(0);
+	xine_set_param(this->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -1);
+
+	setStreamType(1);
+	setStreamType(0);
 
         //_x_demux_control_start(stream);
         //_x_demux_seek(stream, 0, 0, 0);
@@ -204,7 +205,7 @@ ASSERT(stream);
 		eWarning("xine_play failed!");
 		return ;
 	}
-	xine_set_param(this->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -1);
+	xine_set_param(this->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, 0);
 	videoPlayed = true;
 }
 
@@ -294,6 +295,18 @@ int cXineLib::getCurrentTrackAudio() {
 		return ret;
 	}
 	return 0;
+}
+
+std::string cXineLib::getAudioLang(int value) {
+	char lang_buffer[XINE_LANG_MAX];
+	char *lang = NULL;
+
+	if (!xine_get_audio_lang(this->stream, value, &lang_buffer[0])) {
+		snprintf(lang_buffer, sizeof(lang_buffer), "%3d", value);
+	}
+	lang = lang_buffer;
+
+	return lang;
 }
 
 void cXineLib::setPrebuffer(int prebuffer) {

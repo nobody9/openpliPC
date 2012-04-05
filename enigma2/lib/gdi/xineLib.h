@@ -72,6 +72,7 @@ public:
 	int getNumberOfTracksAudio();
 	void selectAudioStream(int value);
 	int getCurrentTrackAudio();
+	std::string getAudioLang(int value);
 	///////////////////////
 	
 
