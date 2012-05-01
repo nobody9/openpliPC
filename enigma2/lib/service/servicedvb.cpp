@@ -1964,10 +1964,18 @@ int eDVBServicePlay::getCurrentTrack()
 
 RESULT eDVBServicePlay::selectTrack(unsigned int i)
 {
+	int old_apid;
+	old_apid=m_current_audio_pid; //remember current apid
+
 	int ret = selectAudioStream(i);
 
 	if (m_decoder->set())
 		return -5;
+
+	if (old_apid != m_current_audio_pid) { //compare old apid and new apid
+		cXineLib *xineLib = cXineLib::getInstance();
+		xineLib->selectAudioStream(i); // switch audio track
+	}
 
 	return ret;
 }

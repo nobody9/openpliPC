@@ -236,7 +236,6 @@ int eDVBAudio::startPid(int pid, int type)
 		break;
 	}
 	xineLib->setAudioType(pid, xine_type);
-	xineLib->playVideo();
   
 	/*eDebugNoNewLine("AUDIO_SET_BYPASS(%d) - ", bypass);
 	if (::ioctl(m_fd, AUDIO_SET_BYPASS_MODE, bypass) < 0)

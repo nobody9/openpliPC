@@ -278,6 +278,10 @@ void cXineLib::SeekTo(long long value) {
 void cXineLib::setAudioType(int pid, int type) {
 	audioData.pid = pid;
 	audioData.streamtype = type;
+
+	if (videoPlayed) {
+		setStreamType(0);
+	}
 }
 
 int cXineLib::getNumberOfTracksAudio() {
