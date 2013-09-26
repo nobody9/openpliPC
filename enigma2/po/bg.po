@@ -1,15 +1,17 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: tuxbox-enigma 0.0.1\n"
+"Project-Id-Version: enigma2 3.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-02 12:01+0100\n"
-"PO-Revision-Date: 2010-03-26 23:44+0200\n"
+"POT-Creation-Date: 2012-12-01 16:48+0100\n"
+"PO-Revision-Date: 2013-01-12 13:05+0200\n"
 "Last-Translator: Мартин Петков <marto74bg@yahoo.co.uk>\n"
 "Language-Team: Bulgarian\n"
+"Language: bg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.4\n"
 
 msgid ""
 "\n"
@@ -27,7 +29,7 @@ msgstr ""
 
 msgid ""
 "\n"
-"Backup your Dreambox settings."
+"Backup your receiver settings."
 msgstr ""
 "\n"
 "Копие на вашите Clarke-Tech настройки."
@@ -41,14 +43,14 @@ msgstr ""
 
 msgid ""
 "\n"
-"Manage extensions or plugins for your Dreambox"
+"Manage extensions or plugins for your receiver"
 msgstr ""
 "\n"
 "Управление на плъгини за вашия Clarke-Tech"
 
 msgid ""
 "\n"
-"Online update of your Dreambox software."
+"Online update of your receiver software."
 msgstr ""
 "\n"
 "Мрежова актуализация за вашия Clarke-Tech софтуер"
@@ -62,20 +64,6 @@ msgstr ""
 
 msgid ""
 "\n"
-"Restore your Dreambox settings."
-msgstr ""
-"\n"
-"Възстановяване на вашите Clarke-Tech настройки."
-
-msgid ""
-"\n"
-"Restore your Dreambox with a new firmware."
-msgstr ""
-"\n"
-"Възстановяване на вашия Clarke-Tech с нов фирмуер."
-
-msgid ""
-"\n"
 "Restore your backups by date."
 msgstr ""
 "\n"
@@ -83,7 +71,21 @@ msgstr ""
 
 msgid ""
 "\n"
-"Scan for local packages and install them."
+"Restore your receiver settings."
+msgstr ""
+"\n"
+"Възстановяване на вашите Clarke-Tech настройки."
+
+msgid ""
+"\n"
+"Restore your receiver with a new firmware."
+msgstr ""
+"\n"
+"Възстановяване на вашия Clarke-Tech с нов фирмуер."
+
+msgid ""
+"\n"
+"Scan for local extensions and install them."
 msgstr ""
 "\n"
 "Сканиране за местни пакети и инсталация."
@@ -124,6 +126,11 @@ msgstr "%d мин"
 
 msgid "%d services found!"
 msgstr "%d намерени програми!"
+
+msgid "%s updated package available"
+msgid_plural "%s updated packages available"
+msgstr[0] "%s актуализиран пакет е наличен"
+msgstr[1] "%s актуализирани пакети са налични"
 
 msgid "(show optional DVD audio menu)"
 msgstr "(покажи DVD аудио меню)"
@@ -175,14 +182,14 @@ msgstr ""
 
 msgid ""
 "A finished record timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"receiver to standby. Do that now?"
 msgstr ""
 "Таймера при завършване на запис желае да постави\n"
 "Clarke-Tech в стендбай. Да го направи ли сега?"
 
 msgid ""
 "A finished record timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your receiver. Shutdown now?"
 msgstr ""
 "Таймера при завършване на запис желае да изключи\n"
 "вашия Clarke-Tech. Изключване сега?"
@@ -223,14 +230,14 @@ msgstr "Исканото устройство (%s) не беше намерен�
 
 msgid ""
 "A sleep timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"receiver to standby. Do that now?"
 msgstr ""
 "Таймера за сън иска да превключи\n"
 "Clarke-Tech в стендбай. Да го направи ли сега?"
 
 msgid ""
 "A sleep timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your receiver. Shutdown now?"
 msgstr ""
 "Таймера за сън иска да изключи\n"
 "вашия Clarke-Tech. Изключване сега?"
@@ -242,7 +249,7 @@ msgstr ""
 "Провален планиран запис!\n"
 "Спиране на ТВ и опит отново?\n"
 
-msgid "A/V Settings"
+msgid "A/V settings"
 msgstr "A/V Настройки"
 
 msgid "AA"
@@ -284,8 +291,8 @@ msgstr "Настройки на адаптера"
 msgid "Add"
 msgstr "Добавяне"
 
-msgid "Add Bookmark"
-msgstr "Добавяне Bookmark"
+msgid "Add bookmark"
+msgstr "Добавяне отметка"
 
 msgid "Add WLAN configuration?"
 msgstr "Добавяне настройки за WLAN?"
@@ -311,6 +318,15 @@ msgstr "Добави към букет"
 msgid "Add to favourites"
 msgstr "Добави към предпочитани"
 
+msgid "Add/remove timer for current event"
+msgstr "Добави/Премахнитаймер за текущото предаване"
+
+msgid "Adjust 3D settings"
+msgstr "3D настройки"
+
+msgid "Adjust HDMI CEC settings"
+msgstr "HDMI CEC настройки"
+
 msgid ""
 "Adjust the color settings so that all the color shades are distinguishable, "
 "but appear as saturated as possible. If you are happy with the result, press "
@@ -325,7 +341,7 @@ msgstr ""
 msgid "Advanced"
 msgstr "Експертни"
 
-msgid "Advanced Options"
+msgid "Advanced options"
 msgstr "Експертни Настройки"
 
 msgid "Advanced Video Setup"
@@ -339,10 +355,11 @@ msgstr "След предаването"
 
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your Dreambox's manual on how to do that."
+"Refer to your receiver's manual on how to do that."
 msgstr ""
 "След завършване на стартовия помощник, вие трябва да protect single "
-"services. Погледнете във вашата инструкция за Clarke-Tech как да го направите."
+"services. Погледнете във вашата инструкция за Clarke-Tech как да го "
+"направите."
 
 msgid "Album"
 msgstr "Албум"
@@ -350,7 +367,7 @@ msgstr "Албум"
 msgid "All"
 msgstr "Всички"
 
-msgid "All Satellites"
+msgid "All satellites"
 msgstr "Всички Сателити"
 
 msgid "Alpha"
@@ -406,11 +423,11 @@ msgstr ""
 "следния backup:\n"
 
 msgid ""
-"Are you sure you want to restore your Enigma2 backup?\n"
-"Enigma2 will restart after the restore"
+"Are you sure you want to restore the backup?\n"
+"Your receiver will restart after the backup has been restored!"
 msgstr ""
-"Искате ли да възстановите вашия Енигма2 backup?\n"
-"Енигма2 ще се рестартира след възстановяването"
+"Искате ли да възстановите вашия backup?\n"
+"Приемникът ще се рестартира след възстановяването"
 
 msgid "Artist"
 msgstr "Артист"
@@ -421,13 +438,13 @@ msgstr "Питай преди изключване:"
 msgid "Ask user"
 msgstr "Питай потребител"
 
-msgid "Aspect Ratio"
+msgid "Aspect ratio"
 msgstr "Режим Картина"
 
 msgid "Audio"
 msgstr "Аудио"
 
-msgid "Audio Options..."
+msgid "Audio options..."
 msgstr "Аудио Настройки..."
 
 msgid "Author: "
@@ -439,13 +456,16 @@ msgstr "Aвто"
 msgid "Auto chapter split every ? minutes (0=never)"
 msgstr "Автоматично разделяне на всеки ? минути (0=никога)"
 
+msgid "Auto language selection"
+msgstr "Автоматичен избор на език"
+
 msgid "Auto scart switching"
 msgstr "Автом.скарт превключване"
 
 msgid "Automatic"
 msgstr "Автоматично"
 
-msgid "Automatic Scan"
+msgid "Automatic scan"
 msgstr "Автоматично Търсене"
 
 msgid "Back"
@@ -534,13 +554,13 @@ msgstr "Смяна дир."
 msgid "Change pin code"
 msgstr "Смяна ПИН код"
 
-msgid "Change service pin"
+msgid "Change service PIN"
 msgstr "Смяна ПИН на услуги"
 
-msgid "Change service pins"
+msgid "Change service PINs"
 msgstr "Смяна ПИН на услуги"
 
-msgid "Change setup pin"
+msgid "Change setup PIN"
 msgstr "Смяна ПИН за настройки"
 
 msgid "Channel"
@@ -567,7 +587,7 @@ msgstr "Глава:"
 msgid "Check"
 msgstr "Проверка"
 
-msgid "Checking Filesystem..."
+msgid "Checking filesystem..."
 msgstr "Проверявам файловата с-ма..."
 
 msgid "Choose Tuner"
@@ -642,8 +662,14 @@ msgstr "Завършен"
 msgid "Config"
 msgstr "Конфиг"
 
-msgid "Configuration Mode"
+msgid "Configuration mode"
 msgstr "Режим Конфигурация"
+
+msgid "Configuration mode: %s"
+msgstr "Режим Конфигурация: %s"
+
+msgid "Configuration..."
+msgstr "Конфигурация..."
 
 msgid "Configure interface"
 msgstr "Конфигуриране интерфейс."
@@ -669,7 +695,7 @@ msgstr "Несъвместим таймер"
 msgid "Connect"
 msgstr "Свържи"
 
-msgid "Connect to a Wireless Network"
+msgid "Connect to a wireless network"
 msgstr "Свържи се с безжична мрежа"
 
 msgid "Connected to"
@@ -708,7 +734,7 @@ msgstr "Продължи възпроизвеждането"
 msgid "Contrast"
 msgstr "Контраст"
 
-msgid "Could not connect to Dreambox .NFI Image Feed Server:"
+msgid "Could not connect to receiver .NFI Image Feed Server:"
 msgstr "Не мога да се свържа с Clarke-Tech .NFI имидж сървър:"
 
 msgid "Could not load Medium! No disc inserted?"
@@ -784,7 +810,7 @@ msgstr "Определете какво да се направи при откр
 msgid "Decide what should happen to the crashlogs after submission."
 msgstr "Определете какво да се прави с crashlogs след подаването им."
 
-msgid "Deep Standby"
+msgid "Deep standby"
 msgstr "Изключване"
 
 msgid "Default Settings"
@@ -851,7 +877,7 @@ msgstr "Спри"
 msgid "Disable Picture in Picture"
 msgstr "Спри Картина в Картината"
 
-msgid "Disable Subtitles"
+msgid "Disable subtitles"
 msgstr "Спри Субтитри"
 
 msgid "Disable crashlog reporting"
@@ -875,8 +901,11 @@ msgstr "Покажи 4:3 като"
 msgid "Display >16:9 content as"
 msgstr "Покажи >16:9 като"
 
-msgid "Display Setup"
+msgid "Display setup"
 msgstr "Настройки Дисплей"
+
+msgid "Do not record"
+msgstr "Не записвай"
 
 msgid "Display and Userinterface"
 msgstr "Дисплей и Юзъринтерфейс"
@@ -934,8 +963,9 @@ msgstr "Искате ли да сканирам за канали?"
 msgid "Do you want to do another manual service scan?"
 msgstr "Искате ли да извърша друго ръчно сканиране?"
 
-msgid "Do you want to enable the parental control feature on your Dreambox?"
-msgstr "Искате ли да включа опцията за родителски контрол на вашия Clarke-Tech?"
+msgid "Do you want to enable the parental control feature on your receiver?"
+msgstr ""
+"Искате ли да включа опцията за родителски контрол на вашия Clarke-Tech?"
 
 msgid "Do you want to install default sat lists?"
 msgstr "Да инсталирм ли стандартните листи с канали?"
@@ -949,7 +979,7 @@ msgstr "Да възпроизведа ли DVD в устройството?"
 msgid "Do you want to preview this DVD before burning?"
 msgstr "Искате ли да прегледате това DVD преди записа?"
 
-msgid "Do you want to reboot your Dreambox?"
+msgid "Do you want to reboot your receiver?"
 msgstr "Искате ли да рестартирам вашия Clarke-Tech?"
 
 msgid "Do you want to remove the package:\n"
@@ -968,11 +998,14 @@ msgstr ""
 "Искате ли да изпратите ваши данни(име и email) за да се свържем с вас при "
 "нужда?"
 
-msgid "Do you want to update your Dreambox?"
+msgid "Do you want to update your receiver to %s?"
+msgstr "Искате ли да актуализирате вашия Clarke-Tech към %s?"
+
+msgid "Do you want to update your receiver?"
 msgstr "Искате ли да актуализирате вашия Clarke-Tech?"
 
 msgid ""
-"Do you want to update your Dreambox?\n"
+"Do you want to update your receiver?\n"
 "After pressing OK, please wait!"
 msgstr ""
 "Искате ли да актуализирате вашия Clarke-Tech?\n"
@@ -1005,8 +1038,8 @@ msgstr "Изтегли"
 msgid "Download .NFI-Files for USB-Flasher"
 msgstr "Изтегли .NFI-Файлове за USB-флашка"
 
-msgid "Download Plugins"
-msgstr "Изтегли Плъгини"
+msgid "Download plugins"
+msgstr "Изтегли плъгини"
 
 msgid "Downloadable new plugins"
 msgstr "Има нови плъгини за теглене"
@@ -1038,6 +1071,9 @@ msgstr "Редактирай"
 msgid "Edit DNS"
 msgstr "Редактирай DNS"
 
+msgid "Edit bouquets list"
+msgstr "Редакт. списъка с букети"
+
 msgid "Edit Title"
 msgstr "Редакт. Заглавие"
 
@@ -1050,10 +1086,10 @@ msgstr "Редакт. листа с канали"
 msgid "Edit settings"
 msgstr "Редакт.настройки"
 
-msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgid "Edit the Nameserver configuration of your receiver.\n"
 msgstr "Редактиране DNS настройките за вашия Clarke-Tech.\n"
 
-msgid "Edit the network configuration of your Dreambox.\n"
+msgid "Edit the network configuration of your receiver.\n"
 msgstr "Редактиране мрежовите настройки за вашия Clarke-Tech.\n"
 
 msgid "Edit title"
@@ -1153,7 +1189,7 @@ msgstr "Изход от помощника"
 msgid "Expert"
 msgstr "Експерт"
 
-msgid "Extended Setup..."
+msgid "Extended setup..."
 msgstr "Разширени Настройки..."
 
 msgid "Factory reset"
@@ -1168,14 +1204,17 @@ msgstr "Бърз"
 msgid "Fast DiSEqC"
 msgstr "Бърз DiSEqC"
 
+msgid "Fast Scan"
+msgstr "Бързо Сканиране"
+
 msgid "Fast Forward speeds"
 msgstr "Скорост превъртане напред"
 
 msgid "Favourites"
 msgstr "Предпочитани"
 
-msgid "Filesystem Check..."
-msgstr "Проверка файлова с-ма..."
+msgid "Filesystem check"
+msgstr "Проверка файлова с-ма"
 
 msgid "Filesystem contains uncorrectable errors"
 msgstr "Файловата система съдържа непоправими грешки"
@@ -1262,14 +1301,17 @@ msgstr "Графичен Мулти ЕПГ"
 msgid "Greek"
 msgstr "Гръцки"
 
-msgid "Harddisk"
+msgid "Hard disk"
 msgstr "Твърд Диск"
 
-msgid "Harddisk setup"
+msgid "Hard disk setup"
 msgstr "Настройки HDD"
 
-msgid "Harddisk standby after"
+msgid "Hard disk standby after"
 msgstr "HDD в готовност след"
+
+msgid "Harddisk"
+msgstr "Твърд диск"
 
 msgid "Hidden network SSID"
 msgstr "Скрит мрежов SSID"
@@ -1329,8 +1371,8 @@ msgstr ""
 "стъпка.\n"
 "Ако сте доволни от резултата, натиснете OK."
 
-msgid "Image-Upgrade"
-msgstr "Ъпгрейд-Имидж"
+msgid "Image: "
+msgstr "Имидж: "
 
 msgid "In Progress"
 msgstr "Се Изпълнява"
@@ -1344,22 +1386,25 @@ msgstr "Увеличен волтаж"
 msgid "Index"
 msgstr "Индекс"
 
-msgid "InfoBar"
-msgstr "ИнфоЛента"
+msgid "Info"
+msgstr "Инфо"
 
-msgid "Infobar timeout"
+msgid "Info bar"
+msgstr "Инфо Лента"
+
+msgid "Info bar timeout"
 msgstr "Времетраене ИнфоЛента"
 
 msgid "Information"
 msgstr "Информация"
 
-msgid "Initialization..."
-msgstr "Инициализация..."
+msgid "Initialization"
+msgstr "Инициализация"
 
 msgid "Initialize"
 msgstr "Инициализирай"
 
-msgid "Initializing Harddisk..."
+msgid "Initializing storage device..."
 msgstr "Инициализиране Твърд диск..."
 
 msgid "Input"
@@ -1374,8 +1419,26 @@ msgstr "Инсталирай нов имидж с USB стик"
 msgid "Install a new image with your web browser"
 msgstr "Инсталирай нов имидж с уеб браузър"
 
-msgid "Install local IPKG"
-msgstr "Инсталирай местен IPKG"
+msgid "Install channel list"
+msgstr "Инсталирай списък с канали"
+
+msgid "Install extensions."
+msgstr "Инсталирай плъгини."
+
+msgid "Install local extension"
+msgstr "Инсталирай плъгин от HDD,USB или .tmp"
+
+msgid "Install picons on"
+msgstr "Инсталирай picons"
+
+msgid "Install softcam"
+msgstr "Инсталирай софткам"
+
+msgid "Installation has completed."
+msgstr "Инсталирането завърши."
+
+msgid "Installation or removal has completed."
+msgstr "Инсталирането или премахването завърши."
 
 msgid "Install or remove finished."
 msgstr "Инсталацията или премахването завърши."
@@ -1411,16 +1474,16 @@ msgstr "Инсталация стандартни... Моля изчакайте
 msgid "Installing package content... Please wait..."
 msgstr "Инсталиране package content... Моля изчакайте..."
 
-msgid "Instant Record..."
+msgid "Instant record..."
 msgstr "Моментален Запис..."
 
 msgid "Intermediate"
 msgstr "Междинен"
 
-msgid "Internal Flash"
+msgid "Internal flash"
 msgstr "Вътрешна Флаш"
 
-msgid "Invalid Location"
+msgid "Invalid location"
 msgstr "Грешно Място"
 
 msgid "Invalid directory selected: %s"
@@ -1441,17 +1504,20 @@ msgstr "Италиански"
 msgid "Keyboard"
 msgstr "Клавиатура"
 
-msgid "Keyboard Setup"
+msgid "Keyboard setup"
 msgstr "Настройка Клавиатура"
 
-msgid "LAN Adapter"
+msgid "LAN adapter"
 msgstr "LAN Адаптер"
+
+msgid "Language"
+msgstr "Език"
 
 msgid "Language selection"
 msgstr "Избор Език"
 
-msgid "Language"
-msgstr "Език"
+msgid "Last upgrade: "
+msgstr "Последна актуализация: "
 
 msgid "Last speed"
 msgstr "Последна скорост"
@@ -1489,7 +1555,7 @@ msgstr "Зареди"
 msgid "Load Length of Movies in Movielist"
 msgstr "Зареди дължината на филма в списъка"
 
-msgid "Local Network"
+msgid "Local network"
 msgstr "Локална Мрежа"
 
 msgid "Location"
@@ -1501,7 +1567,7 @@ msgstr "Закл:"
 msgid "Log results to harddisk"
 msgstr "Записване Log на твърдия диск"
 
-msgid "Long Keypress"
+msgid "Long key press"
 msgstr "Дълго натискане на Бутон"
 
 msgid "Longitude"
@@ -1516,11 +1582,17 @@ msgstr "Основно Меню"
 msgid "Mainmenu"
 msgstr "Основно Меню"
 
+msgid "Manage extensions"
+msgstr "Управление на пакети"
+
 msgid "Manage your receiver's software"
 msgstr "Управление софтуера на ресийвъра"
 
 msgid "Manual Scan"
 msgstr "Ръчно Търсене"
+
+msgid "Manual scan"
+msgstr "Ръчно търсене"
 
 msgid "Manual transponder"
 msgstr "Ръчен транспондер"
@@ -1612,7 +1684,7 @@ msgstr "DNS"
 msgid "Nameserver %d"
 msgstr "DNS %d"
 
-msgid "Nameserver Setup"
+msgid "Nameserver setup"
 msgstr "Настройки DNS"
 
 msgid "Nameserver settings"
@@ -1624,19 +1696,16 @@ msgstr "Маска"
 msgid "Network"
 msgstr "Мрежа"
 
-msgid "Network Configuration..."
+msgid "Network configuration..."
 msgstr "Мрежова Конфигурация..."
 
-msgid "Network Mount"
+msgid "Network mount"
 msgstr "Мрежов Маунт"
 
 msgid "Network SSID"
 msgstr "Мрежов SSID"
 
-msgid "Network Setup"
-msgstr "Настройки на Мрежа"
-
-msgid "Network Wizard"
+msgid "Network wizard"
 msgstr "Мрежов Помощник"
 
 msgid "Network scan"
@@ -1657,13 +1726,10 @@ msgstr "Мрежа..."
 msgid "Network:"
 msgstr "Мрежа:"
 
-msgid "NetworkWizard"
-msgstr "Мрежов Помощник"
-
 msgid "New"
 msgstr "Нови Канали"
 
-msgid "New pin"
+msgid "New PIN"
 msgstr "Нов ПИН"
 
 msgid "New version:"
@@ -1795,7 +1861,7 @@ msgstr "Не, но рестартирай от начало"
 msgid "No, do nothing."
 msgstr "Не не прави нищо."
 
-msgid "No, just start my Dreambox"
+msgid "No, just start my receiver"
 msgstr "Не, просто стартирай Clarke-Tech"
 
 msgid "No, not now"
@@ -1845,11 +1911,11 @@ msgstr ""
 msgid "OK, guide me through the upgrade process"
 msgstr "OK, води ме през процеса на ъпгрейд"
 
-msgid "OSD Settings"
+msgid "OSD settings"
 msgstr "OSD Настройки"
 
-msgid "OSD visibility"
-msgstr "OSD видимост"
+msgid "OSD transparency"
+msgstr "OSD прозрачност"
 
 msgid "Off"
 msgstr "Изкл."
@@ -1860,13 +1926,13 @@ msgstr "Вкл."
 msgid "One"
 msgstr "Един"
 
-msgid "Only Free scan"
+msgid "Only free scan"
 msgstr "Търсене само Свободни"
 
 msgid "Optionally enter your name if you want to."
 msgstr "Въведете вашето име ако желаете."
 
-msgid "Orbital Position"
+msgid "Orbital position"
 msgstr "Орбитална Позиция"
 
 msgid "Package details for: "
@@ -1890,13 +1956,13 @@ msgstr "Управление на пакети"
 msgid "Page"
 msgstr "Страница"
 
-msgid "Parent Directory"
+msgid "Parent directory"
 msgstr "Главна Директория"
 
 msgid "Parental control"
 msgstr "Родителски контрол"
 
-msgid "Parental control services Editor"
+msgid "Parental control services Еditor"
 msgstr "Родителски контрол редактор канали"
 
 msgid "Parental control setup"
@@ -1914,13 +1980,13 @@ msgstr "При завършване на филма натисни пауза"
 msgid "Phone number"
 msgstr "Телефонен номер"
 
-msgid "PiPSetup"
+msgid "PiP Setup"
 msgstr "PiP Настройки"
 
-msgid "PicturePlayer"
+msgid "Picture Player"
 msgstr "Плеър за Снимки"
 
-msgid "Pin code needed"
+msgid "PIN code needed"
 msgstr "Нужен е ПИН код"
 
 msgid "Play"
@@ -1932,16 +1998,16 @@ msgstr "Пусни Аудио-CD..."
 msgid "Play DVD"
 msgstr "Пусни DVD"
 
-msgid "Play Music..."
+msgid "Play music..."
 msgstr "Пусни Музика..."
 
 msgid "Play recorded movies..."
 msgstr "Пусни записаните филми..."
 
-msgid "Please Reboot"
+msgid "Please reboot"
 msgstr "Моля Рестартирайте"
 
-msgid "Please Select Medium to be Scanned"
+msgid "Please select medium to be scanned"
 msgstr "Моля изберете Среда за Сканиране"
 
 msgid "Please change recording endtime"
@@ -2294,7 +2360,7 @@ msgstr "Записи"
 msgid "Recordings always have priority"
 msgstr "Записите винаги са с приоритет"
 
-msgid "Reenter new pin"
+msgid "Reenter new PIN"
 msgstr "Въведете отново новия ПИН"
 
 msgid "Refresh"
@@ -2308,6 +2374,12 @@ msgstr "Избор честота на обновяване."
 
 msgid "Reload"
 msgstr "Презареди"
+
+msgid "Reload black-/white lists"
+msgstr "Презареди черен/бял списък"
+
+msgid "Remember service PIN"
+msgstr "Помни ПИН кода"
 
 msgid "Remove"
 msgstr "Премахни"
@@ -2384,6 +2456,9 @@ msgstr "Рестарт GUI"
 msgid "Restart GUI now?"
 msgstr "Рестарт GUI сега?"
 
+msgid "Restart enigma"
+msgstr "Рестарт енигма"
+
 msgid "Restart network"
 msgstr "Рестарт мрежа"
 
@@ -2396,11 +2471,11 @@ msgstr "Рестартиране на мрежата и интерфейсите
 msgid "Restore"
 msgstr "Възстановаване"
 
-msgid "Restore backups..."
-msgstr "Възстановяване backups..."
+msgid "Restore backups"
+msgstr "Възстановяване backups"
 
-msgid "Restore running"
-msgstr "Възстановяване"
+msgid "Restore running..."
+msgstr "Възстановяване..."
 
 msgid "Restore system settings"
 msgstr "Възстановяване на системните настройки"
@@ -2515,7 +2590,7 @@ msgstr "Избери HDD"
 msgid "Select Location"
 msgstr "Изберете Местоположение"
 
-msgid "Select Network Adapter"
+msgid "Select a network adapter"
 msgstr "Изберете Мрежов Адаптер"
 
 msgid "Select a movie"
@@ -2578,10 +2653,7 @@ msgstr "Сръбски"
 msgid "Service"
 msgstr "Канали"
 
-msgid "Service Scan"
-msgstr "Търсене на Канали"
-
-msgid "Service Searching"
+msgid "Service searching"
 msgstr "Търсене на Канали"
 
 msgid "Service has been added to the favourites."
@@ -2635,16 +2707,16 @@ msgstr "Настройки"
 msgid "Setup"
 msgstr "Настройки"
 
-msgid "Setup Mode"
+msgid "Setup mode"
 msgstr "Режим Настройки"
 
-msgid "Show Info"
+msgid "Show info"
 msgstr "Покажи Инфо"
 
-msgid "Show Message when Recording starts"
+msgid "Show message when recording starts"
 msgstr "Показвай съобщение когато започне  запис"
 
-msgid "Show WLAN Status"
+msgid "Show WLAN status"
 msgstr "Покажи WLAN Състояние"
 
 msgid "Show blinking clock in display during recording"
@@ -2674,10 +2746,10 @@ msgstr "Покажи ТВ плеъра..."
 msgid "Shows the state of your wireless LAN connection.\n"
 msgstr "Показва статуса на вашата безжична LAN връзка.\n"
 
-msgid "Shutdown Dreambox after"
+msgid "Shutdown receiver after"
 msgstr "Изключи Clarke-Tech след"
 
-msgid "Signal Strength:"
+msgid "Signal strength:"
 msgstr "Сила на сигнала:"
 
 msgid "Signal: "
@@ -2710,13 +2782,13 @@ msgstr "Кожа..."
 msgid "Skins"
 msgstr "Кожи"
 
-msgid "Sleep Timer"
+msgid "Sleep timer"
 msgstr "Tаймер за Сън"
 
 msgid "Sleep timer action:"
 msgstr "Действие при таймер за сън:"
 
-msgid "Slideshow Interval (sec.)"
+msgid "Slideshow interval (sec.)"
 msgstr "Слайдшоу Интервал (сек.)"
 
 msgid "Slot %d"
@@ -2731,7 +2803,7 @@ msgstr "Словенски"
 msgid "Slow"
 msgstr "Бавно"
 
-msgid "Slow Motion speeds"
+msgid "Slow motion speeds"
 msgstr "Скорост при забавено движение"
 
 msgid "Software"
@@ -2752,7 +2824,7 @@ msgstr "Някои плъгини не са налични:\n"
 msgid "Somewhere else"
 msgstr "Някъде другаде"
 
-msgid "Sorry MediaScanner is not installed!"
+msgid "Sorry media scanner is not installed!"
 msgstr "MediaScanner не е инсталиран!"
 
 msgid "Sorry no backups found!"
@@ -2807,7 +2879,7 @@ msgstr "Испански"
 msgid "Standby"
 msgstr "Готовност"
 
-msgid "Standby / Restart"
+msgid "Standby / restart"
 msgstr "Готовност / Рестарт"
 
 msgid "Start from the beginning"
@@ -2837,7 +2909,7 @@ msgstr "Стерео"
 msgid "Stop"
 msgstr "Стоп"
 
-msgid "Stop Timeshift?"
+msgid "Stop timeshift?"
 msgstr "Сиране Таймшифт?"
 
 msgid "Stop current event and disable coming events"
@@ -2865,10 +2937,13 @@ msgid "Subservices"
 msgstr "Подканали"
 
 msgid "Subtitle selection"
-msgstr "Избор Субтитри"
+msgstr "Избор  на субтитри"
 
 msgid "Subtitles"
 msgstr "Субтитри"
+
+msgid "Subtitle settings"
+msgstr "Настройка на субтитрите"
 
 msgid "Sun"
 msgstr "Нед"
@@ -2876,7 +2951,7 @@ msgstr "Нед"
 msgid "Sunday"
 msgstr "Неделя"
 
-msgid "Swap Services"
+msgid "Swap services"
 msgstr "Размени Канали"
 
 msgid "Swedish"
@@ -2888,7 +2963,7 @@ msgstr "Към следващ подканал"
 msgid "Switch to previous subservice"
 msgstr "Към предишен подканал"
 
-msgid "Symbol Rate"
+msgid "Symbol rate"
 msgstr "Скорост на Сигнала"
 
 msgid "Symbolrate"
@@ -2915,7 +2990,7 @@ msgstr "Тест Тип"
 msgid "Test mode"
 msgstr "Тестов режим"
 
-msgid "Test the network configuration of your Dreambox.\n"
+msgid "Test the network configuration of your receiver.\n"
 msgstr "Тест на мрежовите настройки на вашия Clarke-Tech.\n"
 
 msgid "Test-Messagebox?"
@@ -2930,7 +3005,7 @@ msgstr ""
 
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your Dreambox."
+"Please press OK to start using your receiver."
 msgstr ""
 "Благодаря ви,че използвахте помощника. Приемника е вече готов за ползване.\n"
 "Моля натиснете OK за да започнете да използвате вашия Clarke-Tech."
@@ -2975,10 +3050,11 @@ msgstr "Инсталирането на стандартните листи с �
 
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your Dreambox by pressing the OK button on the remote control."
+"configuring your receiver by pressing the OK button on the remote control."
 msgstr ""
 "Инсталирането на стандартните листи с канали завърши. Сега вие можете да  "
-"продължите с настройките на вашия Clarke-Tech с натискане ОК на дистанционното."
+"продължите с настройките на вашия Clarke-Tech с натискане ОК на "
+"дистанционното."
 
 msgid "The package doesn't contain anything."
 msgstr "Пакетът не съдържа нищо"
@@ -3006,6 +3082,9 @@ msgstr "Tаймера за сън е активиран."
 
 msgid "The sleep timer has been disabled."
 msgstr "Таймера за сън е спрян."
+
+msgid "The user interface of your receiver is restarting"
+msgstr "Потребителският интерфейс на приемника се рестартира"
 
 msgid ""
 "The wireless LAN plugin is not installed!\n"
@@ -3071,10 +3150,10 @@ msgstr ""
 "Този .nfi файл съдържа валиден md5 подпис. Да продължа ли с инсталирането на "
 "този имидж във flash паметта?"
 
-msgid "This Dreambox can't decode %s streams!"
+msgid "This receiver can't decode %s streams!"
 msgstr "Този Clarke-Tech не може да декодира %s стриймове!"
 
-msgid "This Dreambox can't decode %s video streams!"
+msgid "This receiver can't decode %s video streams!"
 msgstr "Този Clarke-Tech не може да декодира %s видео стриймове!"
 
 msgid "This is step number 2."
@@ -3176,13 +3255,16 @@ msgstr "Въвеждане Час/Дата"
 msgid "Timer"
 msgstr "Таймер"
 
-msgid "Timer Edit"
+msgid "Timer edit"
 msgstr "Редактирай Таймер"
 
-msgid "Timer Editor"
+msgid "Timer editor"
 msgstr "Редактор Таймер"
 
-msgid "Timer Type"
+msgid "Timer overview"
+msgstr "Преглед на таймерите"
+
+msgid "Timer type"
 msgstr "Вид Таймер"
 
 msgid "Timer entry"
@@ -3213,7 +3295,7 @@ msgid "Title properties"
 msgstr "Заглавие свойства"
 
 msgid ""
-"To update your Dreambox firmware, please follow these steps:\n"
+"To update your receiver firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
@@ -3221,8 +3303,8 @@ msgid ""
 "3) Wait for bootup and follow instructions of the wizard."
 msgstr ""
 "За да обновите firmware на вашия Clarke-Tech, моля следвайте тези стъпки:\n"
-"1) Изключете вашия Clarke-Tech от задния бутон за захранване и поставете bootable "
-"USB стик.\n"
+"1) Изключете вашия Clarke-Tech от задния бутон за захранване и поставете "
+"bootable USB стик.\n"
 "2) Включете отново приемника и задръжте POWER бутон на предния панел "
 "натиснат за 10 секунди.\n"
 "3) Изчакайте зареждането и следвайте инструкциите на помощника."
@@ -3313,6 +3395,15 @@ msgstr ""
 "Не мога да инициализирам твърдия диск.\n"
 "Грешка: "
 
+msgid ""
+"Unattended upgrade in progress\n"
+"Please wait until your receiver reboots\n"
+"This may take a few minutes"
+msgstr ""
+"Извършва се автоматична актуализация\n"
+"Моля изчакайте докато приемникът ви се рестартира\n"
+"Това може да отнеме няколко минути"
+
 msgid "Universal LNB"
 msgstr "Универсално LNB"
 
@@ -3324,6 +3415,36 @@ msgstr "Не се поддържа"
 
 msgid "Update"
 msgstr "Актуализация"
+
+msgid "Update and ask to reboot"
+msgstr "Актуализирай и попитай за рестарт"
+
+msgid "Update and reboot (recommended)"
+msgstr "Актуализирай и рестартирай (препоръчително)"
+
+msgid "Update channel list only"
+msgstr "Актуализирай само списъка с канали"
+
+msgid "Update completed, %d package was installed."
+msgid_plural "Update completed, %d packages were installed."
+msgstr[0] "Актуализацията завърши, %d пакет беше инсталиран."
+msgstr[1] "Актуализацията завърши, %d пакета бяха инсталирани."
+
+msgid "Update completed. Do you want to reboot your receiver?"
+msgstr "Актуализацията завърши. Искате ли да рестартирате приемника?"
+
+msgid ""
+"Update failed. Your receiver does not have a working internet connection."
+msgstr "Неуспешна актуализация. Приемникът няма работеща интернет връзка."
+
+msgid "Update has completed."
+msgstr "Актуализацията завърши."
+
+msgid "Updatefeed not available."
+msgstr "Няма наличен updatefeed."
+
+msgid "Updating software catalog"
+msgstr "Актуализирам софтуер каталога"
 
 msgid "Updates your receiver's software"
 msgstr "Актуализира софтуера на вашия приемник"
@@ -3337,13 +3458,13 @@ msgstr "Актуализация...Моля изчакайте...Това мож
 msgid "Upgrade finished."
 msgstr "Ъпгрейда завърши."
 
-msgid "Upgrade finished. Do you want to reboot your Dreambox?"
+msgid "Upgrade finished. Do you want to reboot your receiver?"
 msgstr "Ъпгрейда завърши. Искате ли да рестартирате вашия Clarke-Tech?"
 
 msgid "Upgrading"
 msgstr "Ъпгрейдвам"
 
-msgid "Upgrading Dreambox... Please wait"
+msgid "Upgrading receiver... Please wait"
 msgstr "Ъпгрейдвам Clarke-Tech... Моля изчакайте"
 
 msgid "Use"
@@ -3404,19 +3525,19 @@ msgstr "VCR скарт"
 msgid "Vertical"
 msgstr "Вертикална"
 
-msgid "Video Fine-Tuning"
+msgid "Video fine tuning"
 msgstr "Фина настройка картина"
 
-msgid "Video Fine-Tuning Wizard"
+msgid "Video fine tuning wizard"
 msgstr "Помощник за фина настройка на картината"
 
-msgid "Video Output"
+msgid "Video output"
 msgstr "Видео Изход"
 
-msgid "Video Setup"
+msgid "Video setup"
 msgstr "Видео Настройка"
 
-msgid "Video Wizard"
+msgid "Video wizard"
 msgstr "Видео Помощник"
 
 msgid ""
@@ -3520,17 +3641,17 @@ msgstr "Делничен"
 
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your Dreambox by providing a backup facility for your "
+"the firmware of your receiver by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Добре дошли при помощника за ъпгред на имиджа. Помощника ще ви помогне при "
-"ъпгрейдването firmware на вашия Clarke-Tech осигурявайки backup за вашите текущи "
-"настройки и кратко обяснение, как да ъпгрейднете вашия firmware."
+"ъпгрейдването firmware на вашия Clarke-Tech осигурявайки backup за вашите "
+"текущи настройки и кратко обяснение, как да ъпгрейднете вашия firmware."
 
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your Dreambox.\n"
+"This start wizard will guide you through the basic setup of your receiver.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Добре дошли.\n"
@@ -3577,10 +3698,10 @@ msgstr "Безжична"
 msgid "Wireless LAN"
 msgstr "Безжична LAN"
 
-msgid "Wireless Network"
+msgid "Wireless network"
 msgstr "Безжична Мрежа"
 
-msgid "Wireless Network State"
+msgid "Wireless network state"
 msgstr "Статус на безжичната мрежа"
 
 msgid "Write error while recording. Disk full?\n"
@@ -3673,11 +3794,11 @@ msgstr ""
 "помощника."
 
 msgid ""
-"You do not seem to have a harddisk in your Dreambox. So backing up to a "
+"You do not seem to have a harddisk in your receiver. So backing up to a "
 "harddisk is not an option for you."
 msgstr ""
-"Изглежда нямате твърд диск във вашия Clarke-Tech. Така, че backing up на твърд "
-"диск не е опция за вас."
+"Изглежда нямате твърд диск във вашия Clarke-Tech. Така, че backing up на "
+"твърд диск не е опция за вас."
 
 msgid ""
 "You have chosen to backup to an usb drive. Better backup to the harddisk!\n"
@@ -3719,18 +3840,16 @@ msgstr ""
 "\n"
 "Искате ли да въведете ПИН сега?"
 
-msgid "Your Dreambox is shutting down. Please stand by..."
-msgstr "Вашия Clarke-Tech се изключва. Моля изчакайте..."
-
 msgid ""
-"Your Dreambox isn't connected to the internet properly. Please check it and "
+"Your receiver isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
-"Вашият Clarke-Tech не е свързан правилно с интернет. Моля проверете и опитайте "
-"отново."
+"Вашият Clarke-Tech не е свързан правилно с интернет. Моля проверете и "
+"опитайте отново."
 
-msgid "Your Dreambox will restart after pressing OK on your remote control."
-msgstr "Вашия Clarke-Tech ще се рестартира след натискане ОK на дистанционното."
+msgid "Your receiver will restart after pressing OK on your remote control."
+msgstr ""
+"Вашия Clarke-Tech ще се рестартира след натискане ОK на дистанционното."
 
 msgid "Your TV works with 50 Hz. Good!"
 msgstr "Вашия ТВ работи с 50 Hz. Браво!"
@@ -3793,6 +3912,15 @@ msgstr ""
 "Свързахте ли вашият USB WLAN стик?\n"
 "\n"
 "Изберете следваща стъпка."
+
+msgid "Your receiver is rebooting"
+msgstr "Приемникът се рестартира"
+
+msgid "Your receiver is shutting down"
+msgstr "Приемникът се изключва"
+
+msgid "Your receiver is shutting down. Please stand by..."
+msgstr "Вашия приемник се изключва. Моля изчакайте..."
 
 msgid "Zap back to service before positioner setup?"
 msgstr "Назад към канала преди 'настройка на позиционер'?"
@@ -3857,17 +3985,17 @@ msgstr "добави файлове към плейлиста"
 msgid "add marker"
 msgstr "добави маркер"
 
-msgid "add recording (enter recording duration)"
-msgstr "добави запис (въведете продължителност на записа)"
+msgid "Add recording (enter recording duration)"
+msgstr "Добави запис (въведете продължителност на записа)"
 
-msgid "add recording (enter recording endtime)"
-msgstr "добави запис (въведете край на записа)"
+msgid "Add recording (enter recording endtime)"
+msgstr "Добави запис (въведете край на записа)"
 
-msgid "add recording (indefinitely)"
-msgstr "добави запис (без ограничение)"
+msgid "Add recording (indefinitely)"
+msgstr "Добави запис (без ограничение)"
 
-msgid "add recording (stop after current event)"
-msgstr "добави запис (спри след текущото предаване)"
+msgid "Add recording (stop after current event)"
+msgstr "Добави запис (спри след текущото предаване)"
 
 msgid "add service to bouquet"
 msgstr "добави канала към букет"
@@ -4263,6 +4391,14 @@ msgstr "не се използва"
 msgid "nothing connected"
 msgstr "нищо не е свързано"
 
+msgctxt "now/next: 'next' event label"
+msgid "Next"
+msgstr "Следва"
+
+msgctxt "now/next: 'now' event label"
+msgid "Now"
+msgstr "Сега"
+
 msgid "off"
 msgstr "изкл."
 
@@ -4286,6 +4422,9 @@ msgstr "отвори списъка с канали(up)"
 
 msgid "pause"
 msgstr "пауза"
+
+msgid "play as picture in picture"
+msgstr "Активиране картина в картината"
 
 msgid "please press OK when ready"
 msgstr "моля натиснете ОК когато е готово"
@@ -4404,10 +4543,13 @@ msgstr "избор menu entry"
 msgid "select movie"
 msgstr "избор филм"
 
-msgid "service pin"
+msgid "service PIN"
 msgstr "ПИН канали"
 
-msgid "setup pin"
+msgid "set as startup service"
+msgstr "задаване като стартиращ канал"
+
+msgid "setup PIN"
 msgstr "ПИН настройки"
 
 msgid "show DVD main menu"
@@ -4554,8 +4696,8 @@ msgstr "непознат канал"
 msgid "until restart"
 msgstr "до рестарт"
 
-msgid "user defined"
-msgstr "потребителска"
+msgid "User interface"
+msgstr "Потребителски интерфейс"
 
 msgid "vertical"
 msgstr "вертикална"
