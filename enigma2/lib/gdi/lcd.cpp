@@ -91,7 +91,6 @@ eDBoxLCD::eDBoxLCD()
 	{
 		int i=LCD_MODE_BIN;
 		ioctl(lcdfd, LCD_IOCTL_ASC_MODE, &i);
-		inverted=0;
 		FILE *f = fopen(eEnv::resolve("${sysconfdir}/stb/lcd/xres").c_str(), "r");
 		if (f)
 		{
