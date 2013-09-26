@@ -7,6 +7,7 @@
 #include <lib/gdi/esize.h>
 #include <lib/base/init.h>
 #include <lib/base/init_num.h>
+#include <lib/base/eenv.h>
 #ifdef HAVE_TEXTLCD
 	#include <lib/base/estring.h>
 #endif
