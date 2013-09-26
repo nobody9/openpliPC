@@ -2650,7 +2650,7 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 							    pid = PyInt_AsLong(PyTuple_GET_ITEM(subs, 1)),
 							    comp_page = PyInt_AsLong(PyTuple_GET_ITEM(subs, 2)), // ttx page
 							    anc_page = PyInt_AsLong(PyTuple_GET_ITEM(subs, 3)); // ttx magazine
-					if (type == 0) // dvb
+							if (type == 0) // dvb
 								m_subtitle_parser->start(pid, comp_page, anc_page);
 							else if (type == 1) // ttx
 								m_teletext_parser->setPageAndMagazine(comp_page, anc_page);
