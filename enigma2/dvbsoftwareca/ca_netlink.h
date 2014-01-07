@@ -6,8 +6,8 @@
 #include <net/genetlink.h>
 
 int reply_ca(struct sk_buff *skb_2, struct genl_info *info);
-int netlink_send_cw(unsigned char ca_num, ca_descr_t *ca_descr);
-int netlink_send_pid(unsigned char ca_num, ca_pid_t *ca_pid);
+int netlink_send_cw(int ca_num, ca_descr_t *ca_descr);
+int netlink_send_pid(int ca_num, ca_pid_t *ca_pid);
 int register_netlink(void);
 void unregister_netlink(void);
 
