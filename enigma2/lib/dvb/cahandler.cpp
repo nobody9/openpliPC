@@ -572,7 +572,7 @@ int eDVBCAService::buildCAPMT(eTable<ProgramMapSection> *ptr)
 			tmp[0] = 0x83; /* adapter */
 			tmp[1] = 0x01;
 			tmp[2] = m_adapter;
-			capmt.injectDescriptor(tmp, false);
+			capmt.injectDescriptor(tmp, true);
 		}
 
 		tmp[0] = 0x82; // demux
