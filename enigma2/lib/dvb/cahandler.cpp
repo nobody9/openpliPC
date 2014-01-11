@@ -535,7 +535,8 @@ int eDVBCAService::buildCAPMT(eTable<ProgramMapSection> *ptr)
 
 	eDebug("demux %d mask %02x prevhash %08x", data_demux, demux_mask, m_prev_build_hash);
 
-	unsigned int build_hash = (data_demux << 24);
+	unsigned int build_hash = (m_adapter<<8);
+	build_hash = (data_demux << 24);
 	build_hash |= (pmtpid << 16);
 	build_hash |= (demux_mask << 8);
 	build_hash |= (pmt_version&0xFF);
